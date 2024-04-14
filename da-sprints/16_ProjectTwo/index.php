@@ -30,17 +30,17 @@ unset($n);
 
 if (isset($_GET['theme'])) {
     //Блок вывода каждой отдельной темы из текстового файла в формате "markdown":
-    echo "<a href=".${_SERVER['SCRIPT_NAME']}."?>Назад к списку тем</a><br>";
+    echo "<a href=".$_SERVER['SCRIPT_NAME']."?>Назад к списку тем</a><br>";
     $text = file_get_contents($_GET['theme']);
     $html = Markdown::defaultTransform($text);
     echo $html;
-    echo "<br><a href=".${_SERVER['SCRIPT_NAME']}."?>Назад к списку тем</a><br>";
+    echo "<br><a href=".$_SERVER['SCRIPT_NAME']."?>Назад к списку тем</a><br>";
     }
 else {
     //Блок вывода перечня тем списком:
     echo "<h1>СБОРНЫЙ ПРОЕКТ № 2</h1><br>";
     for ($i = 1; $i < count($list); $i++) {
-        echo "<a href=".${_SERVER['SCRIPT_NAME']}."?theme=".$list[$i][2]."><h1>"."Тема ".$list[$i][0]." ".$list[$i][1]."</h1></a><br>";
+        echo "<a href=".$_SERVER['SCRIPT_NAME']."?theme=".$list[$i][2]."><h1>"."Тема ".$list[$i][0]." ".$list[$i][1]."</h1></a><br>";
         }
     }
 unset($i);
