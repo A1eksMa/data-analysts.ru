@@ -1,0 +1,201 @@
+# Когортный анализ
+## 01 Когортный анализ на примере Retention Rate
+Практические задания отсутствуют
+***
+## 02 Когортный анализ Retention Rate: теория
+Практические задания отсутствуют
+***
+## 03 Когортный анализ Retention Rate: практика
+### Задача 01
+	SELECT DISTINCT(o.user_id)
+	FROM tools_shop.orders o
+	LEFT JOIN tools_shop.users u ON o.user_id = u.user_id
+### Задача 02
+	SELECT o.user_id, MIN(CAST(DATE_TRUNC('month',e.event_time) AS date)) AS first_event
+	FROM tools_shop.orders o
+	LEFT JOIN tools_shop.users u ON o.user_id = u.user_id
+	LEFT JOIN tools_shop.events e ON  o.user_id = e.user_id
+	GROUP BY o.user_id
+### Задача 03
+	WITH
+	first_events AS
+	(
+	SELECT o.user_id, MIN(CAST(DATE_TRUNC('month',e.event_time) AS date)) AS first_event
+	FROM tools_shop.orders o
+	LEFT JOIN tools_shop.users u ON o.user_id = u.user_id
+	LEFT JOIN tools_shop.events e ON  o.user_id = e.user_id
+	GROUP BY o.user_id
+	)
+	SELECT e.user_id, CAST(DATE_TRUNC('month',e.event_time) AS date)
+	FROM tools_shop.events e
+	WHERE e.user_id IN (SELECT user_id FROM first_events)
+	GROUP BY e.user_id, CAST(DATE_TRUNC('month',e.event_time) AS date)
+### Задача 04
+	WITH
+	first_events AS
+	(
+	SELECT o.user_id, MIN(CAST(DATE_TRUNC('month',e.event_time) AS date)) AS first_event
+	FROM tools_shop.orders o
+	LEFT JOIN tools_shop.users u ON o.user_id = u.user_id
+	LEFT JOIN tools_shop.events e ON  o.user_id = e.user_id
+	GROUP BY o.user_id
+	),
+	sessions AS
+	(
+	SELECT e.user_id, CAST(DATE_TRUNC('month',e.event_time) AS date)
+	FROM tools_shop.events e
+	WHERE e.user_id IN (SELECT user_id FROM first_events)
+	GROUP BY e.user_id, CAST(DATE_TRUNC('month',e.event_time) AS date)
+	)
+	SELECT DISTINCT(first_event),
+	COUNT(*) OVER (PARTITION BY first_event) AS cohort_users_cnt
+	FROM first_events
+### Задача 05
+	WITH profile AS
+	  (SELECT u.user_id,
+	          DATE_TRUNC('month', MIN(event_time))::date AS dt
+	   FROM tools_shop.users u
+	   JOIN tools_shop.orders o ON u.user_id = o.user_id
+	   JOIN tools_shop.events e ON u.user_id = e.user_id
+	   GROUP BY 1), 
+	sessions AS
+	  (SELECT p.user_id,
+	          DATE_TRUNC('month', event_time)::date AS session_dt
+	   FROM tools_shop.events e
+	   JOIN profile p ON p.user_id = e.user_id
+	   GROUP BY 1,
+	            2),
+	cohort_users_cnt AS
+	  (SELECT dt,
+	          COUNT(user_id) AS cohort_users_cnt
+	   FROM profile
+	   GROUP BY 1)
+	   
+	SELECT c.dt, s.session_dt, c.cohort_users_cnt, COUNT(p.user_id) AS user_cnt, 
+	ROUND(COUNT(p.user_id) * 100.0 / c.cohort_users_cnt,2) AS retention_rate
+	FROM profile p
+	JOIN sessions s ON p.user_id = s.user_id
+	JOIN cohort_users_cnt c ON p.dt = c.dt
+	GROUP BY c.dt, s.session_dt, c.cohort_users_cnt
+***
+## 04 Когортный анализ LTV: теория
+Практические задания отсутствуют
+***
+## 05 Когортный анализ LTV: практика
+### Задача 01
+	SELECT user_id, CAST(DATE_TRUNC('month',created_at) AS date) AS month, 
+	COUNT(*) OVER (PARTITION BY CAST(DATE_TRUNC('month',created_at) AS date)) AS cohort_size
+	FROM tools_shop.users
+### Задача 02
+	WITH user_profile AS (SELECT p.user_id, CAST(DATE_TRUNC('month',created_at) AS date) AS 	start_cohort, 
+	COUNT(*) OVER (PARTITION BY CAST(DATE_TRUNC('month',created_at) AS date)) AS cohort_size
+	FROM tools_shop.users p)
+	SELECT 
+	EXTRACT(MONTH FROM AGE(DATE_TRUNC('month', o.created_at), up.start_cohort)) AS lifetime,
+	CAST(DATE_TRUNC('month',o.created_at) AS date) AS order_date, 
+	up.start_cohort, 
+	up.cohort_size, 
+	o.total_amt
+	FROM user_profile up
+	JOIN tools_shop.orders o ON up.user_id = o.user_id
+### Задача 03
+	WITH user_profile AS (SELECT p.user_id, CAST(DATE_TRUNC('month',created_at) AS date) AS 	start_cohort, 
+	COUNT(*) OVER (PARTITION BY CAST(DATE_TRUNC('month',created_at) AS date)) AS cohort_size
+	FROM tools_shop.users p),
+	sessions AS (SELECT 
+	EXTRACT(MONTH FROM AGE(DATE_TRUNC('month', o.created_at), up.start_cohort)) AS lifetime,
+	CAST(DATE_TRUNC('month',o.created_at) AS date) AS order_date, 
+	up.start_cohort, 
+	up.cohort_size, 
+	o.total_amt
+	FROM user_profile up
+	JOIN tools_shop.orders o ON up.user_id = o.user_id)
+	
+	SELECT lifetime,
+	       start_cohort,
+	       cohort_size,
+	       SUM(total_amt) OVER (PARTITION BY start_cohort ORDER BY lifetime) / cohort_size AS ltv
+	FROM sessions;
+### Задача 04
+	WITH user_profile AS (SELECT p.user_id, CAST(DATE_TRUNC('month',created_at) AS date) AS 	start_cohort, 
+	COUNT(*) OVER (PARTITION BY CAST(DATE_TRUNC('month',created_at) AS date)) AS cohort_size
+	FROM tools_shop.users p),
+	sessions AS (SELECT 
+	EXTRACT(MONTH FROM AGE(DATE_TRUNC('month', o.created_at), up.start_cohort)) AS lifetime,
+	CAST(DATE_TRUNC('month',o.created_at) AS date) AS order_date, 
+	up.start_cohort, 
+	up.cohort_size, 
+	o.total_amt
+	FROM user_profile up
+	JOIN tools_shop.orders o ON up.user_id = o.user_id),
+	ltv_raw AS (SELECT lifetime,
+	       start_cohort,
+	       cohort_size,
+	       SUM(total_amt) OVER (PARTITION BY start_cohort ORDER BY lifetime) / cohort_size AS ltv
+	FROM sessions)
+	SELECT lifetime,
+	       start_cohort,
+	       ltv
+	FROM ltv_raw
+	WHERE start_cohort BETWEEN '2019-01-01' AND '2019-12-01'
+	GROUP BY lifetime, start_cohort, ltv
+	ORDER BY start_cohort, lifetime;
+***
+## 06 Когортный анализ Churn Rate: теория
+Практические задания отсутствуют
+***
+## 07 
+### Задача 01
+	SELECT DISTINCT(o.user_id)
+	FROM tools_shop.orders o JOIN tools_shop.users u ON o.user_id = u.user_id
+### Задача 02
+	SELECT o.user_id, MIN(CAST(DATE_TRUNC('month',e.event_time) AS date))
+	FROM tools_shop.orders o JOIN tools_shop.users u ON o.user_id = u.user_id
+	JOIN tools_shop.events e ON o.user_id = e.user_id
+	GROUP BY o.user_id
+### Задача 03
+	WITH one AS
+	(SELECT o.user_id, MIN(CAST(DATE_TRUNC('month',e.event_time) AS date)) AS start_dt
+	FROM tools_shop.orders o JOIN tools_shop.users u ON o.user_id = u.user_id
+	JOIN tools_shop.events e ON o.user_id = e.user_id
+	GROUP BY o.user_id)
+	
+	SELECT start_dt, CAST(DATE_TRUNC('month',e.event_time) AS date) AS dt, COUNT(DISTINCT(e.user_id))
+	FROM tools_shop.events e
+	JOIN one o ON  e.user_id = o.user_id
+	GROUP BY start_dt, dt
+### Задача 04
+	WITH one AS
+	(SELECT o.user_id, MIN(CAST(DATE_TRUNC('month',e.event_time) AS date)) AS start_dt
+	FROM tools_shop.orders o JOIN tools_shop.users u ON o.user_id = u.user_id
+	JOIN tools_shop.events e ON o.user_id = e.user_id
+	GROUP BY o.user_id),
+	sessions AS
+	(SELECT start_dt, CAST(DATE_TRUNC('month',e.event_time) AS date) AS session_dt, COUNT(DISTINCT	(e.user_id)) AS users_cnt
+	FROM tools_shop.events e
+	JOIN one o ON  e.user_id = o.user_id
+	GROUP BY start_dt, session_dt)
+	
+	SELECT *,
+	       LAG(users_cnt) OVER (PARTITION BY start_dt ORDER BY session_dt) AS previous_day_users_cnt
+	FROM sessions;
+### Задача 05
+	WITH one AS
+	(SELECT o.user_id, MIN(CAST(DATE_TRUNC('month',e.event_time) AS date)) AS start_dt
+	FROM tools_shop.orders o JOIN tools_shop.users u ON o.user_id = u.user_id
+	JOIN tools_shop.events e ON o.user_id = e.user_id
+	GROUP BY o.user_id),
+	sessions AS
+	(SELECT start_dt, CAST(DATE_TRUNC('month',e.event_time) AS date) AS session_dt, COUNT(DISTINCT	(e.user_id)) AS users_cnt
+	FROM tools_shop.events e
+	JOIN one o ON  e.user_id = o.user_id
+	GROUP BY start_dt, session_dt)
+	
+	SELECT *,
+	       LAG(users_cnt) OVER (PARTITION BY start_dt ORDER BY session_dt) AS previous_day_users_cnt,
+	       ROUND((1 - (users_cnt::numeric/ LAG(users_cnt) OVER (PARTITION BY start_dt ORDER BY 	session_dt))) * 100, 2) AS churn_rate
+	FROM sessions;
+***
+## 08 Заключение
+Практические задания отсутствуют
+***

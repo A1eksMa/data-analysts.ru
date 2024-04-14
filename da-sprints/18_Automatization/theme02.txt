@@ -1,0 +1,303 @@
+#Что такое дата-пайплайны и зачем они нужны
+##01 Введение
+Практические задания отсутствуют ***
+##02 Дата-пайплайны для автоматизации дашбордов
+Практические задания отсутствуют ***
+##03 Агрегация данных и создание таблиц в БД
+Практические задания отсутствуют ***
+##04 Вертикальные и горизонтальные таблицы
+Практические задания отсутствуют ***
+##05 Создание скрипта пайплайна
+Практические задания отсутствуют ***
+##06 Создание скрипта пайплайна (практика)
+***
+### Задание 1
+	#!/usr/bin/python
+	import pandas as pd
+	from sqlalchemy import create_engine
+	
+	db_config = {
+	'user': 'my_user', # ваш код 
+	'pwd': 'my_user_password', # ваш код 
+	'host': 'localhost', # ваш код 
+	'port': 5432, # ваш код 
+	'db': 'games', # ваш код
+	} 
+	connection_string = 'postgresql://{}:{}@{}:{}/{}'.format(
+	db_config['user'],
+	db_config['pwd'],
+	db_config['host'],
+	db_config['port'],
+	db_config['db'],
+	)
+	engine = create_engine(connection_string)
+	query = '''SELECT * FROM data_raw'''
+	data_raw = pd.io.sql.read_sql(query, con=engine, index_col='game_id')
+	print(data_raw.info())
+	print(data_raw.head(5))
+***
+### Задание 2
+	#!/usr/bin/python
+	import sys
+
+	import getopt
+	from datetime import datetime
+	
+	import pandas as pd
+	
+	from sqlalchemy import create_engine
+	
+	if __name__ == '__main__':
+	
+	    # укажите входные параметры в строках
+	    unixOptions = "sdt:edt:"
+	    gnuOptions = ["start_dt=", "end_dt="]
+	
+	    fullCmdArguments = sys.argv
+	    argumentList = fullCmdArguments[1:]
+	
+	    try:
+	        arguments, values = getopt.getopt(
+	            argumentList, unixOptions, gnuOptions
+	        )
+	    except getopt.error as err:
+	        print(str(err))
+	        sys.exit(2)
+	
+	    start_dt = '1981-01-01'
+	    end_dt = '1998-01-01'
+	    for currentArgument, currentValue in arguments:
+	        if currentArgument in ('-sdt', '--start_dt'):
+	            start_dt = currentValue
+	        elif currentArgument in ('-edt', '--end_dt'):
+	            end_dt = currentValue
+	
+	    db_config = {
+	        'user': 'my_user',
+	        'pwd': 'my_user_password',
+	        'host': 'localhost',
+	        'port': 5432,
+	        'db': 'games',
+	    }
+	    connection_string = 'postgresql://{}:{}@{}:{}/{}'.format(
+	        db_config['user'],
+	        db_config['pwd'],
+	        db_config['host'],
+	        db_config['port'],
+	        db_config['db'],
+	    )
+	
+	    engine = create_engine(connection_string)
+	
+	    query = ''' SELECT *
+	                FROM data_raw
+	                WHERE year_of_release::TIMESTAMP BETWEEN '{}'::TIMESTAMP AND '{}'::TIMESTAMP
+	            '''.format(
+	        start_dt, end_dt
+	    )  # напишите код
+
+	    data_raw = pd.io.sql.read_sql(query, con=engine, index_col='game_id')
+	    print(data_raw['year_of_release'].unique())
+	
+***
+### Задание 3
+
+	#!/usr/bin/python
+	import sys
+	
+	import getopt
+	from datetime import datetime
+	
+	import pandas as pd
+	
+	from sqlalchemy import create_engine
+	
+	if __name__ == "__main__":
+	
+	    unixOptions = "sdt:edt:"  
+	    gnuOptions = ["start_dt=", "end_dt="]
+			
+	    fullCmdArguments = sys.argv
+	    argumentList = fullCmdArguments[1:] 
+	
+	    try:  
+	        arguments, values = getopt.getopt(argumentList, unixOptions, gnuOptions)
+	    except getopt.error as err:  
+	        print (str(err))
+        sys.exit(2)
+		
+	    start_dt = '1981-01-01'
+	    end_dt = '1998-01-01'   
+	    for currentArgument, currentValue in arguments:  
+	        if currentArgument in ("-sdt", "--start_dt"):
+	            start_dt = currentValue                                   
+	        elif currentArgument in ("-edt", "--end_dt"):
+	            end_dt = currentValue  
+	
+	    db_config = {'user': 'my_user',
+	                 'pwd': 'my_user_password',
+	                 'host': 'localhost',
+	                 'port': 5432,
+	                 'db': 'games'}   
+	    connection_string = 'postgresql://{}:{}@{}:{}/{}'.format(db_config['user'],
+	                                                             db_config['pwd'],
+	                                                             db_config['host'],
+	                                                             db_config['port'],
+	                                                             db_config['db'])
+	
+    engine = create_engine(connection_string)
+	            
+	    query = ''' SELECT *
+                FROM data_raw
+                WHERE year_of_release::TIMESTAMP BETWEEN '{}'::TIMESTAMP AND '{}'::TIMESTAMP
+	            '''.format(start_dt, end_dt)
+	
+	    data_raw = pd.io.sql.read_sql(query, con = engine, index_col = 'game_id')
+	
+	    columns_str = ['name', 'platform', 'genre', 'rating']
+	    columns_numeric = ['na_players', 'eu_players', 'jp_players', 'other_players',
+	                       'critic_score', 'user_score']
+	    columns_datetime = ['year_of_release']
+	
+	    for column in columns_str: data_raw[column] = data_raw[column].astype(str)  
+	    for column in columns_numeric: data_raw[column] = pd.to_numeric(data_raw[column], errors='coerce')
+	    for column in columns_datetime: data_raw[column] = pd.to_datetime(data_raw[column])   
+	
+	    data_raw['total_copies_sold'] = data_raw[['na_players',
+	                          'eu_players',
+	                          'jp_players',
+	                          'other_players']].sum(axis = 1) # ваш код
+	
+	    agg_games_year_genre_platform = data_raw.groupby(['year_of_release', 'genre', 'platform']).agg({'name': 'count', 'total_copies_sold': 'sum'}) # ваш код
+	    agg_games_year_score = data_raw.groupby(['year_of_release', 'genre', 'platform']).agg({'critic_score': 'mean', 'user_score': 'mean'}) # ваш код
+	
+	    print(data_raw.info())
+	    print(agg_games_year_genre_platform.head(5))
+	    print(agg_games_year_score.head(5))
+	
+	    print(data_raw.info())
+	
+***
+### Задание 4
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	import sys
+	
+	import getopt
+	from datetime import datetime
+	
+	import pandas as pd
+	
+	from sqlalchemy import create_engine
+	
+	if __name__ == '__main__':
+	
+	    # задаём входные параметры
+	    unixOptions = 'sdt:edt:'
+	    gnuOptions = ['start_dt=', 'end_dt=']
+	
+	    fullCmdArguments = sys.argv
+	    argumentList = fullCmdArguments[1:]  # excluding script name
+	
+	    try:
+	        arguments, values = getopt.getopt(
+	            argumentList, unixOptions, gnuOptions
+	        )
+	    except getopt.error as err:
+	        # output error, and return with an error code
+	        print(str(err))
+	        sys.exit(2)
+	
+	    start_dt = '1981-01-01'
+	    end_dt = '1998-01-01'
+	    for currentArgument, currentValue in arguments:
+	        if currentArgument in ('-sdt', '--start_dt'):
+	            start_dt = currentValue
+	        elif currentArgument in ('-edt', '--end_dt'):
+	            end_dt = currentValue
+	
+	    db_config = {
+	        'user': 'my_user',
+	        'pwd': 'my_user_password',
+        'host': 'localhost',
+	        'port': 5432,
+        'db': 'games',
+	    }
+	    connection_string = 'postgresql://{}:{}@{}:{}/{}'.format(
+	        db_config['user'],
+	        db_config['pwd'],
+	        db_config['host'],
+	        db_config['port'],
+	        db_config['db'],
+	    )
+	
+	    engine = create_engine(connection_string)
+	
+	    query = ''' SELECT * 
+	                FROM data_raw 
+	                WHERE year_of_release::TIMESTAMP BETWEEN '{}'::TIMESTAMP AND '{}'::TIMESTAMP
+	            '''.format(
+	        start_dt, end_dt
+	    )
+	
+	    data_raw = pd.io.sql.read_sql(query, con=engine, index_col='game_id')
+	
+	    columns_str = ['name', 'platform', 'genre', 'rating']
+	    columns_numeric = [
+	        'na_players',
+	        'eu_players',
+	        'jp_players',
+	        'other_players',
+	        'critic_score',
+	        'user_score',
+	    ]
+	    columns_datetime = ['year_of_release']
+	
+	    for column in columns_str:
+	        data_raw[column] = data_raw[column].astype(str)
+	    for column in columns_numeric:
+	        data_raw[column] = pd.to_numeric(data_raw[column], errors='coerce')
+	    for column in columns_datetime:
+	        data_raw[column] = pd.to_datetime(data_raw[column])
+	    data_raw['total_copies_sold'] = data_raw[
+	        ['na_players', 'eu_players', 'jp_players', 'other_players']
+	    ].sum(axis=1)
+	
+	    agg_games_year_genre_platform = data_raw.groupby(
+	        ['year_of_release', 'genre', 'platform']
+	    ).agg({'name': 'count', 'total_copies_sold': 'sum'})
+	    agg_games_year_score = data_raw.groupby(
+	        ['year_of_release', 'genre', 'platform']
+	    ).agg({'critic_score': 'mean', 'user_score': 'mean'})
+	
+	    agg_games_year_genre_platform = agg_games_year_genre_platform.rename(
+	        columns={'name': 'games'}
+	    )  # напишите код
+	    agg_games_year_score = agg_games_year_score.rename(
+	        columns={'critic_score': 'avg_critic_score', 'user_score': 'avg_user_score'}
+	    )  # напишите код
+	
+	    agg_games_year_genre_platform = agg_games_year_genre_platform.fillna(
+	        0
+	    ).reset_index()
+	    agg_games_year_score = agg_games_year_score.fillna(0).reset_index()
+	
+	    tables = {
+	        'agg_games_year_genre_platform': agg_games_year_genre_platform,  # ваш код
+	        'agg_games_year_score': agg_games_year_score,
+	    }  # ваш код
+	
+	    for table_name, table_data in tables.items():
+	
+	        query = '''
+	                  DELETE FROM {} WHERE year_of_release BETWEEN '{}'::TIMESTAMP AND '{}'::TIMESTAMP
+	                '''.format(
+	            'agg_games_year_score', start_dt, end_dt
+	        )  # напишите код
+	        engine.execute(query)
+	
+	        agg_games_year_score.to_sql(
+	            name='agg_games_year_score', con=engine, if_exists='append', index=False
+	        )  # напишите код
+	
+	    print('All done.')

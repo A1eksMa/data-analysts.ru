@@ -1,0 +1,233 @@
+#Изучение срезов данных
+
+***
+
+##01 Введение
+
+Практические задания отсутствуют
+
+***
+##02 Срезы данных и поиск авиабилетов
+
+### Задача 1 / 3
+
+>Выберите строки с выгодной ценой за авиабилет
+
+	#Находим максимальныю цену авиабилетов:
+	max = df['Price'].max()
+	#Создаем переменную, которая в полтора раза меньше:
+	lim = max/1.5
+	#Подставляем ее в условие сравнения булева массива (возвращаются все строки, где условие True):
+	print(df[df['Price']<lim])
+
+### Задача 2 / 3
+
+>Выберите строки, где значения столбца `Travel_time_from` больше или равны 365 или значения `Travel_time_to` меньше 250
+
+	print(df[(df['Travel_time_from']>=365) | (df['Travel_time_to']<250)])
+
+### Задача 3 / 3
+
+>Выберите строки, где:
+- полёт с пересадкой;
+- прилёт до 8 июля (ни 9, ни 10, ни 11 июля).
+
+	print(df[~(df['Is_Direct']) & ~(df['Date_To'].isin(['09.07.2019', '10.07.2019', '11.07.2019'])) ])
+
+***
+
+##03 Срезы данных методом query()
+
+Практические задания отсутствуют
+
+***
+
+##04 Возможности query()
+
+### Задача 1 / 2
+
+>Выберите строки, где: `Has_luggage` равно `False` и `Airline` не равно ни `S7`, ни `Rossiya`
+
+	print(df.query('Has_luggage==False and Airline not in ["S7","Rossiya"]'))
+
+### Задача 2 / 2
+
+>Выберите строки, где `Airline` равно `Belavia`, `S7` или `Rossiya`, при этом `Travel_time_from` меньше переменной под названием `max_time`
+
+	print(df.query('Airline in ["S7","Rossiya","Belavia"] and Travel_time_from<@max_time'))
+
+***
+
+##05 Срезы в действии
+
+### Задача 1 / 3
+
+>Одной строкой кода отсортируйте таблицу по убыванию значений в столбце `time_spent` и выведите на экран первые 10 строк всей таблицы
+
+	print(data.sort_values(by='time_spent',ascending=False).head(10))
+
+### Задача 2 / 3
+
+>... сделайте срез данных и извлеките всю информацию о станции `3c1e4c52`
+
+	sample = data.query('id=="3c1e4c52"')
+	print(sample['id'].count())
+
+### Задача 3 / 3
+
+>Методом `hist()` постройте две гистограммы распределения значений в столбце `time_spent`: одну для объекта `data`, вторую — для `sample`
+
+	data['time_spent'].hist(bins=100,range=(0,1500))
+	plt.show() 
+	sample['time_spent'].hist(bins=100,range=(0,1500))
+	plt.show()
+
+***
+
+##06 «Слишком долгая» заправка — это сколько?
+
+Практические задания отсутствуют
+
+***
+
+##07 Работа с датой и временем
+
+### Задача 1 / 3
+
+>...измените тип столбца `date_time` на более удобный тип для даты
+
+	import pandas as pd
+	data = pd.read_csv('/datasets/visits.csv', sep='\t')
+	data['date_time'] = pd.to_datetime(data['date_time'], format='%Y%m%dT%H%M%S')
+	print(data.head())
+
+### Задача 2 / 3
+
+>Создайте столбец `data['local_time']` и сохраните в нём сдвинутое на 3 часа время из столбца `data['date_time']`
+
+	import pandas as pd
+	data = pd.read_csv('/datasets/visits.csv', sep='\t')
+	data['date_time'] = pd.to_datetime(data['date_time'], format='%Y%m%dT%H%M%S')
+	data['local_time'] = data['date_time'] + pd.Timedelta(hours=3)
+	print(data.head())
+
+### Задача 3 / 3
+
+>...Округлите время до часов
+
+	import pandas as pd
+	data = pd.read_csv('/datasets/visits.csv', sep='\t')
+	data['date_time'] = pd.to_datetime(data['date_time'], format='%Y%m%dT%H%M%S')
+	data['local_time'] = data['date_time'] + pd.Timedelta(hours=3)
+	data['date_hour'] = data['local_time'].dt.round('1H')
+	print(data.head())
+
+***
+
+##08 Графики
+
+>Снова создайте переменную `sample`, записав в неё срез из данных по АЗС с `id == '3c1e4c52'`. Обратите внимание, что на этот раз в `sample` войдут все форматы времени
+
+	import pandas as pd
+	
+	data = pd.read_csv('/datasets/visits.csv', sep='\t')
+	data['date_time'] = pd.to_datetime(
+	    data['date_time'], format='%Y-%m-%dT%H:%M:%S'
+	)
+	data['local_time'] = data['date_time'] + pd.Timedelta(hours=3)
+	sample = data.query('id=="3c1e4c52"')
+	sample.plot(x='local_time', y='time_spent', style='o', ylim=(0, 1000), grid=True, figsize=(12, 6))
+
+***
+
+##09 Группировка с pivot_table()
+
+>Из данных сводной таблицы постройте график зависимости между временем прибытия и количеством заездов в час
+
+	import pandas as pd
+	
+	data = pd.read_csv('/datasets/visits.csv', sep='\t')
+	data['local_time'] = pd.to_datetime(
+	    data['date_time'], format='%Y-%m-%dT%H:%M:%S'
+	) + pd.Timedelta(hours=3)
+	data['date_hour'] = data['local_time'].dt.round('1H')
+	(
+	    data.query('id == "3c1e4c52"')
+	    .pivot_table(index='date_hour', values='time_spent', aggfunc='count')
+	    .plot(grid=True, figsize=(12, 5))
+	) 
+
+***
+
+##10 Помечаем срез данных
+
+### Задача 1 / 5
+
+>Добавьте в таблицу `data` столбец `too_fast` (пер. «слишком быстрый») со значениями `True` и `False`
+
+	import pandas as pd
+	
+	data = pd.read_csv('/datasets/visits.csv', sep='\t')
+	data['too_fast'] = data['time_spent'] < 60
+	print(data.head())
+
+### Задача 2 / 5
+
+>Рассчитайте среднее арифметическое для значений в столбце `too_fast` и выведите его на экран
+
+	import pandas as pd
+	
+	data = pd.read_csv('/datasets/visits.csv', sep='\t')
+	data['too_fast'] = data['time_spent'] < 60
+	print(data['too_fast'].mean())
+
+### Задача 3 / 5
+
+>Создайте переменную `too_fast_stat` и запишите в неё значения из сводной таблицы, сгруппировав доли быстрых заездов по АЗС
+
+	import pandas as pd
+	
+	data = pd.read_csv('/datasets/visits.csv', sep='\t')
+	data['too_fast'] = data['time_spent'] < 60
+	
+	too_fast_stat = data.pivot_table(index='id', values='too_fast', aggfunc='mean')
+	print(too_fast_stat.head())
+
+### Задача 4 / 5
+
+>Постройте гистограмму распределения значений в таблице `too_fast_stat` на 30 корзин
+
+	import pandas as pd
+	
+	data = pd.read_csv('/datasets/visits.csv', sep='\t')
+	data['too_fast'] = data['time_spent'] < 60
+	too_fast_stat = data.pivot_table(index='id', values='too_fast')
+	too_fast_stat.hist(bins=30)
+
+### Задача 5 / 5
+
+>Создайте сводную таблицу с процентом медленных заездов для каждой АЗС. Постройте гистограмму доли медленных заездов по всем АЗС на 30 корзин
+
+	import pandas as pd
+	
+	data = pd.read_csv('/datasets/visits.csv', sep='\t')
+	data['too_fast'] = data['time_spent'] < 60
+	too_fast_stat = data.pivot_table(index='id', values='too_fast')
+	too_fast_stat.hist(bins=30)
+	data['too_slow'] = data['time_spent'] > 1000
+	too_slow_stat = data.pivot_table(index='id', values='too_slow')
+	too_slow_stat.hist(bins=30)
+
+***
+
+##11 Сохраняем результаты
+
+Практические задания отсутствуют
+
+***
+
+##12 Заключение
+
+Практические задания отсутствуют
+
+***

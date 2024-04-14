@@ -1,0 +1,509 @@
+#01 Введение
+
+
+#02 Словари — основы
+
+#==============
+
+movies = {'Она':2013,'Большие глаза':2014,'Таксист':1976,'Король комедии':1982}
+
+print(movies)
+
+#==============
+
+
+#03 Поиск и добавление элементов
+
+#==============
+
+financial_info = {
+
+    'American Express': 93.23,
+
+    'Boeing': 178.44,
+
+    'Coca-Cola': 45.15,
+
+    'Nike': 97.99,
+
+    'JPMorgan':96.27,
+
+    'Walmart': 130.68,
+
+    'Walt Disney': 119.34
+
+}
+
+
+walmart_price = financial_info['Walmart']
+
+print(walmart_price)
+
+#==============
+
+financial_info = {
+
+    'American Express': 93.23,
+
+    'Boeing': 178.44,
+
+    'Coca-Cola': 45.15,
+
+    'Nike': 97.99,
+
+    'JPMorgan': 96.27,
+
+    'Walmart': 130.68,
+
+    'Walt Disney': 119.34
+
+}
+
+
+nike_price = financial_info.get('Nike')
+
+print(nike_price)
+
+#==============
+
+financial_info = {
+
+    'American Express': 93.23,
+
+    'Boeing': 178.44,
+
+    'Coca-Cola': 45.15,
+
+    'Nike': 97.99,
+
+    'JPMorgan': 96.27,
+
+    'Walmart': 130.68,
+
+    'Walt Disney': 119.34
+
+}
+
+
+financial_info['Microsoft'] = 208.35
+
+
+print(financial_info)
+
+#==============
+#04 Словари и списки
+
+
+#05 Список словарей
+
+#==============
+
+monuments = [
+
+    {
+
+        'name': 'Статуя Единства', # название
+
+        'country': 'Индия', # страна
+
+        'height': 182 # высота без постамента
+
+    },
+
+    {
+
+        'name': 'Статуя богини Каннон в Сендае',
+
+        'country': 'Япония',
+
+        'height': 100
+
+    },
+
+    {
+
+        'name': 'Родина-Мать зовёт!',
+
+        'country': 'Россия',
+
+        'height': 85
+
+    },
+
+    {
+
+        'name': 'Будда Дорденма',
+
+        'country': 'Бутан',
+
+        'height': 51.5
+
+    },
+
+    {
+
+        'name': 'Статуя Свободы',
+
+        'country': 'США',
+
+        'height': 46
+
+    }
+
+]
+
+total = 0
+
+for i in monuments:
+
+    total += i['height']
+
+print(total/len(monuments))
+
+#==============
+
+order = [
+
+    {
+
+        'item': 'Пицца Маргарита', # название позиции
+
+        'category': 'пицца', # категория товара
+
+        'quantity': 2, # количество в заказе
+
+        'comment': 'Побольше сыра, пожалуйста!', # комментарий к заказу
+
+        'price': 320 # стоимость одной единицы товара
+
+    },
+
+    {
+
+        'item': 'Пицца с ветчиной',
+
+        'category': 'пицца',
+
+        'quantity': 1,
+
+        'comment': '',
+
+        'price': 410
+
+    },
+
+    {
+
+        'item': 'Pepsi 1 л',
+
+        'category': 'напитки',
+
+        'quantity': 3,
+
+        'comment': '',
+
+        'price': 75
+
+    },
+
+    {
+
+        'item': 'Сок яблочный 0.5 л',
+
+        'category': 'напитки',
+
+        'quantity': 1,
+
+        'comment': '',
+
+        'price': 80
+
+    },
+
+    {
+
+        'item': 'Круассан с сыром',
+
+        'category': 'выпечка',
+
+        'quantity': 2,
+
+        'comment': '',
+
+        'price': 130
+
+    }
+
+]
+
+
+total = 0
+
+for i in order:
+
+    if i['category'] == 'пицца':
+
+        total += i['price']*i['quantity']
+
+        
+
+print(total)
+
+#==============
+
+#06 Лаборатория словарей
+
+#==============
+
+arts_info = {
+
+    'Звёздная ночь': 'Ван Гог Винсент',
+
+    'Крик': 'Мунк Эдвард',
+
+    'Неизвестная': 'Крамской Иван',
+
+    'Итальянский полдень': 'Брюллов Карл',
+
+    'Рожь': 'Шишкин Иван',
+
+}
+
+
+print(arts_info['Крик']) # допишите ваш код внутри print()
+
+print(arts_info.get('Рожь',-1)) # допишите ваш код внутри print()
+
+#==============
+
+nba_players = {
+
+    'Джеймс Харден': [2191, 2818, 2335],
+
+    'Леброн Джеймс': [2251, 1505, 1698],
+
+    'Дэмиан Лиллард': [1962, 2067, 2009],
+
+}
+
+
+for person, points in nba_players.items(): 
+
+    total_points = int(sum(points)/len(points))
+
+    print(f'{person} {total_points}')
+
+#==============
+
+tracklist = [
+
+    {
+
+        'title': 'Stronger', # название трека
+
+        'artist': 'Saimoo', # исполнитель
+
+        'duration': 145, # продолжительность (в секундах)
+
+        'genre': 'Deep House', # жанр
+
+    },
+
+    {
+
+        'title': 'Alors On Danse',
+
+        'artist': 'Stromae',
+
+        'duration': 205,
+
+        'genre': 'Hip-Hop',
+
+    },
+
+    {
+
+        'title': 'Don\'t Be So Shy',
+
+        'artist': 'Imany (Filatov & Karas Remix)',
+
+        'duration': 190,
+
+        'genre': 'Deep House',
+
+    },
+
+    {
+
+        'title': 'Off My Mind',
+
+        'artist': 'Matvey Emerson',
+
+        'duration': 130,
+
+        'genre': 'Deep House',
+
+    },
+
+    {
+
+        'title': 'Now You\'re Gone',
+
+        'artist': 'Basshunter',
+
+        'duration': 154,
+
+        'genre': 'Eurodance',
+
+    },
+
+    {
+
+        'title': 'It Was A Good Day',
+
+        'artist': 'Ice Cube',
+
+        'duration': 260,
+
+        'genre': 'Hip-Hop',
+
+    },
+
+    {
+
+        'title': 'Diva',
+
+        'artist': 'Beyonce',
+
+        'duration': 200,
+
+        'genre': 'Hip-Hop',
+
+    }
+
+]
+
+
+hip_hop_duration = 0
+
+
+for i in tracklist:
+
+    if i['genre'] == 'Hip-Hop':
+
+        hip_hop_duration+= i['duration']
+
+
+print(hip_hop_duration)
+#==============
+
+from json import dumps
+
+
+tracklist = [
+
+    {
+
+        'title': 'Stronger',
+
+        'artist': 'Saimoo',
+
+        'duration': 145,
+
+        'genre': 'Deep House',
+
+    },
+
+    {
+
+        'title': 'Alors On Danse',
+
+        'artist': 'Stromae',
+
+        'duration': 205,
+
+        'genre': 'Hip-Hop',
+
+    },
+
+    {
+
+        'title': 'Don\'t Be So Shy',
+
+        'artist': 'Imany (Filatov & Karas Remix)',
+
+        'duration': 190,
+
+        'genre': 'Deep House',
+
+    },
+
+    {
+
+        'title': 'Off My Mind',
+
+        'artist': 'Matvey Emerson',
+
+        'duration': 130,
+
+        'genre': 'Deep House',
+
+    },
+
+    {
+
+        'title': 'Now You\'re Gone',
+
+        'artist': 'Basshunter',
+
+        'duration': 154,
+
+        'genre': 'Eurodance',
+
+    },
+
+    {
+
+        'title': 'It Was A Good Day',
+
+        'artist': 'Ice Cube',
+
+        'duration': 260,
+
+        'genre': 'Hip-Hop',
+
+    },
+
+    {
+
+        'title': 'Diva',
+
+        'artist': 'Beyonce',
+
+        'duration': 200,
+
+        'genre': 'Hip-Hop',
+
+    }
+
+]
+
+
+deep_house_tracklist = []
+
+
+for i in tracklist:
+
+    if i['genre'] == 'Deep House':
+
+        deep_house_tracklist.append(i)
+
+
+for track in deep_house_tracklist:
+
+    print(dumps(track, indent=4))
+
+#==============
+
+
+#07 Заключение

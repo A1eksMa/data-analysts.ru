@@ -1,0 +1,599 @@
+#Название темы
+##01 Введение
+
+
+##02 Конверсия и повторные покупатели
+
+
+#==============
+`email_visits = 1000 # количество визитов из рассыло
+context_visits = 2500 # количество визитов из контекстной рекламы`
+
+
+email_purchases = 50 # количество покупок из рассылок
+
+context_purchases = 100 # количество покупок из контекстной рекламы
+
+
+email_conversion = email_purchases / email_visits# поделите email_purchases на email_visits
+
+context_conversion = context_purchases / context_visits# напишите ваш код здесь
+
+# выведите значение конверсий рассылок
+
+print('Конверсия рассылок: {:.0%}'.format(email_conversion))
+
+# выведите на экран значения конверсий контекстной рекламы
+
+print('Конверсия контекстной рекламы: {:.0%}'.format(context_conversion))
+
+#==============
+
+email_visits = 1000 # количество визитов из рассылок
+
+context_visits = 2500 # количество визитов из контекстной рекламы
+
+email_purchases = 50 # количество покупок из рассылок
+
+context_purchases = 100 # количество покупок из контекстной рекламы
+
+
+email_conversion = email_purchases / email_visits
+
+context_conversion = context_purchases / context_visits 
+
+print('Конверсия рассылок: {:.0%}'.format(email_conversion))
+
+print('Конверсия контекстной рекламы: {:.0%}'.format(context_conversion))
+
+if email_conversion > context_conversion:
+
+    print('Вывод: рассылки эффективнее')
+
+else:
+
+    print('Вывод: контекстная реклама эффективнее')
+
+#==============
+
+email_visits = 1000 # количество визитов из рассылок
+
+context_visits = 2500 # количество визитов из контекстной рекламы
+
+email_purchases = 50 # количество покупок из рассылок
+
+context_purchases = 100 # количество покупок из контекстной рекламы
+
+
+email_conversion = email_purchases / email_visits
+
+context_conversion = context_purchases / context_visits 
+
+print('Конверсия рассылок: {:.0%}'.format(email_conversion))
+
+print('Конверсия контекстной рекламы: {:.0%}'.format(context_conversion))
+
+if email_conversion > context_conversion:
+
+    print('Вывод: рассылки эффективнее')
+
+elif  email_conversion < context_conversion:
+
+    print('Вывод: контекстная реклама эффективнее')
+
+else:
+
+    print('Конверсии равны, пора смотреть другие метрики')
+
+#==============
+
+email_visits = 1000 # количество визитов из рассылок
+
+context_visits = 250 # количество визитов из контекстной рекламы
+
+email_purchases = 50 # количество покупок из рассылок
+
+context_purchases = 100 # количество покупок из контекстной рекламы
+
+
+email_conversion = email_purchases / email_visits
+
+context_conversion = context_purchases / context_visits 
+
+print('Конверсия рассылок: {:.0%}'.format(email_conversion))
+
+print('Конверсия контекстной рекламы: {:.0%}'.format(context_conversion))
+
+if email_conversion > context_conversion:
+
+    print('Вывод: рассылки эффективнее')
+
+elif  email_conversion < context_conversion:
+
+    print('Вывод: контекстная реклама эффективнее')
+
+else:
+
+    print('Конверсии равны, пора смотреть другие метрики')
+
+#==============
+
+first_purchase = 885 # количество пользователей, совершивших 1 покупку
+
+repeated_purchase = 136 # количество пользователей, совершивших 2 и более покупок
+
+total = first_purchase + repeated_purchase # общее количество покупателей
+
+print('Общее количество покупателей:',total)
+
+#==============
+
+first_purchase = 885
+
+repeated_purchase = 136
+
+total = first_purchase + repeated_purchase
+
+# поделите количество пользователей, совершивших 2 и более покупок, на общее количество покупателей
+
+repeated_purchase_part = repeated_purchase / total
+
+print('Доля повторных покупок равна {:.0%}'.format(repeated_purchase_part))
+
+#==============
+
+import pandas as pd
+
+purchases = pd.read_csv('/datasets/returned.csv')
+
+purchases['total'] = purchases['first'] + purchases['repeated']
+
+print(purchases)
+
+#==============
+
+import pandas as pd
+
+purchases = pd.read_csv('/datasets/returned.csv')
+
+purchases['total'] = purchases['first'] + purchases['repeated']
+
+# отношение повторных покупок ко всем покупкам 
+
+purchases['repeated_share'] = purchases['repeated'] / purchases['total'] 
+
+print(purchases)
+
+#==============
+
+import pandas as pd
+
+purchases = pd.read_csv('/datasets/returned.csv')
+
+purchases['total'] = purchases['first'] + purchases['repeated']
+
+purchases['repeated_share'] = purchases['repeated'] / purchases['total']
+
+print(purchases.sort_values(by='repeated_share',ascending=False))
+
+#==============
+
+#03 User ID и куки
+
+#==============
+
+import pandas as pd
+
+logs = pd.read_csv('/datasets/logs.csv')
+
+print(logs.head())
+
+#==============
+
+import pandas as pd
+
+logs = pd.read_csv('/datasets/logs.csv')
+
+logs.info()
+
+#==============
+
+import pandas as pd
+
+logs = pd.read_csv('/datasets/logs.csv')
+
+print('Уникальных email:',len(logs['email'].unique())) # напишите код для подсчёта уникальных email здесь
+
+print('Уникальных User ID:',len(logs['user_id'].unique())) # напишите код для подсчёта уникальных User ID здесь
+
+#==============
+
+import pandas as pd
+
+logs = pd.read_csv('/datasets/logs.csv')
+
+print(logs['source'].unique())
+
+#Вывод:
+
+#['other' 'email' 'context' 'None' 'undef']
+
+#==============
+
+
+#04 Вы обнаружили NaN и None
+
+#==============
+
+import pandas as pd
+
+hogwarts_points = pd.read_csv('/datasets/hogwarts_points.csv')
+
+hogwarts_points = hogwarts_points.fillna('Гриффиндор')
+
+print(hogwarts_points)
+
+#==============
+
+import pandas as pd
+
+hogwarts_points = pd.read_csv('/datasets/hogwarts_points.csv')
+
+hogwarts_points['faculty_name'] = hogwarts_points['faculty_name'].fillna(value='Гриффиндор')
+
+#print(hogwarts_points)
+
+print('Сумма баллов учеников:',hogwarts_points.groupby('student_name')['points'].sum().sum())
+
+print('Сумма баллов факультетов:',hogwarts_points.groupby('faculty_name')['points'].sum().sum())
+
+print('Кубок получает', hogwarts_points.groupby('faculty_name')['points'].sum().idxmax())
+
+#==============
+
+import pandas as pd
+
+logs = pd.read_csv('/datasets/logs.csv')
+
+logs.info()
+
+visits = logs.groupby('source')['user_id'].count()
+
+print(visits)
+
+#==============
+
+import pandas as pd
+
+logs = pd.read_csv('/datasets/logs.csv')
+
+purchase = logs.groupby('source')['purchase'].sum()
+
+print(purchase)
+
+#==============
+
+import pandas as pd
+
+
+logs = pd.read_csv('/datasets/logs.csv')
+
+
+visits = logs.groupby('source')['user_id'].count() # количество визитов
+
+purchase = logs.groupby('source')['purchase'].sum() # количество покупок
+
+
+conversion = purchase / visits
+
+print(conversion)
+
+#==============
+
+
+#05Категориальные и количественные переменные
+
+
+#06 Индексация в атрибуте loc
+
+#==============
+
+import pandas as pd
+
+data = pd.read_csv('/datasets/projects.csv')
+
+#print(data.loc[data['Имя']=='Вася']['Роль'])
+
+print(data.loc[2,'Роль'])
+
+#==============
+
+import pandas as pd
+
+data = pd.read_csv('/datasets/projects.csv')
+
+data.loc[:,'Новая функция'] = '+'
+
+print(data)
+
+#==============
+
+import pandas as pd
+
+data = pd.read_csv('/datasets/projects.csv')
+
+rows = data['Роль'] == 'разработчик'
+
+print(rows)
+
+#==============
+
+import pandas as pd
+
+
+data = pd.read_csv('/datasets/projects.csv')
+
+rows = data['Роль'] != 'менеджер'
+
+print(rows)
+
+#==============
+
+
+#07 Логические выражения в атрибуте loc
+
+#==============
+
+import pandas as pd
+
+
+data = pd.read_csv('/datasets/projects.csv')
+
+rows = data['Статья'] == '+'
+
+print(data.loc[rows])
+
+#==============
+
+import pandas as pd
+
+
+data = pd.read_csv('/datasets/projects.csv')
+
+print(data.loc[data['Эксперимент'] == '+','Имя'])
+
+#==============
+
+import pandas as pd
+
+
+data = pd.read_csv('/datasets/projects.csv')
+
+data['Новая функция'].loc[data['Новая функция'] != '+'] = '-'
+
+print(data)
+
+#==============
+
+#Операторы Pandas пишут не словами, а знаками: and превращается в & (амперсанд), or #превращается в | (вертикальная черта), а not превращается в ~ (тильда)
+
+#==============
+
+import pandas as pd
+
+
+data = pd.read_csv('/datasets/projects.csv')
+
+print(data.loc[(data['Эксперимент'] == '+') & (data['Статья'] == '+')])
+
+#==============
+
+import pandas as pd
+
+
+data = pd.read_csv('/datasets/projects.csv')
+
+data['Новая функция'].loc[(data['Роль'] == 'разработчик') & (data['Новая функция'] == '+')] = '-'
+
+print(data)
+
+#==============
+
+
+#08 Работа с пропусками в категориальных переменных
+
+#==============
+
+ 0   user_id   200000 non-null  int64
+
+ 1   source    200000 non-null  object
+
+ 2   email     13953 non-null   object
+
+ 3   purchase  200000 non-null  int64
+
+#==============
+
+import pandas as pd
+
+
+logs = pd.read_csv('/datasets/logs.csv')
+
+logs['email'] = logs['email'].fillna('')
+
+print(logs.head(5))
+
+#==============
+
+import pandas as pd
+
+
+logs = pd.read_csv('/datasets/logs.csv')
+
+logs['email'] = logs['email'].fillna(value='')
+
+print(logs.loc[(logs['source'] == 'None') & (logs['email'] == '')])
+
+#==============
+
+import pandas as pd
+
+
+logs = pd.read_csv('/datasets/logs.csv')
+
+logs['email'] = logs['email'].fillna(value='')
+
+logs.loc[(logs['source'] == 'None','source')] = 'email'
+
+print(logs['source'].value_counts())
+
+#==============
+
+import pandas as pd
+
+
+logs = pd.read_csv('/datasets/logs.csv')
+
+logs['email'] = logs['email'].fillna(value='')
+
+logs.loc[logs['source'] == 'None', 'source'] = 'email'
+
+logs_grouped = logs.groupby('source').agg({'purchase': ['count', 'sum']})
+
+print(logs_grouped)
+
+#==============
+
+import pandas as pd
+
+
+logs = pd.read_csv('/datasets/logs.csv')
+
+logs['email'] = logs['email'].fillna(value='')
+
+logs.loc[logs['source'] == 'None', 'source'] = 'email'
+
+
+logs_grouped = logs.groupby('source').agg({'purchase': ['count', 'sum']})
+
+logs_grouped['conversion'] = logs_grouped['purchase']['sum'] / logs_grouped['purchase']['count']
+
+print(logs_grouped)
+
+#==============
+
+import pandas as pd
+
+
+logs = pd.read_csv('/datasets/logs.csv')
+
+logs['email'] = logs['email'].fillna(value='')
+
+logs.loc[logs['source'] == 'None', 'source'] = 'email'
+
+logs.loc[logs['source'] == 'undef', 'source'] = 'other'
+
+logs_grouped = logs.groupby('source').agg({'purchase': ['count', 'sum']})
+
+logs_grouped['conversion'] = logs_grouped['purchase']['sum'] / logs_grouped['purchase']['count']
+
+print(logs_grouped)
+
+#==============
+
+
+#09 Работа с пропусками в количественных переменных
+#==============
+
+import pandas as pd
+
+
+metrica = pd.read_csv('/datasets/metrica_data.csv')
+
+age_avg = metrica['age'].mean()
+
+print(age_avg)
+
+#==============
+
+import pandas as pd
+
+
+metrica = pd.read_csv('/datasets/metrica_data.csv')
+
+age_avg = metrica['age'].mean()
+
+metrica['age'] = metrica['age'].fillna(value=age_avg)
+
+print(metrica.head(10))
+
+#==============
+
+import pandas as pd
+
+
+metrica = pd.read_csv('/datasets/metrica_data.csv')
+
+time_avg = metrica['time'].mean()
+
+print(time_avg)
+
+#==============
+
+import pandas as pd
+
+
+metrica = pd.read_csv('/datasets/metrica_data.csv')
+
+desktop_data = metrica.loc[metrica['device_type'] == 'desktop']
+
+print(desktop_data.head())
+
+#==============
+
+import pandas as pd
+
+
+metrica = pd.read_csv('/datasets/metrica_data.csv')
+
+desktop_data = metrica.loc[metrica['device_type'] == 'desktop']
+
+#print(desktop_data.head())
+
+desktop_data_time_avg = desktop_data['time'].mean()
+
+print(desktop_data_time_avg)
+
+#==============
+
+import pandas as pd
+
+
+metrica = pd.read_csv('/datasets/metrica_data.csv')
+
+mobile_data = metrica.loc[metrica['device_type'] == 'mobile']
+
+print(mobile_data.head())
+
+#==============
+
+import pandas as pd
+
+
+metrica = pd.read_csv('/datasets/metrica_data.csv')
+
+mobile_data = metrica.loc[metrica['device_type'] == 'mobile']
+
+#print(mobile_data.head())
+
+mobile_data_time_avg = mobile_data['time'].mean()
+
+print(mobile_data_time_avg)
+
+#==============
+
+
+#10 Заполнение пропусков в количественных переменных по категориям
+
+
+#11 Заключение

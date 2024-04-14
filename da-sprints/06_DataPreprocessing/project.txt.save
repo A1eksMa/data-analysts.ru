@@ -1,0 +1,161 @@
+#Проектная работа: Исследование надёжности заемщиков
+
+#Часть 1
+
+***
+
+##Задание 1. Импортируйте библиотеку pandas. Считайте данные из csv-файла в датафрейм и сохраните в переменную `data`
+
+># импортируйте библиотеку pandas
+
+	import pandas as pd
+
+># прочитайте csv-файл
+
+	data = pd.read_csv('/datasets/data.csv')
+
+***
+
+##Задание 2. Выведите первые 20 строчек датафрейма `data` на экран
+
+	print(data.head(20))
+
+***
+
+##Задание 3. Выведите основную информацию о датафрейме с помощью метода `info()`
+
+	data.info()
+
+***
+
+##Задание 4. Выведите количество пропущенных значений для каждого столбца. Используйте комбинацию двух методов
+
+	data.isna().sum()
+
+***
+
+##Задание 5. В двух столбцах есть пропущенные значения...
+
+	for type in data['income_type'].unique():
+	    data['total_income'].loc[(data['income_type'] == type) & (data['total_income'].isna() == True)] = data['total_income'].loc[data['income_type'] == type].median()
+
+***
+
+##Задание 6. В данных могут встречаться артефакты (аномалии)...
+
+	data['days_employed'] = data['days_employed'].abs()
+
+***
+
+##Задание 7. Для каждого типа занятости выведите медианное значение трудового стажа `days_employed` в днях
+
+	data.groupby('income_type')['days_employed'].median()
+
+***
+
+##Задание 8. Выведите перечень уникальных значений столбца `children`
+
+	data['children'].unique()
+
+***
+
+##Задание 9. В столбце `children` есть два аномальных значения. Удалите строки, в которых встречаются такие аномальные значения из датафрейма `data`
+
+	data = data.loc[data['children'] !=-1]
+	data = data.loc[data['children'] !=20]
+
+***
+
+##Задание 10. Ещё раз выведите перечень уникальных значений столбца `children`, чтобы убедиться, что артефакты удалены
+
+	data['children'].unique()
+
+***
+
+##Задание 11. Заполните пропуски в столбце `days_employed` медианными значениями по каждому типу занятости `income_type`
+
+	for type in data['income_type'].unique():
+	    data['days_employed'].loc[(data['income_type'] == type) & (data['days_employed'].isna() == True)] = data['days_employed'].loc[data['income_type'] == type].median()
+
+***
+
+##Задание 12. Убедитесь, что все пропуски заполнены. Проверьте себя и ещё раз выведите количество пропущенных значений для каждого столбца с помощью двух методов
+
+	data.isna().sum()
+
+***
+
+##Задание 13. Замените вещественный тип данных в столбце `total_income` на целочисленный с помощью метода `astype()`
+
+	data['total_income'] = data['total_income'].astype('int')
+
+***
+
+##Задание 14. Обработайте неявные дубликаты в столбце `education`. В этом столбце есть одни и те же значения, но записанные по-разному: с использованием заглавных и строчных букв. Приведите их к нижнему регистру
+
+	data['education'] = data['education'].str.lower()
+
+***
+
+##Задание 15. Выведите на экран количество строк-дубликатов в данных. Если такие строки присутствуют, удалите их. Сбрасывать индексы после удаления строк дубликатов с помощью `reset_index(drop=True)` здесь не требуется
+
+	data.duplicated().sum()
+
+***
+
+##Задание 16. На основании диапазонов, указанных ниже, создайте в датафрейме data столбец `total_income_category`
+
+># создайте функцию categorize_income()
+
+	def categorize_income(income):
+	    if income < 30001:
+	        return 'E'
+	    elif 30001 <= income < 50001:
+	        return 'D'
+	    elif 50001 <= income <200001:
+	        return 'C'
+	    elif 200001 <= income <1000001:
+	        return 'B'
+	    else:
+	        return 'A'
+># примените функцию методом apply()
+
+	data['total_income_category'] = data['total_income'].apply(categorize_income)
+
+***
+
+##Задание 17. Выведите на экран перечень уникальных целей взятия кредита из столбца `purpose`
+
+	data['purpose'].unique()
+
+***
+
+##Задание 18. Создайте функцию, которая на основании данных из столбца `purpose` сформирует новый столбец `purpose_category`
+
+># создайте функцию categorize_purpose()
+
+	def categorize_purpose(str):
+	    if 'авто' in str:
+	        return 'операции с автомобилем'
+	    elif 'жиль' in str or 'движ' in str:
+	        return 'операции с недвижимостью'
+	    elif 'свадьб' in str:
+	        return 'проведение свадьбы'
+	    elif 'образ' in str:
+	        return 'получение образования'
+	    else:
+	        return 'прочее'
+
+># примените функцию методом apply()
+
+	data['purpose_category'] = data['purpose'].apply(categorize_purpose)
+
+***
+
+#Проектная работа: Исследование надёжности заемщиков
+
+#(Часть 2)
+
+***
+
+

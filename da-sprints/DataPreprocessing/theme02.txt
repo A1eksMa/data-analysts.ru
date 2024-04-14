@@ -1,0 +1,613 @@
+#Изменение типов данных
+##01 Введение
+
+
+#02 Как читать файлы из Excel
+
+#==============
+
+import pandas as pd
+
+data = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='traffic_data')
+
+print(data.head())
+
+#==============
+
+import pandas as pd
+
+data = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='traffic_data')
+
+print(data['source'].unique())
+
+#==============
+
+import pandas as pd
+
+subcategory_dict = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='subcategory_ids')
+
+print(subcategory_dict.head())
+
+#==============
+
+import pandas as pd
+
+category_dict = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='category_ids')
+
+print(category_dict.head())
+
+#==============
+
+
+#03 Такие неидеальные данные
+
+#==============
+
+import pandas as pd
+
+data = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='traffic_data')
+
+data.info()
+
+#==============
+
+
+#04 Перевод строковых значений в числа
+
+#==============
+
+import pandas as pd
+
+
+transactions = pd.read_excel('/datasets/ids.xlsx')
+
+pd.to_numeric(transactions['id'])
+
+#==============
+
+import pandas as pd
+
+transactions = pd.read_excel('/datasets/ids.xlsx')
+
+transactions['id'] = pd.to_numeric(transactions['id'], errors='coerce')
+
+print(transactions.tail())
+
+#==============
+
+import pandas as pd
+
+
+transactions = pd.read_excel('/datasets/ids.xlsx')
+
+transactions['id'] = pd.to_numeric(transactions['id'], errors='coerce')
+
+transactions.info()
+
+#==============
+
+import pandas as pd
+
+
+transactions = pd.read_excel('/datasets/ids.xlsx')
+
+transactions['id'] = pd.to_numeric(transactions['id'], errors='coerce')
+
+transactions['amount'] = pd.to_numeric(transactions['amount'], errors='coerce')
+
+transactions.info()
+
+#==============
+
+import pandas as pd
+
+
+transactions = pd.read_excel('/datasets/ids.xlsx')
+
+transactions['id'] = pd.to_numeric(transactions['id'], errors='coerce')
+
+transactions['amount'] = pd.to_numeric(transactions['amount'], errors='coerce')
+
+print(transactions['amount'].sum())
+
+#==============
+
+import pandas as pd
+
+
+transactions = pd.read_excel('/datasets/ids.xlsx')
+
+transactions['id'] = pd.to_numeric(transactions['id'], errors='coerce')
+
+transactions['amount'] = pd.to_numeric(transactions['amount'], errors='coerce')
+
+transactions_per_category = transactions.groupby('category')['amount'].sum()
+
+print(transactions_per_category)
+
+#==============
+
+import pandas as pd
+
+
+data = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='traffic_data')
+
+data['visits'] = pd.to_numeric(data['visits'])
+
+#==============
+
+import pandas as pd
+
+
+data = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='traffic_data')
+
+print(data.loc[964])
+
+#==============
+
+import pandas as pd
+
+
+data = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='traffic_data')
+
+print('Количество строк:',data.shape[0])
+
+print(data.loc[data['subcategory_id']=='total'])
+
+#==============
+
+import pandas as pd
+
+
+data = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='traffic_data')
+
+data = data.loc[data['subcategory_id']!='total']
+
+print(data[data['subcategory_id'] == 'total'])
+
+#==============
+
+import pandas as pd
+
+
+data = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='traffic_data')
+
+data = data[(data['subcategory_id'] != 'total')]
+
+data['visits'] = data['visits'].astype('int')
+
+data.info()
+
+#==============
+
+import pandas as pd
+
+
+data = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='traffic_data')
+
+data = data[(data['subcategory_id'] != 'total')]
+
+data['visits'] = data['visits'].astype('int')
+
+print(data.groupby('source')['visits'].sum())
+
+#==============
+
+#05 Методы Pandas для работы с датой и временем
+
+#==============
+
+import pandas as pd
+
+
+position = pd.read_csv('/datasets/position.csv')
+
+print(position.head(15))
+
+#==============
+
+import pandas as pd
+
+
+position = pd.read_csv('/datasets/position.csv')
+
+position.info()
+
+#==============
+
+import pandas as pd
+
+
+position = pd.read_csv('/datasets/position.csv')
+
+position['timestamp'] = pd.to_datetime(position['timestamp'], format='%Y-%m-%dT%H:%M:%S')
+
+print(position.head())
+
+#==============
+
+import pandas as pd
+
+
+position = pd.read_csv('/datasets/position.csv')
+
+position['timestamp'] = pd.to_datetime(position['timestamp'], format='%Y-%m-%dT%H:%M:%S')
+
+position.info()
+
+#==============
+
+import pandas as pd
+
+
+position = pd.read_csv('/datasets/position.csv')
+
+position['timestamp'] = pd.to_datetime(
+
+    position['timestamp'], format='%Y-%m-%dT%H:%M:%S'
+
+)
+
+print(position.sort_values(by='level' ,ascending=False))
+
+#==============
+
+import pandas as pd
+
+
+position = pd.read_csv('/datasets/position.csv')
+
+position['timestamp'] = pd.to_datetime(
+
+    position['timestamp'], format='%Y-%m-%dT%H:%M:%S'
+
+)
+
+position['month'] = pd.DatetimeIndex(position['timestamp']).month
+
+print(position.head())
+
+#==============
+
+import pandas as pd
+
+
+position = pd.read_csv('/datasets/position.csv')
+
+position['timestamp'] = pd.to_datetime(
+
+    position['timestamp'], format='%Y-%m-%dT%H:%M:%S'
+
+)
+
+position['month'] = pd.DatetimeIndex(position['timestamp']).month
+
+print(position.groupby( 'month')['level'].mean())
+
+#==============
+
+
+#06 Обработка ошибок: try-except
+
+#==============
+
+position = [
+
+    ['2019-05-01', '6'],
+
+    ['2019-05-02', '5'],
+
+    ['2019-05-03', '5'],
+
+    ['2019-05-04', '4'],
+
+    ['2019-05-05', '5'],
+
+    ['2019-05-06', '5'],
+
+    ['2019-05-07', '4'],
+
+    ['2019-05-08', '4'],
+
+    ['2019-05-09', '3'],
+
+    ['2019-05-10', '3'],
+
+]
+
+count_lines = 0
+
+
+for row in position:
+
+    count_lines +=1
+
+print(count_lines)
+
+#==============
+
+position = [
+
+    ['2019-05-01', '6'],
+
+    ['2019-05-02', '5'],
+
+    ['2019-05-03', '5'],
+
+    ['2019-05-04', '4'],
+
+    ['2019-05-05', '5'],
+
+    ['2019-05-06', '5'],
+
+    ['2019-05-07', '4'],
+
+    ['2019-05-08', '4'],
+
+    ['2019-05-09', '3'],
+
+    ['2019-05-10', '3'],
+
+]
+
+
+count_lines = 0
+
+total_position = 0
+
+
+for row in position:
+
+    count_lines += 1
+
+    level = int(row[1]) 
+
+    total_position += level
+
+print(total_position/count_lines)
+
+#==============
+
+position = [
+
+    ['2019-05-01', '- 6'],
+
+    ['2019-05-02', '+5'],
+
+    ['2019-05-03', ' 5'],
+
+    ['2019-05-04', '4'],
+
+    ['2019-05-05', '5'],
+
+    ['2019-05-06', '5'],
+
+    ['2019-05-07', '4'],
+
+    ['2019-05-08', 'Error 5'],
+
+    ['2019-05-09', '3'],
+
+    ['2019-05-10', '3'],
+
+]
+
+count_lines = 0
+
+total_position = 0
+
+
+for row in position:
+
+    count_lines += 1
+
+    level = int(row[1]) 
+
+    total_position += level
+
+print(total_position/count_lines)
+
+#==============
+
+position = [
+
+    ['2019-05-01', '- 6'],
+
+    ['2019-05-02', '+5'],
+
+    ['2019-05-03', ' 5'],
+
+    ['2019-05-04', '4'],
+
+    ['2019-05-05', '5'],
+
+    ['2019-05-06', '5'],
+
+    ['2019-05-07', '4'],
+
+    ['2019-05-08', 'Error 5'],
+
+    ['2019-05-09', '3'],
+
+    ['2019-05-10', '3'],
+
+]
+
+count_lines = 0
+
+total_position = 0
+
+wrong_lines  = 0
+
+
+for row in position:
+
+    try:
+
+        count_lines += 1
+
+        level = int(row[1]) 
+
+        total_position += level
+
+    except:
+
+        wrong_lines +=1
+
+        
+
+print('Количество измерений',count_lines)
+
+print('Количество некорректных строк',wrong_lines)
+
+#==============
+
+position = [
+
+    ['2019-05-01', '- 6'],
+
+    ['2019-05-02', '+5'],
+
+    ['2019-05-03', ' 5'],
+
+    ['2019-05-04', '4'],
+
+    ['2019-05-05', '5'],
+
+    ['2019-05-06', '5'],
+
+    ['2019-05-07', '4'],
+
+    ['2019-05-08', 'Error 5'],
+
+    ['2019-05-09', '3'],
+
+    ['2019-05-10', '3'],
+
+]
+
+
+
+count_lines = 0
+
+wrong_lines_content = []
+
+
+for row in position:
+
+    try:
+
+        count_lines += 1
+
+        level = int(row[1])
+
+        
+
+    except:
+
+        wrong_lines_content.append(row)
+
+print('Количество измерений',count_lines)
+
+print('Некорректные строки',wrong_lines_content)
+
+#==============
+
+#07 Метод merge()
+
+#==============
+
+import pandas as pd
+
+data = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='traffic_data')
+
+subcategory_dict = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='subcategory_ids')
+
+data_subcategory = data.merge(subcategory_dict, on='subcategory_id', how='left')
+
+print(data_subcategory.head(10))
+
+#==============
+
+import pandas as pd
+
+data = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='traffic_data')
+
+subcategory_dict = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='subcategory_ids')
+
+category_dict = pd.read_excel('/datasets/seo_data.xlsx', sheet_name='category_ids')
+
+data_subcategory = data.merge(subcategory_dict, on='subcategory_id', how='left')
+
+
+data_final = data_subcategory.merge(category_dict, on='category_id', how='left')
+
+print(data_final.head(10))
+
+#==============
+
+
+#08 Сводные таблицы
+
+#==============
+
+import pandas as pd
+
+data_final = pd.read_csv('/datasets/data_final.csv')
+
+data_pivot=data_final.pivot_table(index=['category_name','subcategory_name'],columns='source',values='visits',aggfunc='sum')
+
+print(data_pivot.head(10))
+
+#==============
+
+import pandas as pd
+
+data_final = pd.read_csv('/datasets/data_final.csv')
+
+data_pivot = data_final.pivot_table(index=['category_name', 'subcategory_name'], columns='source', values='visits', aggfunc='sum')
+
+data_pivot['ratio'] = data_pivot['organic']/data_pivot['direct']
+
+print(data_pivot.head(10))
+
+#==============
+
+import pandas as pd
+
+data_final = pd.read_csv('/datasets/data_final.csv')
+
+data_pivot = data_final.pivot_table(index=['category_name', 'subcategory_name'], columns='source', values='visits', aggfunc='sum')
+
+data_pivot['ratio'] = data_pivot['organic'] / data_pivot['direct']
+
+print(data_pivot.sort_values(by='ratio',ascending=False).head(10))
+
+#==============
+
+import pandas as pd
+
+data_final = pd.read_csv('/datasets/data_final.csv')
+
+data_pivot = data_final.pivot_table(index=['category_name', 'subcategory_name'], columns='source', values='visits', aggfunc='sum')
+
+data_pivot['ratio'] = data_pivot['organic'] / data_pivot['direct']
+
+print(data_pivot.sort_values(by='ratio',ascending=False).tail(10))
+
+#==============
+
+import pandas as pd
+
+data_final = pd.read_csv('/datasets/data_final.csv')
+
+data_pivot = data_final.pivot_table(index=['category_name', 'subcategory_name'], columns='source', values='visits', aggfunc='sum')
+
+data_pivot['ratio'] = data_pivot['organic'] / data_pivot['direct']
+
+print(data_pivot.loc[data_pivot['direct'] > 1000].sort_values(by='ratio',ascending=False).tail(10))
+
+#==============
+
+
+#09 Заключение

@@ -1,0 +1,1768 @@
+#Проектирование и разработка дашбордов в dash
+##01 Введение
+Практические задания отсутствуют
+***
+##02 Дашборды
+### Задание 1
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	
+	import dash
+	import dash_core_components as dcc
+	import dash_html_components as html
+	
+	import plotly.graph_objs as go
+	
+	import pandas as pd
+	import math
+	
+	# задаём данные для отрисовки
+	x = range(-100, 100, 1)
+	x = [x / 10 for x in x]
+	y_sin = [math.sin(x) for x in x]
+	y_cos = [math.cos(x) for x in x] # напишите код
+	data = [
+	        go.Scatter(x = pd.Series(x), y = pd.Series(y_sin), mode = 'lines', name = 'sin(x)'),
+	        go.Scatter(x = pd.Series(x), y = pd.Series(y_cos), mode = 'lines', name = 'cos(x)'), # напишите код
+	       ]
+	
+	# задаём лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+	app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False)
+	app.layout = html.Div(children=[  
+	    
+	    # формируем html
+	    html.H1(children = 'Тригонометрические функции'),
+	
+	    dcc.Graph(
+	        figure = {'data':  data,
+	                  'layout': go.Layout(xaxis = {'title': 'x'}, yaxis = {'title': 'y'})
+		                 },
+	        id = 'trig_func'
+	    ),      
+	 
+	])
+	
+	# описываем логику дашборда
+	if __name__ == '__main__':
+	    app.run_server(host='0.0.0.0', port=3000)
+***
+### Задание 2
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	
+	import dash
+	import dash_core_components as dcc
+	import dash_html_components as html
+	
+	import plotly.graph_objs as go
+	
+	import pandas as pd
+	
+	# задаём данные для отрисовки
+	games_raw = pd.read_csv('/datasets/games_full.csv')
+	games_raw['Year_of_Release'] = pd.to_datetime(games_raw['Year_of_Release'])
+	
+	# формируем данные для отчёта
+	games_grouped = (games_raw.groupby(['Genre','Year_of_Release']) # ваш код
+	                          .agg({'Name':'count'}) # ваш код
+	                          .reset_index()
+	                          .rename(columns = {'Name':'Games Released'}) # ваш код
+	                )
+	
+	# формируем графики для отрисовки
+	data = []
+	for genre in games_grouped['Genre'].unique():
+	    current = games_grouped.query('Genre == @genre')
+	    data += [go.Scatter(x = current['Year_of_Release'], # напишите код
+	                        y = current['Games Released'], # напишите код
+	                        mode = 'lines',
+	                        stackgroup = 'one', # напишите код
+	                        name = genre)]
+	
+	# задаём лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+	app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False)
+	app.layout = html.Div(children=[  
+	    
+	    # формируем html
+	    html.H1(children = 'Выпуск игр по годам'),
+	
+	    dcc.Graph(
+	        figure = {'data': data,
+	                  'layout': go.Layout(xaxis = {'title': 'Год'},
+	                                      yaxis = {'title': 'Выпущенные игры'})
+	                 },
+	        id = 'games_by_year' # ваш код
+	    ),      
+	 
+	])
+	
+	# описываем логику дашборда
+	if __name__ == '__main__':
+	    app.run_server(host='0.0.0.0', port=3000)
+***
+### Задание 3
+	# !/usr/bin/python
+	# -*- coding: utf-8 -*-
+		
+	import dash
+	import dash_core_components as dcc
+	import dash_html_components as html
+	
+	import plotly.graph_objs as go
+	
+	import pandas as pd
+	
+	# задаём данные для отрисовки
+	from sqlalchemy import create_engine
+	
+	# пример подключения к базе данных для Postresql
+	# db_config = {'user': 'my_user',
+	#             'pwd': 'my_user_password',
+	#             'host': 'localhost',
+	#             'port': 5432,
+	#             'db': 'games'}
+	# engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'],
+	#                                                            db_config['pwd'],
+	#                                                            db_config['host'],
+	#                                                            db_config['port'],
+	#                                                            db_config['db']))
+	# пример подключения к базе данных для Sqlite
+	engine = create_engine('sqlite:////db/games.db', echo = False)
+	
+	# получаем сырые данные
+	# напишите код
+	query = '''
+	            SELECT * FROM data_raw
+	        '''
+	games_raw = pd.io.sql.read_sql(query, con = engine)
+	
+	# формируем данные для отчёта
+	games_grouped = (games_raw.groupby(['genre', 'year_of_release'])
+	                          .agg({'name':'count'})
+	                          .reset_index()
+	                          .rename(columns = {'name':'Games Released'})
+	                )
+
+	# формируем графики для отрисовки
+	data_games_by_year = []
+	for genre in games_grouped['genre'].unique():
+	    current = games_grouped.query('genre == @genre')
+	    data_games_by_year += [go.Scatter(x = current['year_of_release'], # напишите код
+	                        y = current['Games Released'], # напишите код
+	                        mode = 'lines',
+	                        stackgroup = 'one', # напишите код
+	                        name = genre)] # напишите код
+	
+	
+	
+	# задаём лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+	app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False)
+	app.layout = html.Div(children=[  
+	    
+	    # формируем html
+	    html.H1(children = 'Выпуск игр по годам'),
+	
+	    dcc.Graph(
+	        figure = {'data': data_games_by_year,
+	                  'layout': go.Layout(xaxis = {'title': 'Год'},
+	                                      yaxis = {'title': 'Выпущенные игры'})
+	                 },
+	        id = 'games_by_year'
+	    ),         
+	 
+	])
+	
+	# описываем логику дашборда
+	if __name__ == '__main__':
+	    app.run_server(host='0.0.0.0', port=3000)
+***
+##03 Сбор требований при создании дашборда
+Практические задания отсутствуют
+***
+##04 Как создавать основные типы графиков в dash 
+### Задание 1
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	
+	import dash
+	import dash_core_components as dcc
+	import dash_html_components as html
+	
+	import plotly.graph_objs as go
+	
+	import pandas as pd
+	
+	# задаём данные для отрисовки
+	from sqlalchemy import create_engine
+	
+	# пример подключения к базе данных для Postresql
+	#db_config = {'user': 'my_user',
+	#             'pwd': 'my_user_password',
+	#             'host': 'localhost',
+	#             'port': 5432,
+	#             'db': 'games'}
+	#engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'],
+	#                                                            db_config['pwd'],
+	#                                                            db_config['host'],
+	#                                                            db_config['port'],
+	#                                                            db_config['db']))
+	# пример подключения к базе данных для Sqlite
+	engine = create_engine('sqlite:////db/games.db', echo = False)
+	
+	# получаем сырые данные
+	query = '''
+	            SELECT * FROM data_raw
+	        '''
+	games_raw = pd.io.sql.read_sql(query, con = engine)
+	
+	# преобразуем типы
+	games_raw['year_of_release'] = pd.to_datetime(games_raw['year_of_release'])
+	columns = ['na_players', 'eu_players', 'jp_players', 'other_players', 'user_score', 'critic_score']
+	for column in columns: games_raw[column] = pd.to_numeric(games_raw[column], errors = 'coerce')
+	
+	# формируем данные для отчёта
+	games_grouped = (games_raw.groupby(['year_of_release'])
+	                          .agg({'na_players':'sum',  
+	                                'eu_players': 'sum',
+	                                'jp_players': 'sum',
+	                                'other_players': 'sum'})
+		                          .reset_index()
+		                )
+	
+	# задаём настройки стилей для отрисовки в цикле
+	line_styles = {'na_players': {'color': 'red', 'width': 4}, # ваш код
+	               'eu_players': {'color': 'green', 'width': 3, 'dash': 'dash'}, # ваш код
+	               'jp_players': {'color': 'blue', 'width': 2, 'dash': 'dot'}, # ваш код
+	               'other_players': {'color': 'orange', 'width': 1, 'dash': 'dash'}} # ваш код
+	
+	# формируем графики для отрисовки
+	data_games_by_year = []
+	for column in line_styles.keys():
+	    data_games_by_year += [go.Scatter(x = games_grouped['year_of_release'],
+	                                      y = games_grouped[column],
+	                                      mode = 'lines',
+	                                      line = line_styles[column], # напишите код
+	                                      name = column)]
+	
+	# задаём лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+	app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False)
+	app.layout = html.Div(children=[  
+	    
+	    # формируем заголовок тегом HTML
+	    html.H1(children = 'Продажи игр по годам'),
+	
+	    dcc.Graph(
+	        figure = {'data': data_games_by_year,
+	                 'layout': go.Layout(xaxis = {'title': 'Год'},
+	                                      yaxis = {'title': 'Продажи'})
+	                 },
+	        id = 'sales_by_year'
+	    ),         
+	 
+	])
+	
+	# описываем логику дашборда
+	if __name__ == '__main__':
+	    app.run_server(host='0.0.0.0', port=3000)
+
+	
+
+***
+### Задание 2
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	
+	import dash
+	import dash_core_components as dcc
+	import dash_html_components as html
+	
+	import plotly.graph_objs as go
+	
+	import pandas as pd
+	
+	# задаём данные для отрисовки
+	from sqlalchemy import create_engine
+	
+	# пример подключения к базе данных для Postresql
+	#db_config = {'user': 'my_user',
+	#             'pwd': 'my_user_password',
+	#             'host': 'localhost',
+	#             'port': 5432,
+	#             'db': 'games'}
+	#engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'],
+	#                                                            db_config['pwd'],
+	#                                                            db_config['host'],
+	#                                                            db_config['port'],
+	#                                                            db_config['db']))
+	# пример подключения к базе данных для Sqlite
+	engine = create_engine('sqlite:////db/games.db', echo = False)
+	
+	# получаем сырые данные
+	query = '''
+	            SELECT * FROM data_raw
+	        '''
+	games_raw = pd.io.sql.read_sql(query, con = engine)
+	
+	# преобразуем типы
+	games_raw['year_of_release'] = pd.to_datetime(games_raw['year_of_release'])
+	columns = ['na_players', 'eu_players', 'jp_players', 'other_players', 'user_score', 'critic_score']
+	for column in columns: games_raw[column] = pd.to_numeric(games_raw[column], errors = 'coerce')
+	
+	# формируем данные для отчёта
+	games_grouped = (games_raw.groupby(['year_of_release'])
+	                          .agg({'na_players':'sum',  
+	                                'eu_players': 'sum',
+	                                'jp_players': 'sum',
+	                                'other_players': 'sum'})
+	                          .reset_index()
+	                )
+	
+	# задаём настройки стилей для отрисовки в цикле
+	line_styles = {'na_players': {'color': 'red'}, # ваш код
+	               'eu_players': {'color': 'green'}, # ваш код
+	               'jp_players': {'color': 'blue'}, # ваш код
+	               'other_players': {'color': 'orange'}} # ваш код
+	
+	# формируем графики для отрисовки
+	data_games_by_year = []
+	for column in line_styles.keys():
+	    data_games_by_year += [go.Scatter(x = games_grouped['year_of_release'],
+	                                      y = games_grouped[column],
+	                                      mode = 'lines',
+	                                      line = line_styles[column],
+	                                      stackgroup = 'one', # напишите код
+	                                      name = column)]
+	
+	# задаём лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+	app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False)
+	app.layout = html.Div(children=[  
+	    
+	    # формируем html
+	    html.H1(children = 'Продажи игр по годам'),
+	
+	    dcc.Graph(
+	        figure = {'data': data_games_by_year,
+	                  'layout': go.Layout(xaxis = {'title': 'Год'},
+	                                      yaxis = {'title': 'Продажи'})
+	                 },
+	        id = 'sales_by_year' # напишите код
+	    ),         
+	 
+	])
+	
+	# описываем логику дашборда
+	if __name__ == '__main__':
+	    app.run_server(host='0.0.0.0', port=3000)
+
+***
+
+### Задание 3
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	
+	import dash
+	import dash_core_components as dcc
+	import dash_html_components as html
+	
+	import plotly.graph_objs as go
+	
+	import pandas as pd
+	
+	# задаём данные для отрисовки
+	from sqlalchemy import create_engine
+	
+	# пример подключения к базе данных для Postresql
+	#db_config = {'user': 'my_user',
+	#             'pwd': 'my_user_password',
+	#             'host': 'localhost',
+	#             'port': 5432,
+	#             'db': 'games'}
+	#engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'],
+	#                                                            db_config['pwd'],
+	#                                                            db_config['host'],
+	#                                                            db_config['port'],
+	#                                                            db_config['db']))
+	# пример подключения к базе данных для Sqlite
+	engine = create_engine('sqlite:////db/games.db', echo = False)
+	
+	# получаем сырые данные
+	query = '''
+	            SELECT * FROM data_raw
+	        '''
+	games_raw = pd.io.sql.read_sql(query, con = engine)
+	
+	# преобразуем типы
+	games_raw['year_of_release'] = pd.to_datetime(games_raw['year_of_release'])
+	columns = ['user_score', 'critic_score']
+	for column in columns: games_raw[column] = pd.to_numeric(games_raw[column], errors = 'coerce')
+	
+	# задаём цвета для рейтингов
+	games_raw['rating'] = games_raw['rating'].fillna('Неопр.')
+	rating_styles = {'E': {'color': 'red'},
+	                 'T': {'color': 'green'},
+	                 'M': {'color': 'blue'},
+	                 'E10+': {'color': 'magenta'},
+	                 'EC': {'color': 'yellow'},
+	                 'RP': {'color': 'orange'},
+	                 'AO': {'color': 'blue'},
+	                 'K-A': {'color': 'olive'},
+	                 'Неопр.': {'color': 'grey'}}
+	games_raw['rating_color'] = games_raw['rating'].apply(lambda x: rating_styles[x]['color'])
+	
+	# задаём текст для отображения
+	games_raw['text'] = games_raw.apply(lambda x: '{}:{}'.format(x['platform'], x['name']), axis = 1) # напишите код
+	
+	
+	# формируем графики для отрисовки
+	data = []
+	for rating in games_raw['rating'].unique():
+	    current = games_raw.query('rating == @rating')
+	    data += [go.Scatter(x = current['user_score'],
+	                        y = current['critic_score'],
+	                        mode = 'markers',
+	                        opacity = 0.5,
+	                        marker = {'color': rating_styles[rating]['color']}, # ваш код
+	                        text = games_raw['text'], # ваш код
+                        name = rating)]
+	
+	# задаём лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+	app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False)
+	app.layout = html.Div(children=[  
+	    
+	    # формируем заголовок тегом HTML
+	    html.H1(children = 'Игры по оценкам и возрастному рейтингу'),
+	
+	    dcc.Graph(
+	        figure = {'data': data,
+	                  'layout': go.Layout(xaxis = {'title': 'Оценка игроков'},
+	                                      yaxis = {'title': 'Оценка критиков'},
+	                                      hovermode = 'closest'
+	                                      )
+	                 },
+	        id = 'score_scatter'
+	    ),         
+	 
+	])
+	
+	# описываем логику дашборда
+	if __name__ == '__main__':
+	    app.run_server(host='0.0.0.0', port=3000)
+
+***
+
+### Задание 4
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	
+	import dash
+	import dash_core_components as dcc
+	import dash_html_components as html
+	
+	import plotly.graph_objs as go
+	
+	import pandas as pd
+	
+	# задаём данные для отрисовки
+	from sqlalchemy import create_engine
+	
+	# пример подключения к базе данных для Postresql
+	#db_config = {'user': 'my_user',
+	#             'pwd': 'my_user_password',
+	#             'host': 'localhost',
+	#             'port': 5432,
+	#             'db': 'games'}
+	#engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'],
+	#                                                            db_config['pwd'],
+	#                                                            db_config['host'],
+	#                                                            db_config['port'],
+	#                                                            db_config['db']))
+	# пример подключения к базе данных для Sqlite
+	engine = create_engine('sqlite:////db/games.db', echo = False)
+	
+	# получаем сырые данные
+	query = '''
+	            SELECT * FROM data_raw
+	        '''
+	games_raw = pd.io.sql.read_sql(query, con = engine)
+	
+	# формируем данные для отчёта
+	games_grouped = (games_raw.groupby(['genre'])
+	                          .agg({'name': 'nunique'})
+	                          .rename(columns = {'name': 'games_launched'})
+	                          .reset_index()
+	                )
+	games_grouped = games_grouped.sort_values(by='games_launched', ascending = False) # напишите код
+	
+	# формируем подписи
+	games_grouped['label'] = games_grouped.apply(lambda x: '{} игр'.format(x['games_launched']), axis = 1)
+	
+	# формируем графики для отрисовки
+	data = [go.Bar(x = games_grouped['genre'],
+	               y = games_grouped['games_launched'],
+	               text = games_grouped['label'], # напишите код
+	               textposition = 'auto',               
+	               name = 'games_launched')]
+	
+	# задаём лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+	app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False)
+	app.layout = html.Div(children=[  
+	    
+	    # формируем заголовок тегом HTML
+	    html.H1(children = 'Выпуск игр по жанрам'),
+	
+	    dcc.Graph(
+	        figure = {'data': data,
+	                  'layout': go.Layout(xaxis = {'title': 'Жанр'},
+	                                      yaxis = {'title': 'Выпущенные игры'})
+	                 },
+	        id = 'launches_by_genre' # напишите код
+	    ),         
+	 
+	])
+	
+	# описываем логику дашборда
+	if __name__ == '__main__':
+	    app.run_server(host='0.0.0.0', port=3000)
+
+***
+
+### Задание 5
+
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	
+	import dash
+	import dash_core_components as dcc
+	import dash_html_components as html
+	
+	import plotly.graph_objs as go
+	
+	import pandas as pd
+	
+	# задаём данные для отрисовки
+	from sqlalchemy import create_engine
+	
+	# пример подключения к базе данных для Postresql
+	#db_config = {'user': 'my_user',
+	#             'pwd': 'my_user_password',
+	#             'host': 'localhost',
+	#             'port': 5432,
+	#             'db': 'games'}
+	#engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'],
+	#                                                            db_config['pwd'],
+	#                                                            db_config['host'],
+	#                                                            db_config['port'],
+	#                                                            db_config['db']))
+	# пример подключения к базе данных для Sqlite
+	engine = create_engine('sqlite:////db/games.db', echo = False)
+	
+	# получаем сырые данные
+	query = '''
+	            SELECT * FROM data_raw
+	        '''
+	games_raw = pd.io.sql.read_sql(query, con = engine)
+	
+	games_grouped = (games_raw.groupby('platform')
+	                          .agg({'name': 'nunique'})
+	                          .reset_index()
+	                          .rename(columns = {'name': 'games_launched'})
+	                          .sort_values(by = 'games_launched', ascending = False) # напишите код
+	                          .head(10)) # напишите код
+	
+	# формируем графики для отрисовки
+	data  = [go.Pie(labels = games_grouped['platform'], # ваш код
+	                values = games_grouped['games_launched'], # ваш код
+	                name = 'pie')]
+	
+	# задаём лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+	app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False)
+	app.layout = html.Div(children=[  
+	    
+	    # формируем html
+	    html.H1(children = 'Выпуск игр по платформам (топ-10)'),
+	
+	    dcc.Graph(
+	        figure = {'data': data,
+	                  'layout': go.Layout()
+	                 },
+	        id = 'platform_pie' # напишите код
+	    ),         
+	 
+	])
+	
+	# описываем логику дашборда
+	if __name__ == '__main__':
+	    app.run_server(host='0.0.0.0', port=3000)
+
+***
+
+### Задание 6
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	
+	import dash
+	import dash_core_components as dcc
+	import dash_html_components as html
+	
+	import plotly.graph_objs as go
+	
+	import pandas as pd
+	
+	# задаём данные для отрисовки
+	from sqlalchemy import create_engine
+	
+	# пример подключения к базе данных для Postresql
+	#db_config = {'user': 'my_user',
+	#             'pwd': 'my_user_password',
+	#             'host': 'localhost',
+	#             'port': 5432,
+	#             'db': 'games'}
+	#engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'],
+	#                                                            db_config['pwd'],
+	#                                                            db_config['host'],
+	#                                                            db_config['port'],
+	#                                                            db_config['db']))
+	# пример подключения к базе данных для Sqlite
+	engine = create_engine('sqlite:////db/games.db', echo = False)
+	
+	# получаем сырые данные
+	query = '''
+	            SELECT * FROM data_raw
+	        '''
+	games_raw = pd.io.sql.read_sql(query, con = engine)
+	
+	# преобразуем типы
+	games_raw['year_of_release'] = pd.to_datetime(games_raw['year_of_release'])
+	columns = ['na_players', 'eu_players', 'jp_players', 'other_players']
+	for column in columns: games_raw[column] = pd.to_numeric(games_raw[column], errors = 'coerce')
+	games_raw['total'] = games_raw[['na_players', 'eu_players', 'jp_players', 'other_players']].sum(axis = 1)
+	
+	# формируем графики для отрисовки
+	data = []
+	for genre in games_raw.genre.unique():
+	    current = games_raw.query('genre == @genre')
+	    data += [go.Box(y = current['total'], # напишите код
+	                    name = genre)]
+	
+	# задаём лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+	app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False)
+	app.layout = html.Div(children=[  
+	    
+	    # формируем заголовок тегом HTML
+	    html.H1(children = 'Продажи игр по жанрам'),
+	
+	    dcc.Graph(
+	        figure = {'data': data,
+	                  'layout': go.Layout(xaxis = {'title': 'Жанр'},
+	                                      yaxis = {'title': 'Продажи'})
+	                 },
+	        id = 'games_by_genre' # напишите код
+	    ),         
+	 
+	])
+	
+	# описываем логику дашборда
+	if __name__ == '__main__':
+	    app.run_server(host='0.0.0.0', port=3000)
+
+***
+
+### Задание 7
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	
+	import dash
+	import dash_core_components as dcc
+	import dash_html_components as html
+	
+	import plotly.graph_objs as go
+	
+	import pandas as pd
+	
+	# задаём данные для отрисовки
+	from sqlalchemy import create_engine
+	
+	# пример подключения к базе данных для Postresql
+	#db_config = {'user': 'my_user',
+	#             'pwd': 'my_user_password',
+	#             'host': 'localhost',
+	#             'port': 5432,
+	#             'db': 'games'}
+	#engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'],
+	#                                                            db_config['pwd'],
+	#                                                            db_config['host'],
+	#                                                            db_config['port'],
+	#                                                            db_config['db']))
+	# пример подключения к базе данных для Sqlite
+	engine = create_engine('sqlite:////db/games.db', echo = False)
+	
+	# получаем сырые данные
+	query = '''
+	            SELECT * FROM data_raw
+	        '''
+	games_raw = pd.io.sql.read_sql(query, con = engine)
+	
+	# преобразуем типы
+	games_raw['year_of_release'] = pd.to_datetime(games_raw['year_of_release'])
+	columns = ['na_players', 'eu_players', 'jp_players', 'other_players']
+	for column in columns: games_raw[column] = pd.to_numeric(games_raw[column], errors = 'coerce')
+	games_raw['total'] = games_raw[['na_players',
+	                                'eu_players',
+	                                'jp_players',
+	                                'other_players']].sum(axis = 1).round(2)
+	
+	# сформируйте графики для отрисовки
+	games_raw = games_raw[['name', 'platform', 'genre', 'total']].sort_values(by = 'total', ascending = False).head(10) # напишите код
+	
+	data = [go.Table(header = {'values': ['<b>Игра</b>', '<b>Платформа</b>',
+	                                      '<b>Жанр</b>', '<b>Продажи по всем регионам</b>'],
+	                           'fill_color': 'lightgrey',
+	                           'align': 'center'},
+	                 cells = {'values': games_raw.T.values})] # напишите код
+	
+	# задаём лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+	app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False)
+	app.layout = html.Div(children=[  
+	    
+	    # формируем заголовок тегом HTML
+	    html.H1(children = 'Топ-10 игр по продажам'),
+	
+	    dcc.Graph(
+	        figure = {'data': data,
+	                  'layout': go.Layout()
+	                 },
+	        id = 'games_by_genre' # напишите код
+	    ),         
+	 
+	])
+	
+	# описываем логику дашборда
+	if __name__ == '__main__':
+	    app.run_server(host='0.0.0.0', port=3000)
+
+***
+##05 Основы работы с элементами управления
+Практические задания отсутствуют
+***
+##06 Базовые элементы управления в dash
+Практические задания отсутствуют
+***
+##07 Элементы управления и интерактивность
+### Задание 1
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	
+	import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output
+	
+	import plotly.graph_objs as go
+	
+	from datetime import datetime
+	
+	import pandas as pd
+	
+	# задаём данные для отрисовки
+	from sqlalchemy import create_engine
+	
+	# пример подключения к базе данных для Postresql db_config = {'user': 'my_user', 'pwd': 'my_user_password', 'host': 'localhost', 'port': 5432, 'db': 'games'} engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'], db_config['pwd'], 
+	#                                                            db_config['host'], db_config['port'], db_config['db']))
+	# пример подключения к базе данных для Sqlite
+	engine = create_engine('sqlite:////db/games.db', echo = False)
+	
+	# получаем сырые данные
+	query = ''' SELECT * FROM data_raw ''' games_raw = pd.io.sql.read_sql(query, con = engine)
+	
+	# преобразуем типы
+	games_raw['year_of_release'] = pd.to_datetime(games_raw['year_of_release']) columns = ['na_players', 'eu_players', 'jp_players', 'other_players'] for column in columns: games_raw[column] = pd.to_numeric(games_raw[column], errors = 'coerce')
+	
+	# формируем данные для отчёта
+	games_grouped = (games_raw.groupby(['year_of_release', 'genre']) .agg({'name': 'nunique'}) .reset_index() .rename(columns = {'name': 'games_launched'}) )
+	
+	# задаем лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False) app.layout = html.Div(children=[
+	    
+	    # формируем заголовок тегом HTML
+	    html.H1(children = 'Выпуск игр по годам'),
+	
+	    # выбор временного периода
+	    html.Label('Временной период:'),
+	     # допишите код ниже
+	    dcc.DatePickerRange( start_date = games_grouped['year_of_release'].dt.date.min(), # ваш код end_date = datetime(2016,1,1).strftime('%Y-%m-%d'), # ваш код display_format = 'YYYY-MM-DD', id = 'dt_selector', # ваш код ),
+	
+	    # график выпуска игр по годам
+	    dcc.Graph( id = 'sales_by_year' ),
+	 
+	])
+	
+	# описываем логику дашборда
+	@app.callback( [Output('sales_by_year', 'figure'), ], [Input('dt_selector', 'start_date'), # напишите код Input('dt_selector', 'end_date'), # напишите код ]) def update_figures(start_date, end_date):
+	    # приводим входные параметры к нужным типам
+	    start_date = datetime.strptime(start_date, '%Y-%m-%d') end_date = datetime.strptime(end_date, '%Y-%m-%d')
+	    
+	    # применяем фильтрацию
+	    filtered_data = games_grouped.query('year_of_release >= @start_date and year_of_release <= @end_date')
+	    
+	    # формируем графики для отрисовки с учётом фильтров
+	    data = [] for genre in filtered_data['genre'].unique(): data += [go.Scatter(x = filtered_data.query('genre == @genre')['year_of_release'], y = filtered_data.query('genre == @genre')['games_launched'], mode = 'lines', stackgroup = 'one', name = genre)]
+	
+	    # формируем результат для отображения
+	    return ( { 'data': data, 'layout': go.Layout(xaxis = {'title': 'Дата и время'}, yaxis = {'title': 'Выпущенные игры'})
+	        },
+	    )
+	
+	if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000)
+	
+***
+
+### Задание 2
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	 
+	import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output
+	 
+	import plotly.graph_objs as go
+	 
+	from datetime import datetime
+	 
+	import pandas as pd
+	 
+	# задаём данные для отрисовки
+	from sqlalchemy import create_engine
+	 
+	# пример подключения к базе данных для Sqlite
+	engine = create_engine('sqlite:////db/games.db', echo = False)
+	 
+	# получаем сырые данные
+	query = ''' SELECT * FROM data_raw ''' games_raw = pd.io.sql.read_sql(query, con = engine)
+	 
+	# преобразуем типы
+	games_raw['year_of_release'] = pd.to_datetime(games_raw['year_of_release']) columns = ['na_players', 'eu_players', 'jp_players', 'other_players'] for column in columns: games_raw[column] = pd.to_numeric(games_raw[column], errors = 'coerce')
+	 
+	# формируем данные для отчёта
+	games_grouped = (games_raw.groupby(['year_of_release', 'genre']) .agg({'name': 'nunique'}) .reset_index() .rename(columns = {'name': 'games_launched'}) )
+	 
+	# задаём лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False) app.layout = html.Div(children=[
+	 
+	    # формируем заголовок тегом HTML
+	    html.H1(children = 'Выпуск игр по годам'),
+	 
+	    # выбор временного периода
+	    html.Label('Временной период:'), dcc.DatePickerRange( start_date = games_grouped['year_of_release'].dt.date.min(), end_date = datetime(2016,1,1).strftime('%Y-%m-%d'), display_format = 'YYYY-MM-DD', id = 'dt_selector', ),
+	 
+	    # выбор режима отображения абсолютные/относительные значения
+	    html.Label('Режим отображения:'), dcc.RadioItems( # напишите код options = [ {'label': 'Абсолютные значения', 'value': 'absolute_values'}, {'label': '% от общего выпуска', 'value': 'relative_values'}, ], value = 'absolute_values', id = 'mode_selector' # 
+	        напишите код
+	    ),
+	 
+	    # график выпуска игр по годам
+	    dcc.Graph( id = 'sales_by_year' ),
+	 
+	])
+	 
+	# описываем логику дашборда
+	@app.callback( [Output('sales_by_year', 'figure'), ], [Input('dt_selector', 'start_date'), Input('dt_selector', 'end_date'), Input('mode_selector', 'value'), # напишите код ]) def update_figures(start_date, end_date, mode):
+	 
+	    # приводим входные параметры к нужным типам
+	    start_date = datetime.strptime(start_date, '%Y-%m-%d') end_date = datetime.strptime(end_date, '%Y-%m-%d')
+	 
+	    # применяем фильтрацию
+	    filtered_data = games_grouped.query('year_of_release >= @start_date and year_of_release <= @end_date')
+	 
+	    # трансформируем в соотв. с выбранным режимом отображения
+	    if mode == 'relative_values': # напишите код total_by_year = (filtered_data.groupby('year_of_release') .agg({'games_launched': 'sum'}) .rename(columns = {'games_launched': 'total'}) ) filtered_data = (filtered_data.set_index('year_of_release') 
+	                         .join(total_by_year) .reset_index())
+	        filtered_data['games_launched'] = filtered_data['games_launched'] / filtered_data['total']
+	 
+	        # формируем графики для отрисовки с учётом фильтров
+	    data = [] for genre in filtered_data['genre'].unique(): data += [go.Scatter(x = filtered_data.query('genre == @genre')['year_of_release'], y = filtered_data.query('genre == @genre')['games_launched'], mode = 'lines', stackgroup = 'one', name = genre)]
+	 
+	  # формируем результат для отображения
+	    return ( { 'data': data, 'layout': go.Layout(xaxis = {'title': 'Дата и время'}, yaxis = {'title': 'Выпущенные игры'})
+	        },
+	    )
+	 
+	if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000)
+	
+***
+
+### Задание 3
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	 
+	import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output
+	 
+	import plotly.graph_objs as go
+	 
+	from datetime import datetime
+	 
+	import pandas as pd
+	 
+	# задаём данные для отрисовки
+	from sqlalchemy import create_engine
+	 
+	# пример подключения к базе данных для Sqlite
+	engine = create_engine('sqlite:////db/games.db', echo = False)
+	 
+	# получаем сырые данные
+	query = ''' SELECT * FROM data_raw ''' games_raw = pd.io.sql.read_sql(query, con = engine)
+	 
+	# преобразуем типы
+	games_raw['year_of_release'] = pd.to_datetime(games_raw['year_of_release']) columns = ['na_players', 'eu_players', 'jp_players', 'other_players'] for column in columns: games_raw[column] = pd.to_numeric(games_raw[column], errors = 'coerce')
+	 
+	# формируем данные для отчёта
+	games_grouped = (games_raw.groupby(['year_of_release', 'genre']) .agg({'name': 'nunique'}) .reset_index() .rename(columns = {'name': 'games_launched'}) )
+	 
+	# задаём лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False) app.layout = html.Div(children=[
+	 
+	    # формируем заголовок тегом HTML
+	    html.H1(children = 'Выпуск игр по годам'),
+	 
+	    # выбор временного периода
+	    html.Label('Временной период:'), dcc.DatePickerRange( start_date = games_grouped['year_of_release'].dt.date.min(), end_date = datetime(2016,1,1).strftime('%Y-%m-%d'), display_format = 'YYYY-MM-DD', id = 'dt_selector', ),
+	 
+	    # выбор режима отображения абсолютные/относительные значения
+	    html.Label('Режим отображения:'), dcc.RadioItems( options = [ {'label': 'Абсолютные значения', 'value': 'absolute_values'}, {'label': '% от общего выпуска', 'value': 'relative_values'}, ], value = 'absolute_values', id = 'mode_selector' ),
+	 
+	    # выбор жанра
+	    html.Label('Жанры:'), dcc.Checklist( # напишите код options = [{'label': x, 'value': x} for x in games_grouped['genre'].unique()], value = games_grouped['genre'].unique().tolist(), id = 'genre_selector' # напишите код ),
+	 
+	    # график выпуска игр по годам
+	    dcc.Graph( id = 'sales_by_year' ),
+	 
+	])
+ 	
+	# описываем логику дашборда
+	@app.callback( [Output('sales_by_year', 'figure'), ], [Input('dt_selector', 'start_date'), Input('dt_selector', 'end_date'), Input('mode_selector', 'value'), Input('genre_selector', 'value'), # напишите код ]) def update_figures(start_date, end_date, mode, 
+	selected_genres):
+	 
+	    # приводим входные параметры к нужным типам
+	    start_date = datetime.strptime(start_date, '%Y-%m-%d') end_date = datetime.strptime(end_date, '%Y-%m-%d')
+	 
+	    # применяем фильтрацию
+	    filtered_data = games_grouped.query('year_of_release >= @start_date and year_of_release <= @end_date') filtered_data = filtered_data.query('genre in @selected_genres')
+	 
+	    # трансформируем в соотв. с выбранным режимом отображения
+	    if mode == 'relative_values': total_by_year = (filtered_data.groupby('year_of_release') .agg({'games_launched': 'sum'}) .rename(columns = {'games_launched': 'total'}) ) filtered_data = (filtered_data.set_index('year_of_release') .join(total_by_year) 
+	                         .reset_index())
+	        filtered_data['games_launched'] = filtered_data['games_launched'] / filtered_data['total']
+	 
+	        # формируем графики для отрисовки с учётом фильтров
+	    data = [] for genre in filtered_data['genre'].unique(): data += [go.Scatter(x = filtered_data.query('genre == @genre')['year_of_release'], y = filtered_data.query('genre == @genre')['games_launched'], mode = 'lines', stackgroup = 'one', name = genre)]
+	 
+	      # формируем результат для отображения
+	    return ( { 'data': data, 'layout': go.Layout(xaxis = {'title': 'Дата и время'}, yaxis = {'title': 'Выпущенные игры'})
+	        },
+	    )
+	 
+	if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000)
+***
+
+### Задание 4
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	 
+	import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output
+	 
+	import plotly.graph_objs as go
+	 
+	from datetime import datetime
+	 
+	import pandas as pd
+	 
+	# задаём данные для отрисовки
+	from sqlalchemy import create_engine
+	 
+	# пример подключения к базе данных для Sqlite
+	engine = create_engine('sqlite:////db/games.db', echo = False)
+	 
+	# получаем сырые данные
+	query = ''' SELECT * FROM data_raw ''' games_raw = pd.io.sql.read_sql(query, con = engine)
+	 
+	# преобразуем типы
+	games_raw['year_of_release'] = pd.to_datetime(games_raw['year_of_release']) columns = ['na_players', 'eu_players', 'jp_players', 'other_players'] for column in columns: games_raw[column] = pd.to_numeric(games_raw[column], errors = 'coerce')
+	 
+	# формируем данные для отчёта
+	games_grouped = (games_raw.groupby(['year_of_release', 'genre']) .agg({'name': 'nunique'}) .reset_index() .rename(columns = {'name': 'games_launched'}) )
+	 
+	# задаём лейаут
+	external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False) app.layout = html.Div(children=[
+	 
+	    # формируем заголовок тегом HTML
+	    html.H1(children = 'Выпуск игр по годам'),
+	 
+	    # выбор временного периода
+	    html.Label('Временной период:'), dcc.DatePickerRange( start_date = games_grouped['year_of_release'].dt.date.min(), end_date = datetime(2016,1,1).strftime('%Y-%m-%d'), display_format = 'YYYY-MM-DD', id = 'dt_selector', ),
+	 
+	    # выбор режима отображения абсолютные/относительные значения
+	    html.Label('Режим отображения:'), dcc.RadioItems( options = [ {'label': 'Абсолютные значения', 'value': 'absolute_values'}, {'label': '% от общего выпуска', 'value': 'relative_values'}, ], value = 'absolute_values', id = 'mode_selector' ),
+	 
+	    # выбор жанра
+	    html.Label('Жанры:'), dcc.Dropdown( # напишите код options = [{'label': x, 'value': x} for x in games_grouped['genre'].unique()], # ваш код value = games_grouped['genre'].unique().tolist(), # ваш код multi = True, # ваш код id = 'genre_selector' # ваш 
+	        код
+	    ),
+	 
+	    # график выпуска игр по годам
+	    dcc.Graph( id = 'sales_by_year' ),
+		 
+	])
+	 
+	# описываем логику дашборда
+	@app.callback( [Output('sales_by_year', 'figure'), ], [Input('dt_selector', 'start_date'), Input('dt_selector', 'end_date'), Input('mode_selector', 'value'), Input('genre_selector', 'value'), ]) def update_figures(start_date, end_date, mode, 
+	selected_genres):
+	 
+	    # приводим входные параметры к нужным типам
+	    start_date = datetime.strptime(start_date, '%Y-%m-%d') end_date = datetime.strptime(end_date, '%Y-%m-%d')
+	 
+	    # применяем фильтрацию
+	    filtered_data = games_grouped.query('year_of_release >= @start_date and year_of_release <= @end_date') filtered_data = filtered_data.query('genre in @selected_genres')
+	 
+	    # трансформируем в соотв. с выбранным режимом отображения
+	    if mode == 'relative_values': total_by_year = (filtered_data.groupby('year_of_release') .agg({'games_launched': 'sum'}) .rename(columns = {'games_launched': 'total'}) ) filtered_data = (filtered_data.set_index('year_of_release') .join(total_by_year) 
+	                         .reset_index())
+	        filtered_data['games_launched'] = filtered_data['games_launched'] / filtered_data['total']
+	 
+	        # формируем графики для отрисовки с учётом фильтров
+		    data = [] for genre in filtered_data['genre'].unique(): data += [go.Scatter(x = filtered_data.query('genre == @genre')['year_of_release'], y = filtered_data.query('genre == @genre')['games_launched'], mode = 'lines', stackgroup = 'one', name = 
+	                            genre)]
+	 
+	  # формируем результат для отображения
+	    return ( { 'data': data, 'layout': go.Layout(xaxis = {'title': 'Дата и время'}, yaxis = {'title': 'Выпущенные игры'})
+	                 },
+	    )
+	 
+	if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000)
+	
+***
+
+##08 Элементы дашборда
+***
+### Задание 1
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output import plotly.graph_objs as go note = ''' Этот дашборд поможет вам выучить правила композиции дашбордов. '''
+# задаём лейаут
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False) app.layout = html.Div(children=[
+    
+    # формируем html
+    html.H1(children = 'История игрового рынка'), # напишите код
+    # пояснения
+    html.Label(note), # ваш код
+           
+ 
+])
+# описываем логику дашборда
+if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000) ***
+### Задание 2
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output import plotly.graph_objs as go note = ''' Этот дашборд поможет вам выучить правила композиции дашбордов. '''
+# задаём лейаут
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False) app.layout = html.Div(children=[
+    
+    # формируем html
+    html.H1(children = 'История игрового рынка'), html.Br(), # напишите код
+    # пояснения
+    html.Label(note), html.Br(), # напишите код
+ 
+])
+# описываем логику дашборда
+if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000) ***
+### Задание 3
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+ 
+import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output
+ 
+import plotly.graph_objs as go
+ 
+from datetime import datetime
+ 
+import pandas as pd
+ 
+# задаём данные для отрисовки
+from sqlalchemy import create_engine
+ 
+# пример подключения к базе данных для Postresql db_config = {'user': 'my_user', 'pwd': 'my_user_password', 'host': 'localhost', 'port': 5432, 'db': 'games'} engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'], db_config['pwd'], 
+#                                                            db_config['host'], db_config['port'], db_config['db']))
+# пример подключения к базе данных для Sqlite
+engine = create_engine('sqlite:////db/games.db', echo = False)
+ 
+# получаем сырые данные
+query = ''' SELECT * FROM agg_games_year_genre_platform ''' agg_games_year_genre_platform = pd.io.sql.read_sql(query, con = engine) agg_games_year_genre_platform["year_of_release"] = pd.to_datetime(agg_games_year_genre_platform["year_of_release"])
+ 
+note = ''' Этот дашборд поможет вам выучить правила композиции дашбордов. '''
+ 
+# задаём лейаут
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets,compress=False) app.layout = html.Div(children=[
+ 
+    # формируем html
+    html.H1(children = 'История игрового рынка'),
+ 
+    html.Br(),
+ 
+    # пояснения
+    html.Label(note),
+ 
+    html.Br(),
+ 
+    # выбор временного периода
+    html.Label('Года выпуска:'), dcc.DatePickerRange( start_date = agg_games_year_genre_platform['year_of_release'].dt.date.min(), end_date = datetime(2016,1,1).strftime('%Y-%m-%d'), display_format = 'YYYY-MM-DD', id = 'dt_selector', ),
+ 
+    html.Div([ html.Div([
+        # график выпуска игр по годам и жанрам
+        html.Label('Выпуск игр по жанрам:'), dcc.Graph( style = {'height': '50vw'}, id = 'launches_by_genre' ), ], className = 'twelve columns'), ], className = 'row'), # напишите код
+ 
+])
+ 
+# описываем логику дашборда
+@app.callback( [Output('launches_by_genre', 'figure'), ], [Input('dt_selector', 'start_date'), Input('dt_selector', 'end_date'), ] ) def update_figures(start_date, end_date):
+ 
+  # для простоты игнорируем фильтрацию
+ 
+    games_by_genre = (agg_games_year_genre_platform.groupby(['year_of_release', 'genre']) .agg({'games': 'sum'}) .reset_index() ) y_label = 'Выпущенные игры'
+ 
+  # график выпуска по жанрам
+    launches_by_genre = [] for genre in games_by_genre['genre'].unique(): launches_by_genre += [go.Scatter(x = games_by_genre.query('genre == @genre')['year_of_release'], y = games_by_genre.query('genre == @genre')['games'], mode = 'lines', stackgroup = 'one', name 
+                                   = genre)]
+ 
+  # формируем результат для отображения
+    return ( { 'data': launches_by_genre, 'layout': go.Layout(xaxis = {'title': 'Год'}, yaxis = {'title': y_label})
+             },
+  )
+ 
+if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000)
+***
+
+### Задание 4
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output import plotly.graph_objs as go from datetime import datetime import pandas as pd
+# задаём данные для отрисовки
+from sqlalchemy import create_engine
+# пример подключения к базе данных для Postresql db_config = {'user': 'my_user', 'pwd': 'my_user_password', 'host': 'localhost', 'port': 5432, 'db': 'games'} engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'], db_config['pwd'], 
+#                                                            db_config['host'], db_config['port'], db_config['db']))
+# пример подключения к базе данных для Sqlite
+engine = create_engine('sqlite:////db/games.db', echo=False)
+# получаем сырые данные
+query = ''' SELECT * FROM agg_games_year_genre_platform ''' agg_games_year_genre_platform = pd.io.sql.read_sql(query, con=engine) agg_games_year_genre_platform["year_of_release"] = pd.to_datetime( agg_games_year_genre_platform["year_of_release"] ) note = ''' Этот 
+          дашборд поможет вам выучить правила композиции дашбордов.
+       '''
+# задаём лейаут
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash( __name__, external_stylesheets=external_stylesheets, compress=False ) app.layout = html.Div( children=[
+        # формируем html
+        html.H1(children='История игрового рынка'), html.Br(),
+        # пояснения
+        html.Label(note), html.Br(),
+        # выбор временного периода
+        html.Label('Года выпуска:'), dcc.DatePickerRange( start_date=agg_games_year_genre_platform[ 'year_of_release' ].dt.date.min(), end_date=datetime(2016, 1, 1).strftime('%Y-%m-%d'), display_format='YYYY-MM-DD', id='dt_selector', ), html.Div( [ html.Div( [ 
+                        html.Br(),
+                        # график выпуска игр по годам и жанрам
+                        html.Label('Выпуск игр по жанрам:'), dcc.Graph( style={'height': '50vw'}, # напишите код id='launches_by_genre', ), ], className='six columns', ), # напишите код html.Div( [ html.Br(),
+                        # график продаж игр по жанрам
+                        html.Label('Продажи по жанрам:'), dcc.Graph( style={'height': '50vw'}, # напишите код id='sales_by_genre', ), ], className='six columns', ), # напишите код ], className='row', ), ] )
+# описываем логику дашборда
+@app.callback( [ Output('launches_by_genre', 'figure'), Output('sales_by_genre', 'figure'), ], [ Input('dt_selector', 'start_date'), Input('dt_selector', 'end_date'), ], ) def update_figures(start_date, end_date):
+    # для простоты игнорируем фильтрацию
+    games_by_genre = ( agg_games_year_genre_platform.groupby(['year_of_release', 'genre']) .agg({'games': 'sum'}) .reset_index() ) sales_by_genre = ( agg_games_year_genre_platform.groupby(['genre']) .agg({'total_copies_sold': 'sum'}) .reset_index() )
+    # все жанры с малым количеством игр помещаем в одну категорию
+    sales_by_genre['percent'] = ( sales_by_genre['total_copies_sold'] / sales_by_genre['total_copies_sold'].sum() ) sales_by_genre.loc[sales_by_genre['percent'] < 0.05, 'genre'] = 'Другие'
+    # и еще раз группируем
+    sales_by_genre = ( sales_by_genre.groupby(['genre']) .agg({'total_copies_sold': 'sum'}) .reset_index() ) y_label = 'Выпущенные игры'
+    # график выпуска по жанрам
+    launches_by_genre = [] for genre in games_by_genre['genre'].unique(): launches_by_genre += [ go.Scatter( x=games_by_genre.query('genre == @genre')['year_of_release'], y=games_by_genre.query('genre == @genre')['games'], mode='lines', stackgroup='one', name=genre, 
+            )
+        ]
+    # график продаж игр по жанрам
+    sales_by_genre = [ go.Pie( labels=sales_by_genre['genre'], values=sales_by_genre['total_copies_sold'], name='platfroms', ) ]
+    # формируем результат для отображения
+    return ( { 'data': launches_by_genre, 'layout': go.Layout( xaxis={'title': 'Год'}, yaxis={'title': y_label} ),
+        },
+        {'data': sales_by_genre, 'layout': go.Layout()
+        },
+    ) if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000)
+***
+
+### Задание 5
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output import plotly.graph_objs as go from datetime import datetime import pandas as pd
+# задаём данные для отрисовки
+from sqlalchemy import create_engine
+# пример подключения к базе данных для Postresql db_config = {'user': 'my_user', 'pwd': 'my_user_password', 'host': 'localhost', 'port': 5432, 'db': 'games'} engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'], db_config['pwd'], 
+#                                                            db_config['host'], db_config['port'], db_config['db']))
+# пример подключения к базе данных для Sqlite
+engine = create_engine('sqlite:////db/games.db', echo=False)
+# получаем сырые данные
+query = ''' SELECT * FROM agg_games_year_genre_platform ''' agg_games_year_genre_platform = pd.io.sql.read_sql(query, con=engine) agg_games_year_genre_platform["year_of_release"] = pd.to_datetime( agg_games_year_genre_platform["year_of_release"] ) note = ''' Этот 
+          дашборд поможет вам выучить правила композиции дашбордов.
+       '''
+# задаём лейаут
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash( __name__, external_stylesheets=external_stylesheets, compress=False ) app.layout = html.Div( children=[
+        # формируем html
+        html.H1(children='История игрового рынка'), html.Br(),
+        # пояснения
+        html.Label(note), html.Br(),
+        # выбор временного периода
+        html.Label('Года выпуска:'), dcc.DatePickerRange( start_date=agg_games_year_genre_platform[ 'year_of_release' ].dt.date.min(), end_date=datetime(2016, 1, 1).strftime('%Y-%m-%d'), display_format='YYYY-MM-DD', id='dt_selector', ), html.Div( [ html.Div( [ 
+                        html.Br(),
+                        # график выпуска игр по годам и жанрам
+                        html.Label('Выпуск игр по жанрам:'), dcc.Graph( style={'height': '50vw'}, # напишите код id='launches_by_genre', ), ], className='eight columns', ), # напишите код html.Div( [ html.Br(),
+                        # график продаж игр по платформам
+                        html.Label('Продажи по платформам:'), dcc.Graph( style={'height': '25vw'}, # напишите код id='sales_by_platform', ),
+                        # график продаж игр по жанрам
+                        html.Label('Продажи по жанрам:'), dcc.Graph( style={'height': '25vw'}, # напишите код id='sales_by_genre', ), ], className='four columns', ), # напишите код ], className='row', ), ] )
+# описываем логику дашборда
+@app.callback( [ Output('launches_by_genre', 'figure'), Output('sales_by_platform', 'figure'), Output('sales_by_genre', 'figure'), ], [ Input('dt_selector', 'start_date'), Input('dt_selector', 'end_date'), ], ) def update_figures(start_date, end_date):
+    # для простоты игнорируем фильтрацию
+    games_by_genre = ( agg_games_year_genre_platform.groupby(['year_of_release', 'genre']) .agg({'games': 'sum'}) .reset_index() ) sales_by_genre = ( agg_games_year_genre_platform.groupby(['genre']) .agg({'total_copies_sold': 'sum'}) .reset_index() )
+    # все жанры с малым количеством игр помещаем в одну категорию
+    sales_by_genre['percent'] = ( sales_by_genre['total_copies_sold'] / sales_by_genre['total_copies_sold'].sum() ) sales_by_genre.loc[sales_by_genre['percent'] < 0.05, 'genre'] = 'Другие'
+    # и еще раз группируем
+    sales_by_genre = ( sales_by_genre.groupby(['genre']) .agg({'total_copies_sold': 'sum'}) .reset_index() ) sales_by_platform = ( agg_games_year_genre_platform.groupby(['platform']) .agg({'total_copies_sold': 'sum'}) .reset_index() )
+    # все платформы с малым количеством игр помещаем в одну категорию
+    sales_by_platform['percent'] = ( sales_by_platform['total_copies_sold'] / sales_by_platform['total_copies_sold'].sum() ) sales_by_platform.loc[ sales_by_platform['percent'] < 0.05, 'platform' ] = 'Другие'
+    # и еще раз группируем
+    sales_by_platform = ( sales_by_platform.groupby(['platform']) .agg({'total_copies_sold': 'sum'}) .reset_index() ) y_label = 'Выпущенные игры'
+    # график выпуска по жанрам
+    data_by_genre = [] for genre in games_by_genre['genre'].unique(): data_by_genre += [ go.Scatter( x=games_by_genre.query('genre == @genre')['year_of_release'], y=games_by_genre.query('genre == @genre')['games'], mode='lines', stackgroup='one', name=genre, ) ]
+    # график продаж игр по жанрам
+    sales_by_genre = [ go.Pie( labels=sales_by_genre['genre'], values=sales_by_genre['total_copies_sold'], name='platfroms', ) ]
+    # график продаж игр по платформам
+    sales_by_platform = [ go.Pie( labels=sales_by_platform['platform'], values=sales_by_platform['total_copies_sold'], name='platfroms', ) ]
+    # формируем результат для отображения
+    return ( { 'data': data_by_genre, 'layout': go.Layout( xaxis={'title': 'Год'}, yaxis={'title': y_label} ),
+        },
+        {'data': sales_by_platform, 'layout': go.Layout()}, {'data': sales_by_genre, 'layout': go.Layout()}, ) if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000)
+***
+
+##09 Разработка дашборда, основы композиции
+***
+### Задание 1
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output import plotly.graph_objs as go from datetime import datetime import pandas as pd
+# задаём данные для отрисовки
+from sqlalchemy import create_engine
+# пример подключения к базе данных для Postresql db_config = {'user': 'my_user', 'pwd': 'my_user_password', 'host': 'localhost', 'port': 5432, 'db': 'games'} engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'], db_config['pwd'], 
+#                                                            db_config['host'], db_config['port'], db_config['db']))
+# пример подключения к базе данных для Sqlite
+engine = create_engine('sqlite:////db/games.db', echo = False)
+# получаем сырые данные напишите код
+query = ''' SELECT * FROM agg_games_year_genre_platform ''' agg_games_year_genre_platform = pd.io.sql.read_sql(query, con = engine) agg_games_year_genre_platform['year_of_release'] = pd.to_datetime(agg_games_year_genre_platform['year_of_release']) query = ''' SELECT 
+            * FROM agg_games_year_score
+        ''' agg_games_year_score = pd.io.sql.read_sql(query, con = engine) agg_games_year_score['year_of_release'] = pd.to_datetime(agg_games_year_score['year_of_release'])
+# игнорируем записи без оценок
+agg_games_year_score = agg_games_year_score.query('avg_user_score > 0 and avg_critic_score > 0') note = ''' Этот дашборд показывает историю игрового рынка (исключая мобильные устройства). Используйте выбор интервала даты выпуска, жанра и платформы для управления 
+          дашбордом. Используйте селектор выбора режима отображения для того, чтобы показать абсолютные или относительные значения выпуска и продаж игр по годам.
+       '''
+# задаём лейаут
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets, compress=False) app.layout = html.Div(children=[
+    
+    # формируем html
+    html.H1(children = 'История игрового рынка'), # напишите код
+    # пояснения
+    html.Label(note), # напишите код
+ 
+]) if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000) ***
+### Задание 2
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output import plotly.graph_objs as go from datetime import datetime import pandas as pd
+# задаём данные для отрисовки
+from sqlalchemy import create_engine
+# пример подключения к базе данных для Postresql db_config = {'user': 'my_user', 'pwd': 'my_user_password', 'host': 'localhost', 'port': 5432, 'db': 'games'} engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'], db_config['pwd'], 
+#                                                            db_config['host'], db_config['port'], db_config['db']))
+# пример подключения к базе данных для Sqlite
+engine = create_engine('sqlite:////db/games.db', echo=False)
+# получаем сырые данные
+query = ''' SELECT * FROM agg_games_year_genre_platform ''' agg_games_year_genre_platform = pd.io.sql.read_sql(query, con = engine) agg_games_year_genre_platform['year_of_release'] = pd.to_datetime(agg_games_year_genre_platform['year_of_release']) query = ''' SELECT 
+            * FROM agg_games_year_score
+        ''' agg_games_year_score = pd.io.sql.read_sql(query, con = engine) agg_games_year_score['year_of_release'] = pd.to_datetime(agg_games_year_score['year_of_release'])
+# игнорируем записи без оценок
+agg_games_year_score = agg_games_year_score.query('avg_user_score > 0 and avg_critic_score > 0') note = ''' Этот дашборд показывает историю игрового рынка (исключая мобильные устройства). Используйте выбор интервала даты выпуска, жанра и платформы для управления 
+          дашбордом. Используйте селектор выбора режима отображения для того, чтобы показать абсолютные или относительные значения выпуска и продаж игр по годам.
+       '''
+# задаём лейаут
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets, compress=False) app.layout = html.Div(children=[
+    
+    # формируем html
+    html.H1(children = 'История игрового рынка'), html.Br(), html.Div([ html.Div([
+            # график выпуска игр по годам и жанрам
+            html.Label('Выпуск игр по жанрам:'), dcc.RadioItems( options = [ {'label': 'Абсолютные значения', 'value': 'absolute_values'}, {'label': '% от общего выпуска', 'value': 'relative_values'}, ], value = 'absolute_values', id = 'mode_selector' # напишите код 
+            ),
+        
+            dcc.Graph( id = 'launches_by_genre' # напишите код ), ], className = 'eight columns'), html.Div([
+            # график выпуска игр по платформам
+             html.Label('Выпуск игр по платформам:'), dcc.Graph( id = 'launches_by_platform' # напишите код ), ], className = 'four columns'), ], className = 'row'), html.Div([ html.Div([
+            # график продаж игр по жанрам
+            html.Label('Продажи игр по жанрам:'),
+        
+            dcc.Graph( id = 'sales_by_genre' # напишите код ), ], className = 'eight columns'), html.Div([
+            # график средних оценок по жанрам
+            html.Label('Средние оценки по жанрам:'),
+        
+            dcc.Graph( id = 'scores_by_genre' # напишите код ), ], className = 'four columns'),
+        
+    ], className = 'row'),
+    # пояснения
+    html.Label(note), html.Br(), html.Div([ html.Div([
+            # выбор временного периода
+            html.Label('Года выпуска:'), dcc.DatePickerRange( start_date = agg_games_year_genre_platform['year_of_release'].dt.date.min(), end_date = datetime(2016,1,1).strftime('%Y-%m-%d'), display_format = 'YYYY-MM-DD', id = 'dt_selector' # напишите код ), ], 
+        className = 'two columns'), html.Div([
+            # выбор жанра
+            html.Label('Жанры:'), dcc.Dropdown( options = [{'label': x, 'value': x} for x in agg_games_year_genre_platform['genre'].unique()], value = agg_games_year_genre_platform['genre'].unique().tolist(), multi = True, id = 'genre_selector' # напишите код ), ], 
+        className = 'four columns'), html.Div([
+            # выбор платформы
+            html.Label('Платформы:'), dcc.Dropdown( options = [{'label': x, 'value': x} for x in agg_games_year_genre_platform['platform'].unique()], value = agg_games_year_genre_platform['platform'].unique().tolist(), multi = True, id = 'platform_selector' # 
+                напишите код
+            ), ], className = 'six columns'), ], className = 'row'),
+ 
+]) if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000)
+***
+
+### Задание 3
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output import plotly.graph_objs as go from datetime import datetime import pandas as pd
+# задаём данные для отрисовки
+from sqlalchemy import create_engine
+# пример подключения к базе данных для Postresql db_config = {'user': 'my_user', 'pwd': 'my_user_password', 'host': 'localhost', 'port': 5432, 'db': 'games'} engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'], db_config['pwd'], 
+#                                                            db_config['host'], db_config['port'], db_config['db']))
+# пример подключения к базе данных для Sqlite
+engine = create_engine('sqlite:////db/games.db', echo=False)
+# получаем сырые данные
+query = ''' SELECT * FROM agg_games_year_genre_platform ''' agg_games_year_genre_platform = pd.io.sql.read_sql(query, con = engine) agg_games_year_genre_platform['year_of_release'] = pd.to_datetime(agg_games_year_genre_platform['year_of_release']) query = ''' SELECT 
+            * FROM agg_games_year_score
+        ''' agg_games_year_score = pd.io.sql.read_sql(query, con = engine) agg_games_year_score['year_of_release'] = pd.to_datetime(agg_games_year_score['year_of_release'])
+# игнорируем записи без оценок
+agg_games_year_score = agg_games_year_score.query('avg_user_score > 0 and avg_critic_score > 0') note = ''' Этот дашборд показывает историю игрового рынка (исключая мобильные устройства). Используйте выбор интервала даты выпуска, жанра и платформы для управления 
+          дашбордом. Используйте селектор выбора режима отображения для того, чтобы показать абсолютные или относительные значения выпуска и продаж игр по годам.
+       '''
+# задаём лейаут
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets, compress=False) app.layout = html.Div(children=[
+    
+    # формируем html
+    html.H1(children = 'История игрового рынка'), html.Br(), html.Div([ html.Div([
+            # график выпуска игр по годам и жанрам
+            html.Label('Выпуск игр по жанрам:'), dcc.RadioItems( options = [ {'label': 'Абсолютные значения', 'value': 'absolute_values'}, {'label': '% от общего выпуска', 'value': 'relative_values'}, ], value = 'absolute_values', id = 'mode_selector' ),
+        
+            dcc.Graph( id = 'launches_by_genre' ), ], className = 'eight columns'), html.Div([
+            # график выпуска игр по платформам
+             html.Label('Выпуск игр по платформам:'), dcc.Graph( id = 'launches_by_platform' ), ], className = 'four columns'), ], className = 'row'), html.Div([ html.Div([
+            # график выпуска игр по годам и жанрам
+            html.Label('Продажи игр по жанрам:'),
+        
+            dcc.Graph( id = 'sales_by_genre' ), ], className = 'eight columns'), html.Div([
+            # график средних оценок по
+            html.Label('Средние оценки по жанрам:'),
+        
+            dcc.Graph( id = 'scores_by_genre' ), ], className = 'four columns'),
+        
+    ], className = 'row'),
+    # пояснения
+    html.Label(note), html.Br(), html.Div([ html.Div([
+            # выбор временного периода
+            html.Label('Года выпуска:'), dcc.DatePickerRange( start_date = agg_games_year_genre_platform['year_of_release'].dt.date.min(), end_date = datetime(2016,1,1).strftime('%Y-%m-%d'), display_format = 'YYYY-MM-DD', id = 'dt_selector', ), ], className = 'two 
+        columns'), html.Div([
+            # выбор жанра
+            html.Label('Жанры:'), dcc.Dropdown( options = [{'label': x, 'value': x} for x in agg_games_year_genre_platform['genre'].unique()], value = agg_games_year_genre_platform['genre'].unique().tolist(), multi = True, id = 'genre_selector' ), ], className = 
+        'four columns'), html.Div([
+            # выбор платформы
+            html.Label('Платформы:'), dcc.Dropdown( options = [{'label': x, 'value': x} for x in agg_games_year_genre_platform['platform'].unique()], value = agg_games_year_genre_platform['platform'].unique().tolist(), multi = True, id = 'platform_selector' ), ], 
+        className = 'six columns'),
+    ], className = 'row'),
+ 
+])
+#описываем логику дашборда
+@app.callback( [ Output('launches_by_genre', 'figure'), Output('launches_by_platform', 'figure'), Output('sales_by_genre', 'figure'), Output('scores_by_genre', 'figure'), ], [ Input('dt_selector', 'start_date'), Input('dt_selector', 'end_date'), 
+        Input('mode_selector', 'value'), Input('genre_selector', 'value'), Input('platform_selector', 'value'),
+    ]) def update_figures(start_date, end_date, mode, selected_genres, selected_platforms): pass if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000)
+***
+
+### Задание 4
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output import plotly.graph_objs as go from datetime import datetime import pandas as pd
+# задаём данные для отрисовки
+from sqlalchemy import create_engine
+# пример подключения к базе данных для Postresql db_config = {'user': 'my_user', 'pwd': 'my_user_password', 'host': 'localhost', 'port': 5432, 'db': 'games'} engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'], db_config['pwd'], 
+#                                                            db_config['host'], db_config['port'], db_config['db']))
+# пример подключения к базе данных для Sqlite
+engine = create_engine('sqlite:////db/games.db', echo=False)
+# получаем сырые данные
+query = ''' SELECT * FROM agg_games_year_genre_platform ''' agg_games_year_genre_platform = pd.io.sql.read_sql(query, con = engine) agg_games_year_genre_platform['year_of_release'] = pd.to_datetime(agg_games_year_genre_platform['year_of_release']) query = ''' SELECT 
+            * FROM agg_games_year_score
+        ''' agg_games_year_score = pd.io.sql.read_sql(query, con = engine) agg_games_year_score['year_of_release'] = pd.to_datetime(agg_games_year_score['year_of_release'])
+# игнорируем записи без оценок
+agg_games_year_score = agg_games_year_score.query('avg_user_score > 0 and avg_critic_score > 0') note = ''' Этот дашборд показывает историю игрового рынка (исключая мобильные устройства). Используйте выбор интервала даты выпуска, жанра и платформы для управления 
+          дашбордом. Используйте селектор выбора режима отображения для того, чтобы показать абсолютные или относительные значения выпуска и продаж игр по годам.
+       '''
+# задаём лейаут
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets, compress=False) app.layout = html.Div(children=[
+    
+    # формируем html
+    html.H1(children = 'История игрового рынка'), html.Br(), html.Div([ html.Div([
+            # график выпуска игр по годам и жанрам
+            html.Label('Выпуск игр по жанрам:'), dcc.RadioItems( options = [ {'label': 'Абсолютные значения', 'value': 'absolute_values'}, {'label': '% от общего выпуска', 'value': 'relative_values'}, ], value = 'absolute_values', id = 'mode_selector' ),
+        
+            dcc.Graph( id = 'launches_by_genre' ), ], className = 'eight columns'), html.Div([
+            # график выпуска игр по платформам
+             html.Label('Выпуск игр по платформам:'), dcc.Graph( id = 'launches_by_platform' ), ], className = 'four columns'), ], className = 'row'), html.Div([ html.Div([
+            # график выпуска игр по годам и жанрам
+            html.Label('Продажи игр по жанрам:'),
+        
+            dcc.Graph( id = 'sales_by_genre' ), ], className = 'eight columns'), html.Div([
+            # график средних оценок по
+            html.Label('Средние оценки по жанрам:'),
+        
+            dcc.Graph( id = 'scores_by_genre' ), ], className = 'four columns'),
+        
+    ], className = 'row'),
+    # пояснения
+    html.Label(note), html.Br(), html.Div([ html.Div([
+            # выбор временного периода
+            html.Label('Года выпуска:'), dcc.DatePickerRange( start_date = agg_games_year_genre_platform['year_of_release'].dt.date.min(), end_date = datetime(2016,1,1).strftime('%Y-%m-%d'), display_format = 'YYYY-MM-DD', id = 'dt_selector', ), ], className = 'two 
+        columns'), html.Div([
+            # выбор жанра
+            html.Label('Жанры:'), dcc.Dropdown( options = [{'label': x, 'value': x} for x in agg_games_year_genre_platform['genre'].unique()], value = agg_games_year_genre_platform['genre'].unique().tolist(), multi = True, id = 'genre_selector' ), ], className = 
+        'four columns'), html.Div([
+            # выбор платформы
+            html.Label('Платформы:'), dcc.Dropdown( options = [{'label': x, 'value': x} for x in agg_games_year_genre_platform['platform'].unique()], value = agg_games_year_genre_platform['platform'].unique().tolist(), multi = True, id = 'platform_selector' ), ], 
+        className = 'six columns'),
+    ], className = 'row'),
+ 
+])
+# описываем логику дашборда
+@app.callback( [Output('launches_by_genre', 'figure'), Output('launches_by_platform', 'figure'), Output('sales_by_genre', 'figure'), Output('scores_by_genre', 'figure'), ], [Input('dt_selector', 'start_date'), Input('dt_selector', 'end_date'), Input('mode_selector', 
+     'value'), Input('genre_selector', 'value'), Input('platform_selector', 'value'),
+    ]) def update_figures(start_date, end_date, mode, selected_genres, selected_platforms):
+    # применяем фильтрацию
+    filtered = agg_games_year_genre_platform.query('year_of_release >= @start_date and year_of_release <= @end_date') # напишите код filtered = filtered.query('genre in @selected_genres') # ваш код filtered = filtered.query('platform in @selected_platforms') # ваш 
+    код
+    
+    filtered_score = agg_games_year_score.query('year_of_release >= @start_date and year_of_release <= @end_date') # напишите код filtered_score = filtered_score.query('genre in @selected_genres') # ваш код filtered_score = filtered_score.query('platform in 
+    @selected_platforms') # ваш код
+         
+if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000)
+***
+
+### Задание 5
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output import plotly.graph_objs as go from datetime import datetime import pandas as pd
+# задаём данные для отрисовки
+from sqlalchemy import create_engine
+# пример подключения к базе данных для Postresql db_config = {'user': 'my_user', 'pwd': 'my_user_password', 'host': 'localhost', 'port': 5432, 'db': 'games'} engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'], db_config['pwd'], 
+#                                                            db_config['host'], db_config['port'], db_config['db']))
+# пример подключения к базе данных для Sqlite
+engine = create_engine('sqlite:////db/games.db', echo=False)
+# получаем сырые данные
+query = ''' SELECT * FROM agg_games_year_genre_platform ''' agg_games_year_genre_platform = pd.io.sql.read_sql(query, con = engine) agg_games_year_genre_platform['year_of_release'] = pd.to_datetime(agg_games_year_genre_platform['year_of_release']) query = ''' SELECT 
+            * FROM agg_games_year_score
+        ''' agg_games_year_score = pd.io.sql.read_sql(query, con = engine) agg_games_year_score['year_of_release'] = pd.to_datetime(agg_games_year_score['year_of_release'])
+# игнорируем записи без оценок
+agg_games_year_score = agg_games_year_score.query('avg_user_score > 0 and avg_critic_score > 0') note = ''' Этот дашборд показывает историю игрового рынка (исключая мобильные устройства). Используйте выбор интервала даты выпуска, жанра и платформы для управления 
+          дашбордом. Используйте селектор выбора режима отображения для того, чтобы показать абсолютные или относительные значения выпуска и продаж игр по годам.
+       '''
+# задаём лейаут
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets, compress=False) app.layout = html.Div(children=[
+    
+    # формируем html
+    html.H1(children = 'История игрового рынка'), html.Br(), html.Div([ html.Div([
+            # график выпуска игр по годам и жанрам
+            html.Label('Выпуск игр по жанрам:'), dcc.RadioItems( options = [ {'label': 'Абсолютные значения', 'value': 'absolute_values'}, {'label': '% от общего выпуска', 'value': 'relative_values'}, ], value = 'absolute_values', id = 'mode_selector' ),
+        
+            dcc.Graph( id = 'launches_by_genre' ), ], className = 'eight columns'), html.Div([
+            # график выпуска игр по платформам
+             html.Label('Выпуск игр по платформам:'), dcc.Graph( id = 'launches_by_platform' ), ], className = 'four columns'), ], className = 'row'), html.Div([ html.Div([
+            # график выпуска игр по годам и жанрам
+            html.Label('Продажи игр по жанрам:'),
+        
+            dcc.Graph( id = 'sales_by_genre' ), ], className = 'eight columns'), html.Div([
+            # график средних оценок по
+            html.Label('Средние оценки по жанрам:'),
+        
+            dcc.Graph( id = 'scores_by_genre' ), ], className = 'four columns'),
+        
+    ], className = 'row'),
+    # пояснения
+    html.Label(note), html.Br(), html.Div([ html.Div([
+            # выбор временного периода
+            html.Label('Года выпуска:'), dcc.DatePickerRange( start_date = agg_games_year_genre_platform['year_of_release'].dt.date.min(), end_date = datetime(2016,1,1).strftime('%Y-%m-%d'), display_format = 'YYYY-MM-DD', id = 'dt_selector', ), ], className = 'two 
+        columns'), html.Div([
+            # выбор жанра
+            html.Label('Жанры:'), dcc.Dropdown( options = [{'label': x, 'value': x} for x in agg_games_year_genre_platform['genre'].unique()], value = agg_games_year_genre_platform['genre'].unique().tolist(), multi = True, id = 'genre_selector' ), ], className = 
+        'four columns'), html.Div([
+            # выбор платформы
+            html.Label('Платформы:'), dcc.Dropdown( options = [{'label': x, 'value': x} for x in agg_games_year_genre_platform['platform'].unique()], value = agg_games_year_genre_platform['platform'].unique().tolist(), multi = True, id = 'platform_selector' ), ], 
+        className = 'six columns'),
+    ], className = 'row'),
+ 
+])
+# описываем логику дашборда
+@app.callback( [Output('launches_by_genre', 'figure'), Output('launches_by_platform', 'figure'), Output('sales_by_genre', 'figure'), Output('scores_by_genre', 'figure'), ], [Input('dt_selector', 'start_date'), Input('dt_selector', 'end_date'), Input('mode_selector', 
+     'value'), Input('genre_selector', 'value'), Input('platform_selector', 'value'),
+    ]) def update_figures(start_date, end_date, mode, selected_genres, selected_platforms):
+    # применяем фильтрацию
+    filtered = agg_games_year_genre_platform.query('year_of_release >= @start_date and year_of_release <= @end_date') filtered = filtered.query('genre in @selected_genres') filtered = filtered.query('platform in @selected_platforms') filtered_score = 
+    agg_games_year_score.query('year_of_release >= @start_date and year_of_release <= @end_date') filtered_score = filtered_score.query('genre in @selected_genres') filtered_score = filtered_score.query('platform in @selected_platforms') games_by_genre = 
+    (filtered.groupby(['year_of_release', 'genre'])
+                      .agg({'games': 'sum', 'total_copies_sold': 'sum'}) .reset_index() ) games_by_platform = (filtered.groupby(['platform']) .agg({'games': 'sum'}) .reset_index() )
+    # все платформы с малым количеством игр помещаем в одну категорию
+    games_by_platform['percent'] = games_by_platform['games'] / games_by_platform['games'].sum() games_by_platform.loc[games_by_platform['percent'] < 0.05, 'platform'] = 'Другие'
+    # и ещё раз группируем
+    games_by_platform = (games_by_platform.groupby(['platform']) .agg({'games': 'sum'}) .reset_index() )
+    # трансформируем в соотв. с выбранным режимом отображения
+    y_label = 'Выпущенные игры' y_label_sales = 'Продажи игр, млн копий' if mode == 'relative_values': y_label = '% выпущенных игр' y_label_sales = '% продаж игр' total = (games_by_genre.groupby('year_of_release') .agg({'games': 'sum', 'total_copies_sold': 'sum'}) 
+                       .rename(columns = {'games': 'total_launches',
+                                          'total_copies_sold': 'total_sales'}) ) games_by_genre = (games_by_genre.set_index('year_of_release') .join(total) .reset_index()) games_by_genre['games'] = games_by_genre['games'] / games_by_genre['total_launches'] 
+        games_by_genre['total_copies_sold'] = games_by_genre['total_copies_sold'] / games_by_genre['total_sales']
+if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000)
+***
+
+### Задание 6
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output import plotly.graph_objs as go from datetime import datetime import pandas as pd
+# задаём данные для отрисовки
+from sqlalchemy import create_engine
+# пример подключения к базе данных для Postresql db_config = {'user': 'my_user', 'pwd': 'my_user_password', 'host': 'localhost', 'port': 5432, 'db': 'games'} engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'], db_config['pwd'], 
+#                                                            db_config['host'], db_config['port'], db_config['db']))
+# пример подключения к базе данных для Sqlite
+engine = create_engine('sqlite:////db/games.db', echo=False)
+# получаем сырые данные
+query = ''' SELECT * FROM agg_games_year_genre_platform ''' agg_games_year_genre_platform = pd.io.sql.read_sql(query, con = engine) agg_games_year_genre_platform['year_of_release'] = pd.to_datetime(agg_games_year_genre_platform['year_of_release']) query = ''' SELECT 
+            * FROM agg_games_year_score
+        ''' agg_games_year_score = pd.io.sql.read_sql(query, con = engine) agg_games_year_score['year_of_release'] = pd.to_datetime(agg_games_year_score['year_of_release'])
+# игнорируем записи без оценок
+agg_games_year_score = agg_games_year_score.query('avg_user_score > 0 and avg_critic_score > 0') note = ''' Этот дашборд показывает историю игрового рынка (исключая мобильные устройства). Используйте выбор интервала даты выпуска, жанра и платформы для управления 
+          дашбордом. Используйте селектор выбора режима отображения для того, чтобы показать абсолютные или относительные значения выпуска и продаж игр по годам.
+       '''
+# задаём лейаут
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets, compress=False) app.layout = html.Div(children=[
+    
+    # формируем html
+    html.H1(children = 'История игрового рынка'), html.Br(), html.Div([ html.Div([
+            # график выпуска игр по годам и жанрам
+            html.Label('Выпуск игр по жанрам:'), dcc.RadioItems( options = [ {'label': 'Абсолютные значения', 'value': 'absolute_values'}, {'label': '% от общего выпуска', 'value': 'relative_values'}, ], value = 'absolute_values', id = 'mode_selector' ),
+        
+            dcc.Graph( id = 'launches_by_genre' ), ], className = 'eight columns'), html.Div([
+            # график выпуска игр по платформам
+             html.Label('Выпуск игр по платформам:'), dcc.Graph( id = 'launches_by_platform' ), ], className = 'four columns'), ], className = 'row'), html.Div([ html.Div([
+            # график выпуска игр по годам и жанрам
+            html.Label('Продажи игр по жанрам:'),
+        
+            dcc.Graph( id = 'sales_by_genre' ), ], className = 'eight columns'), html.Div([
+            # график средних оценок по
+            html.Label('Средние оценки по жанрам:'),
+        
+            dcc.Graph( id = 'scores_by_genre' ), ], className = 'four columns'),
+        
+    ], className = 'row'),
+    # пояснения
+    html.Label(note), html.Br(), html.Div([ html.Div([
+            # выбор временного периода
+            html.Label('Года выпуска:'), dcc.DatePickerRange( start_date = agg_games_year_genre_platform['year_of_release'].dt.date.min(), end_date = datetime(2016,1,1).strftime('%Y-%m-%d'), display_format = 'YYYY-MM-DD', id = 'dt_selector', ), ], className = 'two 
+        columns'), html.Div([
+            # выбор жанра
+            html.Label('Жанры:'), dcc.Dropdown( options = [{'label': x, 'value': x} for x in agg_games_year_genre_platform['genre'].unique()], value = agg_games_year_genre_platform['genre'].unique().tolist(), multi = True, id = 'genre_selector' ), ], className = 
+        'four columns'), html.Div([
+            # выбор платформы
+            html.Label('Платформы:'), dcc.Dropdown( options = [{'label': x, 'value': x} for x in agg_games_year_genre_platform['platform'].unique()], value = agg_games_year_genre_platform['platform'].unique().tolist(), multi = True, id = 'platform_selector' ), ], 
+        className = 'six columns'),
+    ], className = 'row'),
+ 
+])
+#описываем логику дашборда
+@app.callback( [Output('launches_by_genre', 'figure'), Output('launches_by_platform', 'figure'), Output('sales_by_genre', 'figure'), Output('scores_by_genre', 'figure'), ], [Input('dt_selector', 'start_date'), Input('dt_selector', 'end_date'), Input('mode_selector', 
+     'value'), Input('genre_selector', 'value'), Input('platform_selector', 'value'),
+    ]) def update_figures(start_date, end_date, mode, selected_genres, selected_platforms):
+    # применяем фильтрацию
+    filtered = agg_games_year_genre_platform.query('year_of_release >= @start_date and year_of_release <= @end_date') filtered = filtered.query('genre in @selected_genres') filtered = filtered.query('platform in @selected_platforms') filtered_score = 
+    agg_games_year_score.query('year_of_release >= @start_date and year_of_release <= @end_date') filtered_score = filtered_score.query('genre in @selected_genres') filtered_score = filtered_score.query('platform in @selected_platforms') games_by_genre = 
+    (filtered.groupby(['year_of_release', 'genre'])
+                      .agg({'games': 'sum', 'total_copies_sold': 'sum'}) .reset_index() ) games_by_platform = (filtered.groupby(['platform']) .agg({'games': 'sum'}) .reset_index() )
+    # все платформы с малым количеством игр помещаем в одну категорию
+    games_by_platform['percent'] = games_by_platform['games'] / games_by_platform['games'].sum() games_by_platform.loc[games_by_platform['percent'] < 0.05, 'platform'] = 'Другие'
+    # и ещё раз группируем
+    games_by_platform = (games_by_platform.groupby(['platform']) .agg({'games': 'sum'}) .reset_index() )
+    #трансформируем в соотв. с выбранным режимом отображения
+    y_label = 'Выпущенные игры' y_label_sales = 'Продажи игр, млн копий' if mode == 'relative_values': y_label = '% выпущенных игр' y_label_sales = '% продаж игр' total = (games_by_genre.groupby('year_of_release') .agg({'games': 'sum', 'total_copies_sold': 'sum'}) 
+                 .rename(columns = {'games': 'total_launches',
+                                    'total_copies_sold': 'total_sales'}) ) games_by_genre = (games_by_genre.set_index('year_of_release') .join(total) .reset_index()) games_by_genre['games'] = games_by_genre['games'] / games_by_genre['total_launches'] 
+        games_by_genre['total_copies_sold'] = games_by_genre['total_copies_sold'] / games_by_genre['total_sales']
+        # графики выпуска и продаж игр по жанру
+        launches_by_genre = [] sales_by_genre = [] for genre in games_by_genre['genre'].unique(): launches_by_genre += [go.Scatter(x = games_by_genre.query('genre == @genre')['year_of_release'], # напишите код y = games_by_genre.query('genre == @genre')['games'], 
+                                  mode = 'lines', # ваш код stackgroup = 'one', # ваш код name = genre)]
+            sales_by_genre += [go.Bar(x = games_by_genre.query('genre == @genre')['year_of_release'], # ваш код y = games_by_genre.query('genre == @genre')['total_copies_sold'], name = genre)]
+            # график выпуска игр по платформам
+            launches_by_platform = [go.Pie(labels = games_by_platform['platform'], # напишите код values = games_by_platform['games'], name = 'platfroms')]
+            # точечная диаграмма оценок по жанрам и годам
+            scores_by_genre = [] for genre in filtered_score['genre'].unique(): scores_by_genre += [go.Scatter(x = filtered_score.query('genre == @genre')['avg_user_score'], # напишите код y = filtered_score.query('genre == @genre')['avg_critic_score'], mode = 
+                                        'markers', # напишите код name = genre)]
+if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000)
+***
+
+### Задание 7
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+ 
+import dash import dash_core_components as dcc import dash_html_components as html from dash.dependencies import Input, Output
+ 
+import plotly.graph_objs as go
+ 
+from datetime import datetime
+ 
+import pandas as pd
+ 
+# задаём данные для отрисовки
+from sqlalchemy import create_engine
+ 
+# пример подключения к базе данных для Postresql db_config = {'user': 'my_user', 'pwd': 'my_user_password', 'host': 'localhost', 'port': 5432, 'db': 'games'} engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(db_config['user'], db_config['pwd'], 
+#                                                            db_config['host'], db_config['port'], db_config['db']))
+# пример подключения к базе данных для Sqlite
+engine = create_engine('sqlite:////db/games.db', echo=False)
+ 
+# получаем сырые данные
+query = ''' SELECT * FROM agg_games_year_genre_platform ''' agg_games_year_genre_platform = pd.io.sql.read_sql(query, con = engine) agg_games_year_genre_platform['year_of_release'] = pd.to_datetime(agg_games_year_genre_platform['year_of_release'])
+ 
+query = ''' SELECT * FROM agg_games_year_score ''' agg_games_year_score = pd.io.sql.read_sql(query, con = engine) agg_games_year_score['year_of_release'] = pd.to_datetime(agg_games_year_score['year_of_release'])
+# игнорируем записи без оценок
+agg_games_year_score = agg_games_year_score.query('avg_user_score > 0 and avg_critic_score > 0')
+ 
+note = ''' Этот дашборд показывает историю игрового рынка (исключая мобильные устройства). Используйте выбор интервала даты выпуска, жанра и платформы для управления дашбордом. Используйте селектор выбора режима отображения для того, чтобы показать абсолютные или 
+          относительные значения выпуска и продаж игр по годам.
+       '''
+ 
+# задаём лейаут
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css'] app = dash.Dash(__name__, external_stylesheets=external_stylesheets, compress=False) app.layout = html.Div(children=[
+ 
+    # формируем html
+    html.H1(children = 'История игрового рынка'),
+ 
+    html.Br(),
+ 
+    html.Div([ html.Div([
+ 
+            # график выпуска игр по годам и жанрам
+            html.Label('Выпуск игр по жанрам:'),
+ 
+            dcc.RadioItems( options = [ {'label': 'Абсолютные значения', 'value': 'absolute_values'}, {'label': '% от общего выпуска', 'value': 'relative_values'}, ], value = 'absolute_values', id = 'mode_selector' ),
+ 
+ 
+            dcc.Graph( id = 'launches_by_genre' ), ], className = 'eight columns'),
+ 
+        html.Div([
+            # график выпуска игр по платформам
+             html.Label('Выпуск игр по платформам:'), dcc.Graph( id = 'launches_by_platform' ), ], className = 'four columns'),
+ 
+    ], className = 'row'),
+ 
+    html.Div([ html.Div([
+ 
+            # график выпуска игр по годам и жанрам
+            html.Label('Продажи игр по жанрам:'),
+ 
+            dcc.Graph( id = 'sales_by_genre' ), ], className = 'eight columns'),
+ 
+        html.Div([
+            # график средних оценок по жанрам
+            html.Label('Средние оценки по жанрам:'),
+ 
+            dcc.Graph( id = 'scores_by_genre' ), ], className = 'four columns'),
+ 
+    ], className = 'row'),
+ 
+ 
+    # пояснения
+    html.Label(note),
+ 
+    html.Br(),
+ 
+    html.Div([
+ 
+        html.Div([
+            # выбор временного периода
+            html.Label('Года выпуска:'), dcc.DatePickerRange( start_date = agg_games_year_genre_platform['year_of_release'].dt.date.min(), end_date = datetime(2016,1,1).strftime('%Y-%m-%d'), display_format = 'YYYY-MM-DD', id = 'dt_selector', ), ], className = 'two 
+        columns'),
+ 
+        html.Div([
+            # выбор жанра
+            html.Label('Жанры:'), dcc.Dropdown( options = [{'label': x, 'value': x} for x in agg_games_year_genre_platform['genre'].unique()], value = agg_games_year_genre_platform['genre'].unique().tolist(), multi = True, id = 'genre_selector' ), ], className = 
+        'four columns'),
+ 
+        html.Div([
+            # выбор платформы
+            html.Label('Платформы:'), dcc.Dropdown( options = [{'label': x, 'value': x} for x in agg_games_year_genre_platform['platform'].unique()], value = agg_games_year_genre_platform['platform'].unique().tolist(), multi = True, id = 'platform_selector' ), ], 
+        className = 'six columns'),
+ 
+    ], className = 'row'),
+ 
+])
+
+# описываем логику дашборда
+@app.callback( [Output('launches_by_genre', 'figure'), Output('launches_by_platform', 'figure'), Output('sales_by_genre', 'figure'), Output('scores_by_genre', 'figure'), ], [Input('dt_selector', 'start_date'), Input('dt_selector', 'end_date'), Input('mode_selector', 
+     'value'), Input('genre_selector', 'value'), Input('platform_selector', 'value'),
+    ]) def update_figures(start_date, end_date, mode, selected_genres, selected_platforms):
+ 
+    # применяем фильтрацию
+    filtered = agg_games_year_genre_platform.query('year_of_release >= @start_date and year_of_release <= @end_date') filtered = filtered.query('genre in @selected_genres') filtered = filtered.query('platform in @selected_platforms')
+ 
+    filtered_score = agg_games_year_score.query('year_of_release >= @start_date and year_of_release <= @end_date') filtered_score = filtered_score.query('genre in @selected_genres') filtered_score = filtered_score.query('platform in @selected_platforms')
+ 
+    games_by_genre = (filtered.groupby(['year_of_release', 'genre']) .agg({'games': 'sum', 'total_copies_sold': 'sum'}) .reset_index() )
+ 
+    games_by_platform = (filtered.groupby(['platform']) .agg({'games': 'sum'}) .reset_index() )
+    # все платформы с малым количеством игр помещаем в одну категорию
+    games_by_platform['percent'] = games_by_platform['games'] / games_by_platform['games'].sum() games_by_platform.loc[games_by_platform['percent'] < 0.05, 'platform'] = 'Другие'
+    # и ещё раз группируем
+    games_by_platform = (games_by_platform.groupby(['platform']) .agg({'games': 'sum'}) .reset_index() )
+ 
+    # трансформируем в соотв. с выбранным режимом отображения
+    y_label = 'Выпущенные игры' y_label_sales = 'Продажи игр, млн копий' if mode == 'relative_values': y_label = '% выпущенных игр' y_label_sales = '% продаж игр' total = (games_by_genre.groupby('year_of_release') .agg({'games': 'sum', 'total_copies_sold': 'sum'}) 
+                 .rename(columns = {'games': 'total_launches',
+                                    'total_copies_sold': 'total_sales'}) ) games_by_genre = (games_by_genre.set_index('year_of_release') .join(total) .reset_index()) games_by_genre['games'] = games_by_genre['games'] / games_by_genre['total_launches'] 
+        games_by_genre['total_copies_sold'] = games_by_genre['total_copies_sold'] / games_by_genre['total_sales']
+ 
+    # графики выпуска и продаж игр по жанру
+    launches_by_genre = [] sales_by_genre = [] for genre in games_by_genre['genre'].unique(): launches_by_genre += [go.Scatter(x = games_by_genre.query('genre == @genre')['year_of_release'], y = games_by_genre.query('genre == @genre')['games'], mode = 'lines', 
+                                    stackgroup = 'one', name = genre)]
+        sales_by_genre += [go.Bar(x = games_by_genre.query('genre == @genre')['year_of_release'], y = games_by_genre.query('genre == @genre')['total_copies_sold'], name = genre)]
+ 
+    # график выпуска игр по платформам
+    launches_by_platform = [go.Pie(labels = games_by_platform['platform'], values = games_by_platform['games'], name = 'platfroms')]
+ 
+    # точечная диаграмма оценок по жанрам и годам
+    scores_by_genre = [] for genre in filtered_score['genre'].unique(): scores_by_genre += [go.Scatter(x = filtered_score.query('genre == @genre')['avg_user_score'], y = filtered_score.query('genre == @genre')['avg_critic_score'], mode = 'markers', name = genre)]
+ 
+    # формируем результат для отображения
+    return ( { 'data': launches_by_genre, # напишите код 'layout': go.Layout(xaxis = {'title': 'Год'}, yaxis = {'title': y_label})
+        },
+        { 'data': launches_by_platform, # напишите код 'layout': go.Layout(xaxis = {'title': 'Год'}, yaxis = {'title': y_label_sales}, barmode = 'stack', )
+        },
+        { 'data': sales_by_genre, # напишите код 'layout': go.Layout()
+        },
+        { 'data': scores_by_genre, # напишите код 'layout': go.Layout(xaxis = {'title': 'Средняя оценка пользователей'}, yaxis = {'title': 'Средняя оценка критиков'})
+        },
+ 
+    )
+ 
+if __name__ == '__main__': app.run_server(host='0.0.0.0', port=3000) ***
+##10 Запуск дашборда на локальной машине
+Практические задания отсутствуют ***
+##11 Запуск дашборда на виртуальной машине
+Практические задания отсутствуют ***
+##12 Заключение
+Практические задания отсутствуют
+***

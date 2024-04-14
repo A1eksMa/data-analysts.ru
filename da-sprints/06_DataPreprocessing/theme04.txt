@@ -1,0 +1,181 @@
+#Категоризация данных
+##02 Знакомство с данными
+#==============
+import pandas as pd
+
+support = pd.read_csv('/datasets/support.csv')
+print(support.head(10))
+#==============
+import pandas as pd
+support = pd.read_csv('/datasets/support.csv')
+support.info()	
+#0   user_id          3000 non-null   object
+#1   Тип обращения    3000 non-null   object
+#2   type_id          3000 non-null   int64
+#3   Время обращения  3000 non-null   object
+#==============
+import pandas as pd
+support = pd.read_csv('/datasets/support.csv')
+support = support.rename(columns={'Тип обращения': 'type_message', 'Время обращения': 'timestamp'})
+support.info()
+#==============
+
+#03 Декомпозиция таблиц
+#==============
+import pandas as pd
+
+support = pd.read_csv('/datasets/support_upd.csv')
+print(support['type_message'].value_counts()) 
+#==============
+import pandas as pd
+
+support = pd.read_csv('/datasets/support_upd.csv')
+support_log = support[['user_id','type_id','timestamp']]
+print(support_log.head(10))
+#==============
+import pandas as pd
+
+support = pd.read_csv('/datasets/support_upd.csv')
+support_dict = support[['type_message','type_id']]
+print(support_dict.head(10))
+#==============
+import pandas as pd
+
+support = pd.read_csv('/datasets/support_upd.csv')
+support_dict=support[['type_message','type_id']]
+support_dict = support_dict.drop_duplicates().reset_index(drop=True)
+print(support_dict.sort_values('type_id'))
+#==============
+
+#04 Категоризация по числовым диапазонам
+#==============
+import pandas as pd
+
+support_log = pd.read_csv('/datasets/support_log.csv')
+support_log_grouped = support_log.groupby('type_id').count()
+print(support_log_grouped)
+#==============
+import pandas as pd
+
+support_log = pd.read_csv('/datasets/support_log.csv')
+support_log_grouped = support_log.groupby('type_id').count()
+
+def alert_group(messages):
+    if messages<=300:
+        return 'средний'  
+    elif 300<messages<=500:
+        return 'высокий'
+    else:
+        return 'критичный'
+print(alert_group(10))
+print(alert_group(450))
+print(alert_group(1000))
+#==============
+import pandas as pd
+
+support_log = pd.read_csv('/datasets/support_log.csv')
+support_log_grouped = support_log.groupby('type_id').count()
+
+def alert_group(messages):
+    if messages<=300:
+        return 'средний'  
+    elif 300<messages<=500:
+        return 'высокий'
+    else:
+        return 'критичный'
+#print(alert_group(10))
+#print(alert_group(450))
+#print(alert_group(1000))
+
+support_log_grouped['alert_group'] = support_log_grouped['user_id'].apply(alert_group)
+print(support_log_grouped.head(10))
+#==============
+import pandas as pd
+
+support_log = pd.read_csv('/datasets/support_log.csv')
+support_log_grouped = support_log.groupby('type_id').count()
+
+def alert_group(messages):
+    if messages<=300:
+        return 'средний'  
+    elif 300<messages<=500:
+        return 'высокий'
+    else:
+        return 'критичный'
+#print(alert_group(10))
+#print(alert_group(450))
+#print(alert_group(1000))
+
+support_log_grouped['alert_group'] = support_log_grouped['user_id'].apply(alert_group)
+#print(support_log_grouped.head(10))
+print(support_log_grouped.groupby('alert_group').sum())
+#==============
+
+#05 Функция для одной строки
+#==============
+import pandas as pd
+support_log_grouped = pd.read_csv('/datasets/support_log_grouped.csv')
+print(support_log_grouped)
+#==============
+import pandas as pd
+support_log_grouped = pd.read_csv('/datasets/support_log_grouped.csv')
+
+def alert_group_importance(row):
+    alert_group = row['alert_group']
+    importance = row['importance']
+    if alert_group == 'средний' and importance==1:
+        return 'обратить внимание'
+    elif alert_group == 'высокий' and importance==1:
+        return 'высокий риск'
+    elif alert_group == 'критичный' and importance==1:
+        return 'блокер'
+    else:
+        return 'в порядке очереди'
+row_values = ['высокий', 1]
+row_columns = ['alert_group', 'importance']
+row = pd.Series(data=row_values, index=row_columns)
+print(alert_group_importance(row))
+#==============
+import pandas as pd
+support_log_grouped = pd.read_csv('/datasets/support_log_grouped.csv')
+
+def alert_group_importance(row):
+    alert_group = row['alert_group']
+    importance = row['importance']
+    if alert_group == 'средний' and importance==1:
+        return 'обратить внимание'
+    elif alert_group == 'высокий' and importance==1:
+        return 'высокий риск'
+    elif alert_group == 'критичный' and importance==1:
+        return 'блокер'
+    else:
+        return 'в порядке очереди'
+row_values = ['высокий', 1]
+row_columns = ['alert_group', 'importance']
+row = pd.Series(data=row_values, index=row_columns)
+#print(alert_group_importance(row))
+support_log_grouped['importance_status'] = support_log_grouped.apply(alert_group_importance, axis=1)
+print(support_log_grouped)
+#==============
+import pandas as pd
+support_log_grouped = pd.read_csv('/datasets/support_log_grouped.csv')
+
+def alert_group_importance(row):
+    alert_group = row['alert_group']
+    importance = row['importance']
+    if alert_group == 'средний' and importance==1:
+        return 'обратить внимание'
+    elif alert_group == 'высокий' and importance==1:
+        return 'высокий риск'
+    elif alert_group == 'критичный' and importance==1:
+        return 'блокер'
+    else:
+        return 'в порядке очереди'
+row_values = ['высокий', 1]
+row_columns = ['alert_group', 'importance']
+row = pd.Series(data=row_values, index=row_columns)
+#print(alert_group_importance(row))
+support_log_grouped['importance_status'] = support_log_grouped.apply(alert_group_importance, axis=1)
+#print(support_log_grouped)
+print(support_log_grouped['importance_status'].value_counts())
+#==============

@@ -1,0 +1,182 @@
+body {
+background-color: WhiteSmoke;
+text-align: center;
+}
+
+img {
+border-radius: 10px;
+-webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+}
+
+input, button {
+padding: 5px;
+margin: auto;
+border-radius: 3px;
+-webkit-border-radius: 3px;
+-moz-border-radius: 3px;
+}
+
+.unit {
+display: inline-block;
+width: 260px;
+height: 300px;
+margin: 30px;
+box-shadow: 0 0 15px LightGrey;
+border-radius: 10px;
+-webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+}
+
+.darktheme {
+background-image: url(/da-sprints/img/DarkTheme_bg_color.jpg);
+background-color: brown;
+text-align: right;
+color: WhiteSmoke;
+padding: 30px;
+border-radius: 10px;
+-webkit-border-radius: 10px;
+-moz-border-radius: 10px;
+
+
+}
+
+.content {
+text-align: justify;
+padding: 5% 16%;
+}
+
+blockquote {
+display: block;
+position: relative;
+width: 85%;
+margin: auto;
+
+border-radius: 5px;
+-webkit-border-radius: 5px;
+-moz-border-radius: 5px;
+
+border: 2px solid Silver;
+background: Gainsboro;
+color: #131314;
+padding: 30px 30px 30px 90px;
+
+font-family: 'Lato', sans-serif;
+}
+
+
+blockquote:before {
+
+content: "\201C";
+
+font-family: serif;
+
+position: absolute;
+
+top: 20px;
+
+left: 16px;
+
+color: black;
+
+width: 40px;
+
+height: 40px;
+
+border-radius: 50%;
+
+background: white;
+
+font-size: 40px;
+
+font-weight: bold;
+
+text-align: center;
+
+line-height: 50px;
+
+}
+
+
+blockquote:after {
+
+content: "";
+
+width: 4px;
+
+background: white;
+
+position:absolute;
+
+left: 70px;
+
+top: 20px;
+
+bottom: 20px;
+
+}
+
+
+blockquote p {
+
+margin-top: 0;
+
+font-size: 24px;
+
+font-weight: 300;
+
+}
+
+
+blockquote cite {
+
+font-style: normal;
+
+text-transform: uppercase;
+
+}
+
+
+pre code {
+
+display: block;
+width: 98%;
+margin: auto;
+font: 0.8em/1.6 Monaco, Mono-Space, monospace;
+text-align: left;
+
+border-radius: 5px;
+-webkit-border-radius: 5px;
+-moz-border-radius: 5px;
+
+border: 2px solid Silver;
+background-color: LightGrey;
+padding: 20px;
+
+}
+
+progress {
+border: 0;
+height: 3px;
+width: 90%;
+margin: auto;
+position: relative;
+bottom: 80px;
+}
+
+progress::-moz-progress-bar {
+background: lightcolor;
+}
+
+progress::-webkit-progress-value {
+background: LimeGreen;
+}
+
+progress::-webkit-progress-bar {
+background: DarkGray;
+}
+
+.status {
+position: relative;
+bottom: 15px;
+}

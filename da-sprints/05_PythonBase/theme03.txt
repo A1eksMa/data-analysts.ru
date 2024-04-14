@@ -1,0 +1,137 @@
+#01 Введение
+
+
+#02 Списки — основы
+
+#==============
+
+duration = [142, 175/ 152, 195, 201]
+
+print(duration)
+
+#==============
+
+first_row = ['Побег из Шоушенка','США',1994,'драма',142,9.111]
+
+print(first_row)
+
+#==============
+
+
+#03 Индексы и срезы
+
+#==============
+
+second_row = ['Крёстный отец', 'США', 1972, 'драма, криминал', 175, 8.730]
+
+country = second_row[1]
+
+print(country)
+
+#==============
+
+second_row = ['Крёстный отец', 'США', 1972, 'драма, криминал', 175, 8.730]
+
+movie_slice = second_row[2:5]
+
+print(movie_slice)
+
+#==============
+
+
+#04 Добавление и удаление элементов
+
+#==============
+
+stalker_info = ['Сталкер', 'СССР', 1979]
+
+stalker_info.extend(['фантастика, драма, детектив', 163, 8.083])
+
+print(stalker_info) 
+
+
+#05 Сложение и умножение списков
+
+#==============
+
+first_part = ['Криминальное чтиво', 'США', 1994]
+
+second_part = ['триллер, комедия, криминал', 154, 8.619]
+
+movie_info = first_part + second_part
+
+print(movie_info) 
+
+#==============
+
+zeros = [0]*100
+
+print(zeros)
+
+#==============
+
+
+#06 Сортировка
+
+#==============
+
+movies = ['Хороший, плохой, злой', 'Криминальное чтиво', 'Бойцовский клуб', 'Харакири', 'Сталкер']
+
+movies.sort()
+
+print(movies)
+
+#==============
+
+movies_duration = [142, 175, 152, 195, 201, 154, 178, 139]
+
+movies_duration.sort(reverse=True)
+
+print(movies_duration)
+
+#==============
+
+movies_duration = [142, 175, 152, 195, 201, 154, 178, 139]
+
+movies_duration_sorted = sorted(movies_duration, reverse=True)
+
+print(movies_duration_sorted)
+
+#==============
+
+
+#07 Поиск элементов
+
+#==============
+
+band_list = ['Энтони Кидис', 'Фли', 'Джон Фрушанте', 'Чад Смит']
+
+guitarist_ind = band_list.index('Джон Фрушанте')
+
+print(guitarist_ind)
+
+#==============
+
+
+#08 Списки и строки
+
+#==============
+
+phrase = 'Aladdin#Esmeralda#Hercules#Mulan'
+
+words = phrase.split('#')
+
+print(words)
+
+#==============
+
+stations = ['Кропоткинская', 'Парк культуры', 'Фрунзенская', 'Спортивная']
+
+info = '>'.join(stations)
+
+print(info) 
+
+#==============
+
+
+#09 Заключение

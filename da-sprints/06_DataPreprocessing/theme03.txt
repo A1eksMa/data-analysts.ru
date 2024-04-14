@@ -1,0 +1,168 @@
+#Поиск дубликатов
+##03Лаборатория ручного поиска дубликатов
+#==============
+import pandas as pd
+
+stock = pd.read_excel('/datasets/stock.xlsx', sheet_name='storehouse')
+print(stock['item'].duplicated().sum())
+#==============
+import pandas as pd
+
+stock = pd.read_excel('/datasets/stock.xlsx', sheet_name='storehouse')
+print(stock['item'].value_counts())
+#==============
+import pandas as pd
+
+stock = pd.read_excel('/datasets/stock.xlsx', sheet_name='storehouse')
+xiaomi = stock[stock['item'] == 'Смартфон Xiaomi Redmi 6A 16GB']['count'].sum()
+print(xiaomi)
+#==============
+import pandas as pd
+
+stock = pd.read_excel('/datasets/stock.xlsx', sheet_name='storehouse')
+
+xiaomi = stock[stock['item'] == 'Смартфон Xiaomi Redmi 6A 16GB']['count'].sum()
+huawei = stock[stock['item'] == 'Смартфон HUAWEI P30 lite']['count'].sum()
+print(huawei)
+#==============
+import pandas as pd
+
+stock = pd.read_excel('/datasets/stock.xlsx', sheet_name='storehouse')
+
+xiaomi = stock[stock['item'] == 'Смартфон Xiaomi Redmi 6A 16GB']['count'].sum()
+huawei = stock[stock['item'] == 'Смартфон HUAWEI P30 lite']['count'].sum()
+
+stock = stock.drop_duplicates(subset=['item'], keep='first')
+print(stock)
+#==============
+import pandas as pd
+
+stock = pd.read_excel('/datasets/stock.xlsx', sheet_name='storehouse')
+
+xiaomi = stock[stock['item'] == 'Смартфон Xiaomi Redmi 6A 16GB']['count'].sum()
+huawei = stock[stock['item'] == 'Смартфон HUAWEI P30 lite']['count'].sum()
+
+stock = stock.drop_duplicates(subset=['item'], keep='first')
+stock = stock.reset_index(drop=True)
+print(stock)
+#==============
+import pandas as pd
+
+stock = pd.read_excel('/datasets/stock.xlsx', sheet_name='storehouse')
+xiaomi = stock[stock['item'] == 'Смартфон Xiaomi Redmi 6A 16GB']['count'].sum()
+huawei = stock[stock['item'] == 'Смартфон HUAWEI P30 lite']['count'].sum()
+
+stock = stock.drop_duplicates(subset=['item'], keep='first')
+stock = stock.reset_index(drop=True)
+
+stock.loc[0, 'count'] = xiaomi
+print(stock)
+#==============
+
+#04 Ручной поиск дубликатов с учётом регистра
+#==============
+import pandas as pd
+
+
+pd.set_option('display.max_columns', None)
+
+stock = pd.read_excel('/datasets/stock.xlsx', sheet_name='storehouse')
+stock['item_lowercase'] = stock['item'].str.lower()
+print(stock)
+#==============
+import pandas as pd
+
+# служебная строка для печати всех столбцов таблицы на экран
+pd.set_option('display.max_columns', None)
+
+stock = pd.read_excel('/datasets/stock.xlsx', sheet_name='storehouse')
+stock['item_lowercase'] = stock['item'].str.lower()
+print(stock['item_lowercase'].value_counts())
+#==============
+import pandas as pd
+
+# служебная строка для печати всех столбцов таблицы на экран
+pd.set_option('display.max_columns', None)
+
+stock = pd.read_excel('/datasets/stock.xlsx')
+
+stock['item_lowercase'] = stock['item'].str.lower()
+apple = stock[stock['item_lowercase'] == 'смартфон apple iphone xr 64gb']['count'].sum()
+print(apple)
+#==============
+import pandas as pd
+
+# служебная строка для печати всех столбцов таблицы на экран
+pd.set_option('display.max_columns', None)
+
+stock = pd.read_excel('/datasets/stock.xlsx')
+stock['item_lowercase'] = stock['item'].str.lower()
+
+apple = stock[stock['item_lowercase'] == 'смартфон apple iphone xr 64gb']['count'].sum()
+samsung = stock[stock['item_lowercase'] == 'смартфон samsung galaxy a30 32gb']['count'].sum()
+print(samsung)
+#==============
+import pandas as pd
+
+# служебная строка для печати всех столбцов таблицы на экран
+pd.set_option('display.max_columns', None)
+
+stock = pd.read_excel('/datasets/stock.xlsx')
+stock['item_lowercase'] = stock['item'].str.lower()
+
+apple = stock[stock['item_lowercase'] == 'смартфон apple iphone xr 64gb']['count'].sum()
+samsung = stock[stock['item_lowercase'] == 'смартфон samsung galaxy a30 32gb']['count'].sum()
+
+stock = stock.drop_duplicates(subset=['item_lowercase'], keep='first')
+print(stock)
+#==============
+import pandas as pd
+
+# служебная строка для печати всех столбцов таблицы на экран
+pd.set_option('display.max_columns', None)
+
+stock = pd.read_excel('/datasets/stock.xlsx', sheet_name='storehouse')
+stock['item_lowercase'] = stock['item'].str.lower()
+
+apple = stock[stock['item_lowercase'] == 'смартфон apple iphone xr 64gb']['count'].sum()
+samsung = stock[stock['item_lowercase'] == 'смартфон samsung galaxy a30 32gb']['count'].sum()
+
+stock = stock.drop_duplicates(subset=['item_lowercase'], keep='first')
+stock = stock.reset_index(drop=True)
+print(stock)
+#==============
+import pandas as pd
+
+# служебная строка для печати всех столбцов таблицы на экран
+pd.set_option('display.max_columns', None)
+
+stock = pd.read_excel('/datasets/stock.xlsx', sheet_name='storehouse')
+stock['item_lowercase'] = stock['item'].str.lower()
+
+apple = stock[stock['item_lowercase'] == 'смартфон apple iphone xr 64gb']['count'].sum()
+samsung = stock[stock['item_lowercase'] == 'смартфон samsung galaxy a30 32gb']['count'].sum()
+
+stock = stock.drop_duplicates(subset=['item_lowercase'], keep='first')
+stock = stock.reset_index(drop=True)
+
+stock.loc[3, 'count'] = apple
+print(stock)
+#==============
+import pandas as pd
+
+# служебная строка для печати всех столбцов таблицы на экран
+pd.set_option('display.max_columns', None)
+
+stock = pd.read_excel('/datasets/stock.xlsx', sheet_name='storehouse')
+stock['item_lowercase'] = stock['item'].str.lower()
+
+apple = stock[stock['item_lowercase'] == 'смартфон apple iphone xr 64gb']['count'].sum()
+samsung = stock[stock['item_lowercase'] == 'смартфон samsung galaxy a30 32gb']['count'].sum()
+
+stock = stock.drop_duplicates(subset=['item_lowercase'], keep='first')
+stock = stock.reset_index(drop=True)
+
+stock.loc[3, 'count'] = apple
+stock.loc[1, 'count'] = samsung
+print(stock)
+#==============

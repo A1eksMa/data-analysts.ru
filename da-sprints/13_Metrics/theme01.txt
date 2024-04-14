@@ -1,0 +1,3845 @@
+#Метрики и воронки
+
+***
+
+## 01 Введение
+
+Практические задания отсутствуют
+
+***
+
+## 02 Конверсия, или CR
+
+Практические задания отсутствуют
+
+***
+
+## 03 Воронки
+
+Практические задания отсутствуют
+
+***
+
+## 04 Маркетинговая воронка: показы, клики, CTR и CR
+
+### Задача 1 / 2
+
+	import pandas as pd
+
+	
+
+	ad_data = pd.read_csv('ad_data.csv')
+
+	site_data = pd.read_csv('site_data.csv')
+
+	funnel = pd.merge(ad_data,site_data,on = 'date')
+
+	
+
+	print(funnel.head(5))
+
+### Задача 2 / 2
+
+	import pandas as pd
+
+	
+
+	ad_data = pd.read_csv('ad_data.csv' )
+
+	site_data = pd.read_csv('site_data.csv')
+
+	funnel = pd.merge(ad_data, site_data, on='date')
+
+	
+
+	funnel['ctr, %'] = 100*funnel['clicks']/funnel['impressions']
+
+	funnel['cr, %'] = 100*funnel['registrations'] /funnel['clicks']
+
+	
+
+	print(funnel.head(5))
+
+***
+
+## 05 Маркетинговая воронка: группировка по неделям и месяцам
+
+Практические задания отсутствуют
+
+***
+
+## 06 Маркетинговая воронка: группировка по неделям и месяцам. Практика
+
+### Задача 1 / 2
+
+	import pandas as pd
+
+	
+
+	funnel_daily = pd.read_csv('funnel_daily.csv')
+
+	
+
+	funnel_daily['date'] = pd.to_datetime(funnel_daily['date'])
+
+	funnel_daily['week'] = funnel_daily['date'].dt.isocalendar().week
+
+	
+
+	funnel_weekly = funnel_daily.groupby('week')[['registrations','clicks','impressions']].sum()
+
+	
+
+	funnel_weekly['ctr, %'] = 100*funnel_weekly['clicks']/funnel_weekly['impressions']
+
+	funnel_weekly['cr, %'] = 100*funnel_weekly['registrations'] /funnel_weekly['clicks']
+
+	
+
+	print(funnel_weekly)
+
+### Задача 2 / 2
+
+	import pandas as pd
+
+	
+
+	ad_data = pd.read_csv('ad_data_2.csv')
+
+	site_data = pd.read_csv('site_data_2.csv')
+
+	
+
+	funnel_daily = pd.merge(ad_data, site_data, on='date') 
+
+	funnel_daily['ctr, %'] = 100*funnel_daily['clicks']/funnel_daily['impressions']
+
+	funnel_daily['cr, %'] = 100*funnel_daily['registrations'] /funnel_daily['clicks']
+
+	
+
+	funnel_daily['date'] = pd.to_datetime(funnel_daily['date'])
+
+	funnel_daily['week'] = funnel_daily['date'].dt.isocalendar().week
+
+	funnel_daily['month'] = funnel_daily['date'].dt.month #!
+
+	
+
+	funnel_weekly = funnel_daily.groupby('week')[['impressions','clicks','registrations']].sum()
+
+	funnel_weekly['ctr, %'] = 100*funnel_weekly['clicks']/funnel_weekly['impressions']
+
+	funnel_weekly['cr, %'] = 100*funnel_weekly['registrations'] /funnel_weekly['clicks']
+
+	
+
+	funnel_monthly = funnel_daily.groupby('month')[['impressions','clicks','registrations']].sum()
+
+	funnel_monthly['ctr, %'] = 100*funnel_monthly['clicks']/funnel_monthly['impressions']
+
+	funnel_monthly['cr, %'] = 100*funnel_monthly['registrations'] /funnel_monthly['clicks']
+
+	print(funnel_monthly)
+
+***
+
+##07 Простая продуктовая воронка
+
+### Задание 1
+
+	import pandas as pd
+
+	
+
+	events = pd.read_csv('funnel_prod_events.csv')
+
+	events_count = events.groupby('event_name').agg({'uid': 'count'}).sort_values(by='uid', ascending=False)
+
+	
+
+	print(events_count) 
+
+### Задание 2
+
+	import pandas as pd
+
+	
+
+	events = pd.read_csv('funnel_prod_events.csv')
+
+	
+
+	users_count = events.groupby('event_name').agg({'uid': 'nunique'}).sort_values(by='uid', ascending=False)
+
+	print(users_count)
+
+***
+
+##08 Заключение
+
+Практические задания отсутствуют
+
+***
+
+
+
+# Когортный анализ
+
+***
+
+## 01 Введение
+
+Практические задания отсутствуют
+
+***
+
+## 02 Когортный анализ
+
+Практические задания отсутствуют
+
+***
+
+## 03 Профиль пользователя. Функции first() и last()
+
+Практические задания отсутствуют
+
+***
+
+## 04 Профиль пользователя. Функции first() и last().
+
+Практические задания отсутствуют
+
+***
+
+## 05 Создаём профили пользователей
+
+### Задача 1
+
+import pandas as pd
+
+
+sessions = pd.read_csv('sessions.csv')
+
+sessions['session_start'] = pd.to_datetime(sessions['session_start'])
+
+
+
+def get_profiles(sessions):
+
+
+    profiles = (
+
+        sessions.sort_values(by=['user_id', 'session_start'])
+
+        .groupby('user_id')
+
+        .agg(
+
+            {
+
+                'session_start': 'first',
+
+                'channel': 'first',
+
+                'device': 'first',
+
+                'region': 'first'
+
+            }
+
+        )
+
+        .rename(columns={'session_start': 'first_ts'})
+
+        .reset_index()
+
+    )
+
+
+    profiles['dt'] = profiles['first_ts'].dt.date
+
+    profiles['month'] = profiles['first_ts'].astype('datetime64[M]')
+
+
+    return profiles
+
+
+
+profiles = get_profiles(sessions)
+
+
+print(
+
+    profiles.groupby('device')
+
+    .agg({'user_id': 'nunique'})
+
+    #.rename(columns={'device': 'device', 'user_id': 'count' })
+
+    .sort_values(by = 'user_id', ascending = False)
+
+)
+
+### Задача 2
+
+import pandas as pd
+
+
+sessions = pd.read_csv('sessions.csv')
+
+sessions['session_start'] = pd.to_datetime(sessions['session_start'])
+
+
+orders = pd.read_csv('book_orders.csv')
+
+orders['event_dt'] = pd.to_datetime(orders['event_dt'])
+
+
+# добавили второй аргумент
+
+def get_profiles(sessions, orders):
+
+
+    profiles = (
+
+        sessions.sort_values(by=['user_id', 'session_start'])
+
+        .groupby('user_id')
+
+        .agg(
+
+            {
+
+                'session_start': 'first',
+
+                'channel': 'first',
+
+                'device': 'first',
+
+                'region': 'first',
+
+            }
+
+        )
+
+        .rename(columns={'session_start': 'first_ts'})
+
+        .reset_index()
+
+    )
+
+
+    profiles['dt'] = profiles['first_ts'].dt.date
+
+    profiles['month'] = profiles['first_ts'].astype('datetime64[M]')
+
+    
+
+    # проверьте, есть ли ID пользователей из profiles в orders
+
+    profiles['payer'] =  profiles['user_id'].isin(orders['user_id'].unique())
+
+
+    return profiles
+
+
+# строим профили по двум наборам данных
+
+profiles = get_profiles(sessions, orders)
+
+
+print(
+
+    profiles.groupby('region')
+
+    .agg({'payer': 'mean'})
+
+    .sort_values(by=['payer'], ascending = False)
+
+)
+
+***
+
+## 06 Retention Rate, Churn Rate и горизонт анализа
+
+Практические задания отсутствуют
+
+***
+
+## 07 Расчёт Retention Rate в Python. Функция div().
+
+Практические задания отсутствуют
+
+***
+
+## 08 
+
+### Задача 1
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+
+users = pd.read_csv('ch02_problems01_users.csv')  # профили 
+
+visits = pd.read_csv('ch02_problems01_visits.csv')  # сессии
+
+
+# преобразуйте данные о времени
+
+users['dt'] =  pd.to_datetime(users['dt']).dt.date
+
+users['first_ts'] =  pd.to_datetime(users['first_ts'])
+
+visits['session_start'] =  pd.to_datetime(visits['session_start'])
+
+
+# определите доступный интервал привлечения пользователей
+
+min_analysis_date = users['dt'].min()
+
+observation_date =  users['dt'].max()
+
+
+print(min_analysis_date, observation_date)
+
+
+# задайте горизонт анализа и посчитайте максимальную дату привлечения
+
+analysis_horizon =  14
+
+max_analysis_date =  observation_date - timedelta(days=analysis_horizon - 1)
+
+print(max_analysis_date)
+
+### Задача 2
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+from matplotlib import pyplot as plt
+
+
+users = pd.read_csv('ch02_problems01_users.csv')  # профили
+
+visits = pd.read_csv('ch02_problems01_visits.csv')  # сессии
+
+
+# преобразование данных о времени
+
+users['dt'] = pd.to_datetime(users['dt']).dt.date
+
+users['first_ts'] = pd.to_datetime(users['first_ts'])
+
+visits['session_start'] = pd.to_datetime(visits['session_start'])
+
+
+# доступный интервал привлечения пользователей
+
+min_analysis_date = users['dt'].min()
+
+observation_date = users['dt'].max()
+
+
+# горизонт анализа
+
+analysis_horizon = 14
+
+# максимально возможная дата привлечения с учётом горизонта
+
+max_analysis_date = observation_date - timedelta(days=analysis_horizon - 1)
+
+
+# рассчитайте размеры когорт
+
+report = (
+
+    # допишите код
+
+    users.query('(dt >= @min_analysis_date) and (dt <= @max_analysis_date)')  
+
+    .groupby('dt')  # допишите код
+
+    .agg({'user_id': 'nunique'})  # допишите код
+
+)
+
+
+report.plot(grid=True)  # постройте график, добавьте сетку
+
+plt.title('Динамика привлечения пользователей')  # название графика
+
+plt.xlabel('Дата привлечения')  # название оси X
+
+plt.xticks(rotation=45)  # угол наклона подписей на оси X
+
+plt.ylabel('Размер когорты')   # название оси Y
+
+plt.show()
+
+
+# посчитайте средний размер когорты
+
+mean_daily_cohort_size = report.mean().astype('int')
+
+
+print(mean_daily_cohort_size)
+
+### Задача 3
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+from matplotlib import pyplot as plt
+
+
+
+def get_retention(
+
+    profiles, sessions, observation_date, horizon_days, ignore_horizon=False
+
+):
+
+
+    # исключаем пользователей, не «доживших» до горизонта анализа
+
+    last_suitable_acquisition_date = observation_date
+
+    if not ignore_horizon:
+
+        last_suitable_acquisition_date = observation_date - timedelta(
+
+            days=horizon_days - 1
+
+        )
+
+    result_raw = profiles.query('dt <= @last_suitable_acquisition_date')
+
+
+    # собираем «сырые» данные для расчёта удержания
+
+    result_raw = result_raw.merge(
+
+        sessions[['user_id', 'session_start']], on='user_id', how='left'
+
+    )
+
+    result_raw['lifetime'] = (
+
+        result_raw['session_start'] - result_raw['first_ts']
+
+    ).dt.days
+
+
+    # рассчитываем удержание
+
+    result_grouped = result_raw.pivot_table(
+
+        index=['dt'], columns='lifetime', values='user_id', aggfunc='nunique'
+
+    )
+
+    cohort_sizes = (
+
+        result_raw.groupby('dt')
+
+        .agg({'user_id': 'nunique'})
+
+        .rename(columns={'user_id': 'cohort_size'})
+
+    )
+
+    result_grouped = cohort_sizes.merge(
+
+        result_grouped, on='dt', how='left'
+
+    ).fillna(0)
+
+    result_grouped = result_grouped.div(result_grouped['cohort_size'], axis=0)
+
+
+    # исключаем все лайфтаймы, превышающие горизонт анализа
+
+    result_grouped = result_grouped[
+
+        ['cohort_size'] + list(range(horizon_days))
+
+    ]
+
+
+    # восстанавливаем столбец с размерами когорт
+
+    result_grouped['cohort_size'] = cohort_sizes
+
+
+    # возвращаем таблицу удержания и сырые данные
+
+    return result_raw, result_grouped
+
+
+
+users = pd.read_csv('ch02_problems01_users.csv')  # профили
+
+visits = pd.read_csv('ch02_problems01_visits.csv')  # сессии
+
+
+# преобразование данных о времени
+
+users['dt'] = pd.to_datetime(users['dt']).dt.date
+
+users['first_ts'] = pd.to_datetime(users['first_ts'])
+
+visits['session_start'] = pd.to_datetime(visits['session_start'])
+
+
+# доступный интервал привлечения пользователей
+
+min_analysis_date = users['dt'].min()
+
+observation_date = users['dt'].max()  # момент анализа
+
+
+# горизонт анализа
+
+analysis_horizon = 14
+
+
+# постройте таблицу удержания
+
+retention_raw, retention = get_retention(users,visits,observation_date,analysis_horizon)
+
+
+print(retention)
+
+***
+
+## 09 Визуализация когортного анализа
+
+Практические задания отсутствуют
+
+***
+
+## 10 Визуализация когортного анализа — практика
+
+### Задача 1
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+import seaborn as sns
+
+from matplotlib import pyplot as plt
+
+
+# функция для расчёта удержания
+
+def get_retention(
+
+    profiles, sessions, observation_date, horizon_days, ignore_horizon=False
+
+):
+
+
+    # исключаем пользователей, не «доживших» до горизонта анализа
+
+    last_suitable_acquisition_date = observation_date
+
+    if not ignore_horizon:
+
+        last_suitable_acquisition_date = observation_date - timedelta(
+
+            days=horizon_days - 1
+
+        )
+
+    result_raw = profiles.query('dt <= @last_suitable_acquisition_date')
+
+
+    # собираем «сырые» данные для расчёта удержания
+
+    result_raw = result_raw.merge(
+
+        sessions[['user_id', 'session_start']], on='user_id', how='left'
+
+    )
+
+    result_raw['lifetime'] = (
+
+        result_raw['session_start'] - result_raw['first_ts']
+
+    ).dt.days
+
+
+    # рассчитываем удержание
+
+    result_grouped = result_raw.pivot_table(
+
+        index=['dt'], columns='lifetime', values='user_id', aggfunc='nunique'
+
+    )
+
+    cohort_sizes = (
+
+        result_raw.groupby('dt')
+
+        .agg({'user_id': 'nunique'})
+
+        .rename(columns={'user_id': 'cohort_size'})
+
+    )
+
+    result_grouped = cohort_sizes.merge(
+
+        result_grouped, on='dt', how='left'
+
+    ).fillna(0)
+
+    result_grouped = result_grouped.div(result_grouped['cohort_size'], axis=0)
+
+
+    # исключаем все лайфтаймы, превышающие горизонт анализа
+
+    result_grouped = result_grouped[
+
+        ['cohort_size'] + list(range(horizon_days))
+
+    ]
+
+
+    # восстанавливаем столбец с размерами когорт
+
+    result_grouped['cohort_size'] = cohort_sizes
+
+
+    # возвращаем таблицу удержания и сырые данные
+
+    return result_raw, result_grouped
+
+
+
+users = pd.read_csv('ch02_problems01_users.csv')  # профили
+
+visits = pd.read_csv('ch02_problems01_visits.csv')  # сессии
+
+
+# преобразование данных о времени
+
+users['dt'] = pd.to_datetime(users['dt']).dt.date
+
+users['first_ts'] = pd.to_datetime(users['first_ts'])
+
+visits['session_start'] = pd.to_datetime(visits['session_start'])
+
+
+# доступный интервал привлечения пользователей
+
+min_analysis_date = users['dt'].min()
+
+observation_date = users['dt'].max()  # момент анализа
+
+
+# горизонт анализа
+
+analysis_horizon = 14
+
+
+retention_raw, retention =  get_retention(users,visits,observation_date,analysis_horizon)
+
+
+# постройте хитмэп по таблице удержания
+
+plt.figure(figsize = (15, 6))
+
+sns.heatmap(
+
+    retention.drop(columns=['cohort_size',0]),  # удаляем размеры когорт
+
+    annot=True,  # включаем подписи
+
+    fmt='.2%',  # переводим значения в проценты
+
+) 
+
+plt.title('Тепловая карта удержания') # название графика
+
+plt.show()
+
+### Задача 2
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+import seaborn as sns
+
+from matplotlib import pyplot as plt
+
+
+# функция для расчёта удержания
+
+def get_retention(
+
+    profiles, sessions, observation_date, horizon_days, ignore_horizon=False
+
+):
+
+
+    # исключаем пользователей, не «доживших» до горизонта анализа
+
+    last_suitable_acquisition_date = observation_date
+
+    if not ignore_horizon:
+
+        last_suitable_acquisition_date = observation_date - timedelta(
+
+            days=horizon_days - 1
+
+        )
+
+    result_raw = profiles.query('dt <= @last_suitable_acquisition_date')
+
+
+    # собираем «сырые» данные для расчёта удержания
+
+    result_raw = result_raw.merge(
+
+        sessions[['user_id', 'session_start']], on='user_id', how='left'
+
+    )
+
+    result_raw['lifetime'] = (
+
+        result_raw['session_start'] - result_raw['first_ts']
+
+    ).dt.days
+
+
+    # рассчитываем удержание
+
+    result_grouped = result_raw.pivot_table(
+
+        index=['dt'], columns='lifetime', values='user_id', aggfunc='nunique'
+
+    )
+
+    cohort_sizes = (
+
+        result_raw.groupby('dt')
+
+        .agg({'user_id': 'nunique'})
+
+        .rename(columns={'user_id': 'cohort_size'})
+
+    )
+
+    result_grouped = cohort_sizes.merge(
+
+        result_grouped, on='dt', how='left'
+
+    ).fillna(0)
+
+    result_grouped = result_grouped.div(result_grouped['cohort_size'], axis=0)
+
+
+    # исключаем все лайфтаймы, превышающие горизонт анализа
+
+    result_grouped = result_grouped[
+
+        ['cohort_size'] + list(range(horizon_days))
+
+    ]
+
+
+    # восстанавливаем столбец с размерами когорт
+
+    result_grouped['cohort_size'] = cohort_sizes
+
+
+    # возвращаем таблицу удержания и сырые данные
+
+    return result_raw, result_grouped
+
+
+
+users = pd.read_csv('ch02_problems01_users.csv')  # профили
+
+visits = pd.read_csv('ch02_problems01_visits.csv')  # сессии
+
+
+# преобразование данных о времени
+
+users['dt'] = pd.to_datetime(users['dt']).dt.date
+
+users['first_ts'] = pd.to_datetime(users['first_ts'])
+
+visits['session_start'] = pd.to_datetime(visits['session_start'])
+
+
+# доступный интервал привлечения пользователей
+
+min_analysis_date = users['dt'].min()
+
+observation_date = users['dt'].max()  # момент анализа
+
+
+# горизонт анализа
+
+analysis_horizon = 14
+
+
+retention_raw, retention = get_retention(
+
+    users, visits, observation_date, analysis_horizon
+
+)
+
+r=retention[[6, 13]]
+
+r.plot(grid=True, figsize=(15, 5))
+
+# постройте график истории изменений для 7-го и 14-го дней
+
+# добавьте на график сетку, задав параметр grid
+
+# установите размер графика 15 на 5, задав параметр figsize
+
+
+plt.title('Динамика удержания пользователей на первую и вторую недели «жизни»')
+
+plt.xlabel('Дата привлечения')
+
+plt.xticks(rotation = 45)
+
+plt.ylabel('Доля удержанных пользователей')
+
+plt.show()
+
+***
+
+## 11 Анализ удержания произвольных когорт. Функция subplot().
+
+Практические задания отсутствуют
+
+***
+
+## 12 Анализ удержания произвольных когорт — практика
+
+### Задача 1
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+import seaborn as sns
+
+from matplotlib import pyplot as plt
+
+
+
+def get_retention(
+
+    profiles,
+
+    sessions,
+
+    observation_date,
+
+    horizon_days,
+
+    dimensions=[],
+
+    ignore_horizon=False,
+
+):
+
+
+    # добавляем столбец payer в передаваемый dimensions список
+
+    dimensions = ['payer'] + dimensions
+
+
+    # исключаем пользователей, не «доживших» до горизонта анализа
+
+    last_suitable_acquisition_date = observation_date
+
+    if not ignore_horizon:
+
+        last_suitable_acquisition_date = observation_date - timedelta(
+
+            days=horizon_days - 1
+
+        )
+
+    result_raw = profiles.query('dt <= @last_suitable_acquisition_date')
+
+
+    # собираем «сырые» данные для расчёта удержания
+
+    result_raw = result_raw.merge(
+
+        sessions[['user_id', 'session_start']], on='user_id', how='left'
+
+    )
+
+    result_raw['lifetime'] = (
+
+        result_raw['session_start'] - result_raw['first_ts']
+
+    ).dt.days
+
+
+    # рассчитываем удержание
+
+    result_grouped = result_raw.pivot_table(
+
+        index=dimensions,
+
+        columns='lifetime',
+
+        values='user_id',
+
+        aggfunc='nunique',
+
+    )
+
+    cohort_sizes = (
+
+        result_raw.groupby(dimensions)
+
+        .agg({'user_id': 'nunique'})
+
+        .rename(columns={'user_id': 'cohort_size'})
+
+    )
+
+    result_grouped = cohort_sizes.merge(
+
+        result_grouped, on=dimensions, how='left'
+
+    ).fillna(0)
+
+    result_grouped = result_grouped.div(result_grouped['cohort_size'], axis=0)
+
+
+    # исключаем все лайфтаймы, превышающие горизонт анализа
+
+    result_grouped = result_grouped[
+
+        ['cohort_size'] + list(range(horizon_days))
+
+    ]
+
+
+    # восстанавливаем столбец с размерами когорт
+
+    result_grouped['cohort_size'] = cohort_sizes
+
+
+    # возвращаем таблицу удержания и сырые данные
+
+    return result_raw, result_grouped
+
+
+
+# загружаем данные
+
+users = pd.read_csv('ch02_problems02_users.csv')  # профили
+
+visits = pd.read_csv('ch02_problems02_visits.csv')  # журнал сессий
+
+
+# преобразование данных о времени
+
+users['dt'] = pd.to_datetime(users['dt']).dt.date
+
+users['first_ts'] = pd.to_datetime(users['first_ts'])
+
+visits['session_start'] = pd.to_datetime(visits['session_start'])
+
+
+observation_date = users['dt'].max()  # момент анализа
+
+
+analysis_horizon = 14
+
+# получите сырые данные и таблицу удержания
+
+retention_raw, retention = get_retention(users,visits,observation_date,analysis_horizon)
+
+# исключите размеры когорт и удержание первого дня
+
+report = retention.drop(columns=['cohort_size', 0])
+
+# постройте кривые удержания
+
+report.T.plot(
+
+        grid=True,  # добавляем сетку
+
+        # отметки на оси X — названия колонок
+
+        xticks=list(report.columns.values),
+
+        #ax=plt.subplot(1, 2, i + 1), # задаём расположение графиков
+
+    )
+
+plt.xlabel('Лайфтайм')
+
+plt.title('Кривые удержания с разбивкой по совершению покупок')
+
+plt.show()
+
+### Задача 2
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+import seaborn as sns
+
+from matplotlib import pyplot as plt
+
+
+
+def get_retention(
+
+    profiles,
+
+    sessions,
+
+    observation_date,
+
+    horizon_days,
+
+    dimensions=[],
+
+    ignore_horizon=False,
+
+):
+
+
+    # добавляем столбец payer в передаваемый dimensions список
+
+    dimensions = ['payer'] + dimensions
+
+
+    # исключаем пользователей, не «доживших» до горизонта анализа
+
+    last_suitable_acquisition_date = observation_date
+
+    if not ignore_horizon:
+
+        last_suitable_acquisition_date = observation_date - timedelta(
+
+            days=horizon_days - 1
+
+        )
+
+    result_raw = profiles.query('dt <= @last_suitable_acquisition_date')
+
+
+    # собираем «сырые» данные для расчёта удержания
+
+    result_raw = result_raw.merge(
+
+        sessions[['user_id', 'session_start']], on='user_id', how='left'
+
+    )
+
+    result_raw['lifetime'] = (
+
+        result_raw['session_start'] - result_raw['first_ts']
+
+    ).dt.days
+
+
+    # рассчитываем удержание
+
+    result_grouped = result_raw.pivot_table(
+
+        index=dimensions,
+
+        columns='lifetime',
+
+        values='user_id',
+
+        aggfunc='nunique',
+
+    )
+
+    cohort_sizes = (
+
+        result_raw.groupby(dimensions)
+
+        .agg({'user_id': 'nunique'})
+
+        .rename(columns={'user_id': 'cohort_size'})
+
+    )
+
+    result_grouped = cohort_sizes.merge(
+
+        result_grouped, on=dimensions, how='left'
+
+    ).fillna(0)
+
+    result_grouped = result_grouped.div(result_grouped['cohort_size'], axis=0)
+
+
+    # исключаем все лайфтаймы, превышающие горизонт анализа
+
+    result_grouped = result_grouped[
+
+        ['cohort_size'] + list(range(horizon_days))
+
+    ]
+
+
+    # восстанавливаем столбец с размерами когорт
+
+    result_grouped['cohort_size'] = cohort_sizes
+
+
+    # возвращаем таблицу удержания и сырые данные
+
+    return result_raw, result_grouped
+
+
+
+# загружаем данные
+
+users = pd.read_csv('ch02_problems02_users.csv')  # профили
+
+visits = pd.read_csv('ch02_problems02_visits.csv')  # журнал сессий
+
+
+# преобразование данных о времени
+
+users['dt'] = pd.to_datetime(users['dt']).dt.date
+
+users['first_ts'] = pd.to_datetime(users['first_ts'])
+
+visits['session_start'] = pd.to_datetime(visits['session_start'])
+
+
+observation_date = users['dt'].max()  # момент анализа
+
+
+analysis_horizon = 14  # горизонт анализа
+
+
+retention_raw, retention = get_retention(
+
+    users,visits,observation_date,analysis_horizon, dimensions=['channel']
+
+)
+
+
+# исключаем размеры когорт и удержание первого дня
+
+report = retention.drop(columns=['cohort_size', 0])
+
+
+# задаём размер сетки для графиков
+
+plt.figure(figsize = (20, 6))                 
+
+
+for i, payer in enumerate(users['payer'].unique()):
+
+    report.query('payer == @payer').droplevel('payer').T.plot(
+
+        grid=True,  # добавляем сетку
+
+        # отметки на оси X — названия колонок
+
+        xticks=list(report.columns.values),
+
+        ax=plt.subplot(1, 2, i + 1), # задаём расположение графиков
+
+    )
+
+    plt.xlabel('Лайфтайм')
+
+    plt.title('Кривые удержания для payer = {}'.format(payer))
+
+plt.show()
+
+***
+
+## 13 Анализ динамики удержания произвольных когорт
+
+Практические задания отсутствуют
+
+***
+
+## 14 Анализ динамики удержания произвольных когорт — практика
+
+### Задача
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+import seaborn as sns
+
+from matplotlib import pyplot as plt
+
+
+
+def get_retention(
+
+    profiles,
+
+    sessions,
+
+    observation_date,
+
+    horizon_days,
+
+    dimensions=[],
+
+    ignore_horizon=False,
+
+):
+
+
+    # добавляем столбец payer в передаваемый dimensions список
+
+    dimensions = ['payer'] + dimensions
+
+
+    # исключаем пользователей, не «доживших» до горизонта анализа
+
+    last_suitable_acquisition_date = observation_date
+
+    if not ignore_horizon:
+
+        last_suitable_acquisition_date = observation_date - timedelta(
+
+            days=horizon_days - 1
+
+        )
+
+    result_raw = profiles.query('dt <= @last_suitable_acquisition_date')
+
+
+    # собираем «сырые» данные для расчёта удержания
+
+    result_raw = result_raw.merge(
+
+        sessions[['user_id', 'session_start']], on='user_id', how='left'
+
+    )
+
+    result_raw['lifetime'] = (
+
+        result_raw['session_start'] - result_raw['first_ts']
+
+    ).dt.days
+
+
+    # функция для группировки таблицы по желаемым признакам
+
+    def group_by_dimensions(df, dims, horizon_days):
+
+        result = df.pivot_table(
+
+            index=dims, columns='lifetime', values='user_id', aggfunc='nunique'
+
+        )
+
+        cohort_sizes = (
+
+            df.groupby(dims)
+
+            .agg({'user_id': 'nunique'})
+
+            .rename(columns={'user_id': 'cohort_size'})
+
+        )
+
+        result = cohort_sizes.merge(result, on=dims, how='left').fillna(0)
+
+        result = result.div(result['cohort_size'], axis=0)
+
+        result = result[['cohort_size'] + list(range(horizon_days))]
+
+        result['cohort_size'] = cohort_sizes
+
+        return result
+
+
+    # получаем таблицу удержания
+
+    result_grouped = group_by_dimensions(result_raw, dimensions, horizon_days)
+
+
+    # получаем таблицу динамики удержания
+
+    result_in_time = group_by_dimensions(
+
+        result_raw, dimensions + ['dt'], horizon_days
+
+    )
+
+
+    # возвращаем обе таблицы и сырые данные
+
+    return result_raw, result_grouped, result_in_time
+
+
+
+users = pd.read_csv('ch02_problems02_users.csv')  # профили
+
+visits = pd.read_csv('ch02_problems02_visits.csv')  # журнал сессий
+
+
+# преобразование данных о времени
+
+users['dt'] = pd.to_datetime(users['dt']).dt.date
+
+users['first_ts'] = pd.to_datetime(users['first_ts'])
+
+visits['session_start'] = pd.to_datetime(visits['session_start'])
+
+
+observation_date = users['dt'].max()  # момент анализа
+
+
+analysis_horizon = 14  # горизонт анализа
+
+
+
+# получите сырые данные, таблицу удержания и таблицу динамики удержания
+
+retention_raw, retention, retention_history = get_retention(users, visits, observation_date, analysis_horizon, dimensions=['channel'])
+
+
+plt.figure(figsize = (20, 8))  # размер сетки для графиков                        
+
+
+report =  retention_history[[6, 13]]
+
+
+num_rows = len(users['payer'].unique()) # задайте количество строк в таблице графиков
+
+num_cols = len(users['channel'].unique()) # задайте количество столбцов в таблице графиков
+
+
+# постройте графики по аналогии с примером из прошлого урока:
+
+
+for i, payer in enumerate(users['payer'].unique()):
+
+    for j, channel in enumerate(users['channel'].unique()):
+
+        (report.query('payer == @payer and channel == @channel')
+
+            .droplevel(['payer', 'channel'])
+
+            .plot(
+
+                grid=True,
+
+                ax= plt.subplot(num_rows, num_cols, i * num_cols + j + 1),)
+
+        )
+
+        plt.xlabel('Дата привлечения')
+
+        plt.title('Удержание для payer = {} на {}'.format(payer, channel))
+
+
+plt.tight_layout()
+
+plt.show()
+
+***
+
+## 15 Conversion Rate в когортном анализе
+
+Практические задания отсутствуют
+
+***
+
+## 16 Расчёт конверсии в Python. Метод cumsum()
+
+Практические задания отсутствуют
+
+***
+
+## 17 Расчёт конверсии в Python — практика
+
+### Задача 1
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+import seaborn as sns
+
+from matplotlib import pyplot as plt
+
+
+def get_conversion(
+
+    profiles,
+
+    purchases,
+
+    observation_date,
+
+    horizon_days,
+
+    dimensions=[],
+
+    ignore_horizon=False,
+
+):
+
+
+    # исключаем пользователей, не «доживших» до горизонта анализа
+
+    last_suitable_acquisition_date = observation_date
+
+    if not ignore_horizon:
+
+        last_suitable_acquisition_date = observation_date - timedelta(
+
+            days=horizon_days - 1
+
+        )
+
+    result_raw = profiles.query('dt <= @last_suitable_acquisition_date')
+
+
+    # определяем дату и время первой покупки для каждого пользователя
+
+    first_purchases = (
+
+        purchases.sort_values(by=['user_id', 'event_dt'])
+
+        .groupby('user_id')
+
+        .agg({'event_dt': 'first'})
+
+        .reset_index()
+
+    )
+
+
+    # добавляем данные о покупках в профили
+
+    result_raw = result_raw.merge(
+
+        first_purchases[['user_id', 'event_dt']], on='user_id', how='left'
+
+    )
+
+
+    # рассчитываем лайфтайм для каждой покупки
+
+    result_raw['lifetime'] = (
+
+        result_raw['event_dt'] - result_raw['first_ts']
+
+    ).dt.days
+
+
+    # группируем по cohort, если в dimensions ничего нет
+
+    if len(dimensions) == 0:
+
+        result_raw['cohort'] = 'All users' 
+
+        dimensions = dimensions + ['cohort']
+
+
+    # функция для группировки таблицы по желаемым признакам
+
+    def group_by_dimensions(df, dims, horizon_days):
+
+        result = df.pivot_table(
+
+            index=dims, columns='lifetime', values='user_id', aggfunc='nunique'
+
+        )
+
+        result = result.fillna(0).cumsum(axis=1)
+
+        cohort_sizes = (
+
+            df.groupby(dims)
+
+            .agg({'user_id': 'nunique'})
+
+            .rename(columns={'user_id': 'cohort_size'})
+
+        )
+
+        result = cohort_sizes.merge(result, on=dims, how='left').fillna(0)
+
+        # делим каждую «ячейку» в строке на размер когорты
+
+        # и получаем conversion rate
+
+        result = result.div(result['cohort_size'], axis=0)
+
+        result = result[['cohort_size'] + list(range(horizon_days))]
+
+        result['cohort_size'] = cohort_sizes
+
+        return result
+
+
+    # получаем таблицу конверсии
+
+    result_grouped = group_by_dimensions(result_raw, dimensions, horizon_days)
+
+
+    # для таблицы динамики конверсии убираем 'cohort' из dimensions
+
+    if 'cohort' in dimensions: 
+
+        dimensions = []
+
+
+    # получаем таблицу динамики конверсии
+
+    result_in_time = group_by_dimensions(
+
+        result_raw, dimensions + ['dt'], horizon_days
+
+    )
+
+
+    # возвращаем обе таблицы и сырые данные
+
+    return result_raw, result_grouped, result_in_time
+
+
+
+# загружаем данные
+
+users = pd.read_csv('ch02_problems02_users.csv')  # профили
+
+purchases = pd.read_csv('ch02_problems02_orders.csv')  # покупки
+
+
+# преобразование данных о времени
+
+users['dt'] = pd.to_datetime(users['dt']).dt.date
+
+users['first_ts'] = pd.to_datetime(users['first_ts'])
+
+purchases['event_dt'] = pd.to_datetime(purchases['event_dt'])
+
+
+observation_date = users['dt'].max()  # момент анализа
+
+
+analysis_horizon =  7
+
+
+conversion_raw, conversion, conversion_history = get_conversion(
+
+    users, purchases, observation_date, analysis_horizon
+
+)
+
+
+plt.figure(figsize=(20, 5)) # размер сетки для графиков
+
+
+report = conversion.drop(columns=['cohort_size'])
+
+
+# постройте кривые конверсии
+
+report.T.plot(
+
+    # строим кривые конверсии в первой ячейке таблицы графиков
+
+    grid=True, xticks=list(report.columns.values), ax=plt.subplot(1, 2, 1)
+
+)
+
+plt.title('Кривая конверсии')
+
+sns.heatmap(report, annot=True, fmt='.2%', ax=plt.subplot(1, 2, 2))
+
+plt.title('Тепловая карта конверсии')
+
+
+plt.show()
+
+### Задача 2
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+import seaborn as sns
+
+from matplotlib import pyplot as plt
+
+
+def get_conversion(
+
+    profiles,
+
+    purchases,
+
+    observation_date,
+
+    horizon_days,
+
+    dimensions=[],
+
+    ignore_horizon=False,
+
+):
+
+
+    # исключаем пользователей, не «доживших» до горизонта анализа
+
+    last_suitable_acquisition_date = observation_date
+
+    if not ignore_horizon:
+
+        last_suitable_acquisition_date = observation_date - timedelta(
+
+            days=horizon_days - 1
+
+        )
+
+    result_raw = profiles.query('dt <= @last_suitable_acquisition_date')
+
+
+    # определяем дату и время первой покупки для каждого пользователя
+
+    first_purchases = (
+
+        purchases.sort_values(by=['user_id', 'event_dt'])
+
+        .groupby('user_id')
+
+        .agg({'event_dt': 'first'})
+
+        .reset_index()
+
+    )
+
+
+    # добавляем данные о покупках в профили
+
+    result_raw = result_raw.merge(
+
+        first_purchases[['user_id', 'event_dt']], on='user_id', how='left'
+
+    )
+
+
+    # рассчитываем лайфтайм для каждой покупки
+
+    result_raw['lifetime'] = (
+
+        result_raw['event_dt'] - result_raw['first_ts']
+
+    ).dt.days
+
+
+    # группируем по cohort, если в dimensions ничего нет
+
+    if len(dimensions) == 0:
+
+        result_raw['cohort'] = 'All users'
+
+        dimensions = dimensions + ['cohort']
+
+
+    # функция для группировки таблицы по желаемым признакам
+
+    def group_by_dimensions(df, dims, horizon_days):
+
+        result = df.pivot_table(
+
+            index=dims, columns='lifetime', values='user_id', aggfunc='nunique'
+
+        )
+
+        result = result.fillna(0).cumsum(axis=1)
+
+        cohort_sizes = (
+
+            df.groupby(dims)
+
+            .agg({'user_id': 'nunique'})
+
+            .rename(columns={'user_id': 'cohort_size'})
+
+        )
+
+        result = cohort_sizes.merge(result, on=dims, how='left').fillna(0)
+
+        # делим каждую «ячейку» в строке на размер когорты
+
+        # и получаем conversion rate
+
+        result = result.div(result['cohort_size'], axis=0)
+
+        result = result[['cohort_size'] + list(range(horizon_days))]
+
+        result['cohort_size'] = cohort_sizes
+
+        return result
+
+
+    # получаем таблицу конверсии
+
+    result_grouped = group_by_dimensions(result_raw, dimensions, horizon_days)
+
+
+    # для таблицы динамики конверсии убираем 'cohort' из dimensions
+
+    if 'cohort' in dimensions: 
+
+        dimensions = []
+
+
+    # получаем таблицу динамики конверсии
+
+    result_in_time = group_by_dimensions(
+
+        result_raw, dimensions + ['dt'], horizon_days
+
+    )
+
+
+    # возвращаем обе таблицы и сырые данные
+
+    return result_raw, result_grouped, result_in_time
+
+
+
+# загружаем данные
+
+users = pd.read_csv('ch02_problems02_users.csv')  # профили
+
+purchases = pd.read_csv('ch02_problems02_orders.csv')  # покупки
+
+
+# преобразование данных о времени
+
+users['dt'] = pd.to_datetime(users['dt']).dt.date
+
+users['first_ts'] = pd.to_datetime(users['first_ts'])
+
+purchases['event_dt'] = pd.to_datetime(purchases['event_dt'])
+
+
+observation_date = users['dt'].max()  # момент анализа
+
+
+analysis_horizon = 7  # горизонт анализа
+
+
+conversion_raw, conversion, conversion_history = get_conversion(
+
+    users, purchases, observation_date, analysis_horizon, dimensions=['channel']
+
+)
+
+
+plt.figure(figsize=(20, 5)) # размер сетки для графиков
+
+
+# в одной ячейке — кривые конверсии
+
+report = conversion.drop(columns=['cohort_size'])
+
+report.T.plot(
+
+    grid=True, xticks=list(report.columns.values), ax=plt.subplot(1, 2, 1)
+
+)
+
+plt.title('Конверсия первых семи дней с разбивкой по каналам привлечения')
+
+
+# во второй ячейке постройте график истории изменений
+
+# выберите нужный день «жизни» и постройте сводную таблицу
+
+report = (
+
+    conversion_history[6]
+
+    .reset_index()
+
+    .pivot_table(index='dt', columns='channel', values=6, aggfunc='mean')
+
+    .fillna(0)  # заполняем пропуски на случай, если они возникнут
+
+)
+
+# постройте график и задайте его параметры
+
+report.plot(
+
+    # во второй ячейке строим график истории изменений
+
+    grid=True, ax=plt.subplot(1, 2, 2)
+
+)
+
+
+plt.title('Динамика конверсии 7-го дня с разбивкой по каналам привлечения')
+
+
+plt.show()
+
+***
+
+# Юнит-экономика
+
+## 01 Введение
+
+Практические задания отсутствуют
+
+***
+
+## 02 Экономика одного покупателя: LTV, CAC и ROI
+
+Практические задания отсутствуют
+
+***
+
+## 03 LTV, ARPU и ARPPU. Методы оплаты рекламы
+
+Практические задания отсутствуют
+
+***
+
+## 04 Расчёт LTV в Python
+
+Практические задания отсутствуют
+
+***
+
+## 05 Расчёт LTV в Python — практика
+
+### Задача 1
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+import seaborn as sns
+
+from matplotlib import pyplot as plt
+
+
+
+def get_ltv(
+
+    profiles,
+
+    purchases,
+
+    observation_date,
+
+    horizon_days,
+
+    dimensions=[],
+
+    ignore_horizon=False,
+
+):
+
+
+    # исключаем пользователей, не «доживших» до горизонта анализа
+
+    last_suitable_acquisition_date = observation_date
+
+    if not ignore_horizon:
+
+        last_suitable_acquisition_date = observation_date - timedelta(
+
+            days=horizon_days - 1
+
+        )
+
+    result_raw = profiles.query('dt <= @last_suitable_acquisition_date')
+
+
+    # добавляем данные о выручке в профили
+
+    result_raw = result_raw.merge(
+
+        purchases[['user_id', 'event_dt', 'revenue']],
+
+        on='user_id',
+
+        how='left',
+
+    )
+
+
+    # вычисляем лайфтайм для каждой покупки
+
+    result_raw['lifetime'] = (
+
+        result_raw['event_dt'] - result_raw['first_ts']
+
+    ).dt.days
+
+
+    # группируем по cohort, если в dimensions ничего нет
+
+    if len(dimensions) == 0:
+
+        result_raw['cohort'] = 'All users'
+
+        dimensions = dimensions + ['cohort']
+
+
+    def group_by_dimensions(df, dims, horizon_days):
+
+        # строим «треугольную» таблицу выручки
+
+        result = df.pivot_table(
+
+            index=dims,
+
+            columns='lifetime',
+
+            values='revenue',
+
+            aggfunc='sum',
+
+        )
+
+        # считаем сумму выручки с накоплением
+
+        result = result.fillna(0).cumsum(axis=1)
+
+        # вычисляем размеры когорт
+
+        cohort_sizes = (
+
+            df.groupby(dims)
+
+            .agg({'user_id': 'nunique'})
+
+            .rename(columns={'user_id': 'cohort_size'})
+
+        )
+
+        # объединяем размеры когорт и таблицу выручки
+
+        result = cohort_sizes.merge(result, on=dims, how='left').fillna(0)
+
+        # считаем LTV:
+
+        # делим каждую «ячейку» в строке на размер когорты
+
+        result = result.div(result['cohort_size'], axis=0)
+
+        # исключаем все лайфтаймы, превышающие горизонт анализа
+
+        result = result[['cohort_size'] + list(range(horizon_days))]
+
+        # восстанавливаем размеры когорт
+
+        result['cohort_size'] = cohort_sizes
+
+        return result
+
+
+    # получаем таблицу LTV
+
+    result_grouped = group_by_dimensions(result_raw, dimensions, horizon_days)
+
+
+    # для таблицы динамики конверсии убираем 'cohort' из dimensions
+
+    if 'cohort' in dimensions:
+
+        dimensions = []
+
+    # получаем таблицу динамики LTV
+
+    result_in_time = group_by_dimensions(
+
+        result_raw, dimensions + ['dt'], horizon_days
+
+    )
+
+
+    # возвращаем обе таблицы LTV и сырые данные
+
+    return result_raw, result_grouped, result_in_time
+
+
+
+users = pd.read_csv('ch02_problems02_users.csv')  # профили
+
+purchases = pd.read_csv('ch02_problems02_orders.csv')  # данные о покупках
+
+
+# преобразование данных о времени
+
+users['dt'] = pd.to_datetime(users['dt']).dt.date
+
+users['first_ts'] = pd.to_datetime(users['first_ts'])
+
+purchases['event_dt'] = pd.to_datetime(purchases['event_dt'])
+
+
+observation_date = users['dt'].max()  # момент анализа
+
+analysis_horizon = 7  # горизонт анализа
+
+
+# рассчитайте ltv с разбивкой по channel
+
+ltv_raw, ltv, ltv_history =  get_ltv(users, purchases, observation_date, analysis_horizon, dimensions=['channel'])
+
+
+plt.figure(figsize = (20, 5))  # размер сетки для графиков
+
+
+# исключаем размеры когорт
+
+report = ltv.drop(columns = ['cohort_size'])
+
+
+# в одной ячейке таблицы графиков постройте кривые LTV
+
+report.T.plot(
+
+    grid=True,  
+
+    figsize=(10, 5), 
+
+    xticks=list(report.columns.values), 
+
+    ax=plt.subplot(1, 2, 1),
+
+    )
+
+plt.title('LTV с разбивкой по каналам привлечения')
+
+plt.ylabel('LTV, $')
+
+plt.xlabel('Лайфтайм')
+
+
+# в другой — хитмэп
+
+sns.heatmap(report, annot=True, fmt='.2f', ax=plt.subplot(1, 2, 2))
+
+plt.title('Тепловая карта LTV с разбивкой по каналам привлечения')
+
+plt.xlabel('Лайфтайм')
+
+
+plt.show()
+
+### Задача 2
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+import seaborn as sns
+
+from matplotlib import pyplot as plt
+
+
+
+def get_ltv(
+
+    profiles,
+
+    purchases,
+
+    observation_date,
+
+    horizon_days,
+
+    dimensions=[],
+
+    ignore_horizon=False,
+
+):
+
+
+    # исключаем пользователей, не «доживших» до горизонта анализа
+
+    last_suitable_acquisition_date = observation_date
+
+    if not ignore_horizon:
+
+        last_suitable_acquisition_date = observation_date - timedelta(
+
+            days=horizon_days - 1
+
+        )
+
+    result_raw = profiles.query('dt <= @last_suitable_acquisition_date')
+
+
+    # добавляем данные о выручке в профили
+
+    result_raw = result_raw.merge(
+
+        purchases[['user_id', 'event_dt', 'revenue']],
+
+        on='user_id',
+
+        how='left',
+
+    )
+
+
+    # вычисляем лайфтайм для каждой покупки
+
+    result_raw['lifetime'] = (
+
+        result_raw['event_dt'] - result_raw['first_ts']
+
+    ).dt.days
+
+
+    # группируем по cohort, если в dimensions ничего нет
+
+    if len(dimensions) == 0:
+
+        result_raw['cohort'] = 'All users'
+
+        dimensions = dimensions + ['cohort']
+
+
+    def group_by_dimensions(df, dims, horizon_days):
+
+        # строим «треугольную» таблицу выручки
+
+        result = df.pivot_table(
+
+            index=dims,
+
+            columns='lifetime',
+
+            values='revenue',
+
+            aggfunc='sum',
+
+        )
+
+        # считаем сумму выручки с накоплением
+
+        result = result.fillna(0).cumsum(axis=1)
+
+        # вычисляем размеры когорт
+
+        cohort_sizes = (
+
+            df.groupby(dims)
+
+            .agg({'user_id': 'nunique'})
+
+            .rename(columns={'user_id': 'cohort_size'})
+
+        )
+
+        # объединяем размеры когорт и таблицу выручки
+
+        result = cohort_sizes.merge(result, on=dims, how='left').fillna(0)
+
+        # считаем LTV:
+
+        # делим каждую «ячейку» в строке на размер когорты
+
+        result = result.div(result['cohort_size'], axis=0)
+
+        # исключаем все лайфтаймы, превышающие горизонт анализа
+
+        result = result[['cohort_size'] + list(range(horizon_days))]
+
+        # восстанавливаем размеры когорт
+
+        result['cohort_size'] = cohort_sizes
+
+        return result
+
+
+    # получаем таблицу LTV
+
+    result_grouped = group_by_dimensions(result_raw, dimensions, horizon_days)
+
+
+    # для таблицы динамики конверсии убираем 'cohort' из dimensions
+
+    if 'cohort' in dimensions:
+
+        dimensions = []
+
+    # получаем таблицу динамики LTV
+
+    result_in_time = group_by_dimensions(
+
+        result_raw, dimensions + ['dt'], horizon_days
+
+    )
+
+
+    # возвращаем обе таблицы LTV и сырые данные
+
+    return result_raw, result_grouped, result_in_time
+
+
+
+users = pd.read_csv('ch02_problems02_users.csv')  # профили
+
+purchases = pd.read_csv('ch02_problems02_orders.csv')  # данные о покупках
+
+
+# преобразование данных о времени
+
+users['dt'] = pd.to_datetime(users['dt']).dt.date
+
+users['first_ts'] = pd.to_datetime(users['first_ts'])
+
+purchases['event_dt'] = pd.to_datetime(purchases['event_dt'])
+
+
+observation_date = users['dt'].max()  # момент анализа
+
+analysis_horizon = 7  # горизонт анализа
+
+
+users = users.query('channel == "Organic"')
+
+# отфильтруйте данные пользователей из канала Organic
+
+
+# рассчитайте LTV без разбивки
+
+ltv_raw, ltv, ltv_history =  get_ltv(users, purchases, observation_date, analysis_horizon)
+
+
+plt.figure(figsize=(20, 5))
+
+
+report = ltv.drop(columns = ['cohort_size'])
+
+report.T.plot(
+
+    grid=True, xticks=list(report.columns.values), ax=plt.subplot(1, 2, 1)
+
+)
+
+plt.title('LTV пользователей, привлечённых вне платных каналов')
+
+plt.ylabel('LTV, $')
+
+plt.xlabel('Лайфтайм')
+
+
+# сделайте срез таблицы динамики LTV
+
+report =  ltv_history[[0, 1, 2, 5]]
+
+
+report.plot(grid=True, ax=plt.subplot(1, 2, 2))
+
+plt.title(
+
+    'Динамика LTV 1-го, 2-го, 3-го и 6-го дней для бесплатных пользователей'
+
+)
+
+plt.ylabel('LTV, $')
+
+plt.xlabel('Дата привлечения пользователей')
+
+
+plt.show()
+
+### Задача 3
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+import seaborn as sns
+
+from matplotlib import pyplot as plt
+
+
+
+def get_ltv(
+
+    profiles,
+
+    purchases,
+
+    observation_date,
+
+    horizon_days,
+
+    dimensions=[],
+
+    ignore_horizon=False,
+
+):
+
+
+    # исключаем пользователей, не «доживших» до горизонта анализа
+
+    last_suitable_acquisition_date = observation_date
+
+    if not ignore_horizon:
+
+        last_suitable_acquisition_date = observation_date - timedelta(
+
+            days=horizon_days - 1
+
+        )
+
+    result_raw = profiles.query('dt <= @last_suitable_acquisition_date')
+
+
+    # добавляем данные о выручке в профили
+
+    result_raw = result_raw.merge(
+
+        purchases[['user_id', 'event_dt', 'revenue']],
+
+        on='user_id',
+
+        how='left',
+
+    )
+
+
+    # вычисляем лайфтайм для каждой покупки
+
+    result_raw['lifetime'] = (
+
+        result_raw['event_dt'] - result_raw['first_ts']
+
+    ).dt.days
+
+
+    # группируем по cohort, если в dimensions ничего нет
+
+    if len(dimensions) == 0:
+
+        result_raw['cohort'] = 'All users'
+
+        dimensions = dimensions + ['cohort']
+
+
+    def group_by_dimensions(df, dims, horizon_days):
+
+        # строим «треугольную» таблицу выручки
+
+        result = df.pivot_table(
+
+            index=dims,
+
+            columns='lifetime',
+
+            values='revenue',
+
+            aggfunc='sum',
+
+        )
+
+        # считаем сумму выручки с накоплением
+
+        result = result.fillna(0).cumsum(axis=1)
+
+        # вычисляем размеры когорт
+
+        cohort_sizes = (
+
+            df.groupby(dims)
+
+            .agg({'user_id': 'nunique'})
+
+            .rename(columns={'user_id': 'cohort_size'})
+
+        )
+
+        # объединяем размеры когорт и таблицу выручки
+
+        result = cohort_sizes.merge(result, on=dims, how='left').fillna(0)
+
+        # считаем LTV:
+
+        # делим каждую «ячейку» в строке на размер когорты
+
+        result = result.div(result['cohort_size'], axis=0)
+
+        # исключаем все лайфтаймы, превышающие горизонт анализа
+
+        result = result[['cohort_size'] + list(range(horizon_days))]
+
+        # восстанавливаем размеры когорт
+
+        result['cohort_size'] = cohort_sizes
+
+        return result
+
+
+    # получаем таблицу LTV
+
+    result_grouped = group_by_dimensions(result_raw, dimensions, horizon_days)
+
+
+    # для таблицы динамики конверсии убираем 'cohort' из dimensions
+
+    if 'cohort' in dimensions:
+
+        dimensions = []
+
+    # получаем таблицу динамики LTV
+
+    result_in_time = group_by_dimensions(
+
+        result_raw, dimensions + ['dt'], horizon_days
+
+    )
+
+
+    # возвращаем обе таблицы LTV и сырые данные
+
+    return result_raw, result_grouped, result_in_time
+
+
+
+users = pd.read_csv('ch02_problems02_users.csv')  # профили
+
+purchases = pd.read_csv('ch02_problems02_orders.csv')  # данные о покупках
+
+
+# преобразование данных о времени
+
+users['dt'] = pd.to_datetime(users['dt']).dt.date
+
+users['first_ts'] = pd.to_datetime(users['first_ts'])
+
+purchases['event_dt'] = pd.to_datetime(purchases['event_dt'])
+
+
+observation_date = users['dt'].max()  # момент анализа
+
+analysis_horizon = 7  # горизонт анализа
+
+
+users = users.query('channel == "Organic"')
+
+ltv_raw, ltv, ltv_history = get_ltv(
+
+    users, purchases, observation_date, analysis_horizon
+
+)
+
+
+report =  ltv_history[[5]].sort_values(by=5).head(1)
+
+print(report)
+
+***
+
+## 06 Расчёт CAC и ROI в Python
+
+Практические задания отсутствуют
+
+***
+
+## 07 Расчёт CAC и ROI в Python — практика
+
+### Задача 1
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+
+visits = pd.read_csv('ch02_problems03_visits.csv')  # журнал сессий
+
+purchases = pd.read_csv('ch02_problems02_orders.csv')  # покупки
+
+ad_costs = pd.read_csv('ch02_problems02_costs.csv')  # траты на рекламу
+
+
+# преобразование данных о времени
+
+visits['session_start'] = pd.to_datetime(visits['session_start'])
+
+purchases['event_dt'] = pd.to_datetime(purchases['event_dt'])
+
+
+# добавьте самую раннюю дату в отчёте в формате datetime
+
+min_date =  datetime(2020,7,11)
+
+ # добавьте самую позднюю дату в отчёте в формате datetime
+
+max_date = datetime(2020,8,10)
+
+
+# находим количество дней в отчёте
+
+days_num = (max_date - min_date).days
+
+
+# создаём пустую таблицу для рекламных трат
+
+daily_costs = []
+
+
+# перебираем данные о затратах по источникам
+
+for index, values in ad_costs.iterrows():
+
+# определите канал привлечения
+
+    channel_name =  values['channel'] 
+
+# и общие рекламные траты на него
+
+    channel_costs =  values['costs']
+
+# рассчитайте средние траты за день
+
+    avg_channel_costs =  (channel_costs)/(days_num) 
+
+
+    # заполняем таблицу рекламных трат
+
+    for i in range(days_num):
+
+        current_day =  min_date + timedelta(days=i)
+
+        # рассчитайте текущую дату
+
+        # добавляем строку в таблицу трат
+
+        daily_costs += [[current_day, channel_name, avg_channel_costs]]
+
+
+# превращаем таблицу рекламных трат в датафрейм
+
+daily_costs = pd.DataFrame(daily_costs, columns=['dt', 'channel', 'costs'])
+
+# преобразуем данные о времени
+
+daily_costs['dt'] = daily_costs['dt'].dt.date
+
+
+print(daily_costs.head(5))
+
+### Задача 2
+
+import pandas as pd
+
+from datetime import datetime, timedelta
+
+import numpy as np
+
+
+
+def get_profiles(sessions, orders, events, ad_costs, event_names=[]):
+
+
+    # находим параметры первых посещений
+
+    profiles = (
+
+        sessions.sort_values(by=['user_id', 'session_start'])
+
+        .groupby('user_id')
+
+        .agg(
+
+            {
+
+                'session_start': 'first',
+
+                'channel': 'first',
+
+                'device': 'first',
+
+                'region': 'first',
+
+            }
+
+        )
+
+        .rename(columns={'session_start': 'first_ts'})
+
+        .reset_index()
+
+    )
+
+
+    # для когортного анализа определяем дату первого посещения
+
+    # и первый день месяца, в который это посещение произошло
+
+    profiles['dt'] = profiles['first_ts'].dt.date
+
+    profiles['month'] = profiles['first_ts'].astype('datetime64[M]')
+
+
+    # добавляем признак платящих пользователей
+
+    profiles['payer'] = profiles['user_id'].isin(orders['user_id'].unique())
+
+
+    # добавляем флаги для всех событий из event_names
+
+    for event in event_names:
+
+        if event in events['event_name'].unique():
+
+            profiles[event] = profiles['user_id'].isin(
+
+                events.query('event_name == @event')['user_id'].unique()
+
+            )
+
+
+    # считаем количество уникальных пользователей
+
+    # с одинаковыми источником и датой привлечения
+
+    new_users = (
+
+        profiles.groupby(['dt', 'channel'])
+
+        .agg({'user_id': 'nunique'})
+
+        .rename(columns={'user_id': 'unique_users'})
+
+        .reset_index()
+
+    )
+
+
+    # объединяем траты на рекламу и число привлечённых пользователей
+
+    ad_costs = ad_costs.merge(new_users, on=['dt', 'channel'], how='left')
+
+
+    # делим рекламные расходы на число привлечённых пользователей
+
+    ad_costs['acquisition_cost'] = ad_costs['costs'] / ad_costs['unique_users']
+
+
+    # добавляем стоимость привлечения в профили
+
+    profiles = profiles.merge(
+
+        ad_costs[['dt', 'channel', 'acquisition_cost']],
+
+        on=['dt', 'channel'],
+
+        how='left',
+
+    )
+
+
+    # стоимость привлечения органических пользователей равна нулю
+
+    profiles['acquisition_cost'] = profiles['acquisition_cost'].fillna(0)
+
+
+    return profiles
+
+
+
+visits = pd.read_csv('ch02_problems03_visits.csv')  # журнал сессий
+
+purchases = pd.read_csv('ch02_problems02_orders.csv')  # покупки
+
+ad_costs = pd.read_csv('ch02_problems02_costs.csv')  # траты на рекламу
+
+events = None  # других событий нет, None — чтобы не «сломать» get_profiles()
+
+
+# преобразование данных о времени
+
+visits['session_start'] = pd.to_datetime(visits['session_start'])
+
+purchases['event_dt'] = pd.to_datetime(purchases['event_dt'])
+
+
+# разбиваем траты на рекламу по дням
+
+min_date = datetime(2020, 7, 11)
+
+max_date = datetime(2020, 8, 10)
+
+days_num = (max_date - min_date).days
+
+
+daily_costs = []
+
+for index, values in ad_costs.iterrows():
+
+    channel_name = values['channel']
+
+    channel_costs = values['costs']
+
+    avg_channel_costs = channel_costs / days_num
+
+    for i in range(days_num):
+
+        current_day = min_date + timedelta(days=i)
+
+        daily_costs += [[current_day, channel_name, avg_channel_costs]]
+
+
+# создаём датафрейм с тратами на рекламу по дням
+
+daily_costs = pd.DataFrame(daily_costs, columns=['dt', 'channel', 'costs'])
+
+daily_costs['dt'] = daily_costs['dt'].dt.date
+
+
+users =  get_profiles(visits,purchases,events,daily_costs)
+
+
+print(users.head(5))
+
+### Задача 3
+
+import pandas as pd
+
+import numpy as np
+
+from datetime import datetime, timedelta
+
+from matplotlib import pyplot as plt
+
+
+
+# функция для получения пользовательских профилей
+
+def get_profiles(sessions, orders, events, ad_costs, event_names=[]):
+
+    profiles = (
+
+        sessions.sort_values(by=['user_id', 'session_start'])
+
+        .groupby('user_id')
+
+        .agg(
+
+            {
+
+                'session_start': 'first',
+
+                'channel': 'first',
+
+                'device': 'first',
+
+                'region': 'first',
+
+            }
+
+        )
+
+        .rename(columns={'session_start': 'first_ts'})
+
+        .reset_index()
+
+    )
+
+    profiles['dt'] = profiles['first_ts'].dt.date
+
+    profiles['month'] = profiles['first_ts'].astype('datetime64[M]')
+
+    profiles['payer'] = profiles['user_id'].isin(orders['user_id'].unique())
+
+
+    for event in event_names:
+
+        if event in events['event_name'].unique():
+
+            profiles[event] = profiles['user_id'].isin(
+
+                events.query('event_name == @event')['user_id'].unique()
+
+            )
+
+    new_users = (
+
+        profiles.groupby(['dt', 'channel'])
+
+        .agg({'user_id': 'nunique'})
+
+        .rename(columns={'user_id': 'unique_users'})
+
+        .reset_index()
+
+    )
+
+    ad_costs = ad_costs.merge(new_users, on=['dt', 'channel'], how='left')
+
+    ad_costs['acquisition_cost'] = ad_costs['costs'] / ad_costs['unique_users']
+
+    profiles = profiles.merge(
+
+        ad_costs[['dt', 'channel', 'acquisition_cost']],
+
+        on=['dt', 'channel'],
+
+        how='left',
+
+    )
+
+    profiles['acquisition_cost'] = profiles['acquisition_cost'].fillna(0)
+
+
+    return profiles
+
+# функция для расчёта LTV и ROI
+
+def get_ltv(
+
+    profiles,
+
+    purchases,
+
+    observation_date,
+
+    horizon_days,
+
+    dimensions=[],
+
+    ignore_horizon=False,
+
+):
+
+
+    last_suitable_acquisition_date = observation_date
+
+    if not ignore_horizon:
+
+        last_suitable_acquisition_date = observation_date - timedelta(
+
+            days=horizon_days - 1
+
+        )
+
+    result_raw = profiles.query('dt <= @last_suitable_acquisition_date')
+
+    result_raw = result_raw.merge(
+
+        purchases[['user_id', 'event_dt', 'revenue']], on='user_id', how='left'
+
+    )
+
+    result_raw['lifetime'] = (
+
+        result_raw['event_dt'] - result_raw['first_ts']
+
+    ).dt.days
+
+
+    if len(dimensions) == 0:
+
+        result_raw['cohort'] = 'All users'
+
+        dimensions = dimensions + ['cohort']
+
+
+    def group_by_dimensions(df, dims, horizon_days):
+
+        result = df.pivot_table(
+
+            index=dims, columns='lifetime', values='revenue', aggfunc='sum'
+
+        )
+
+        result = result.fillna(0).cumsum(axis=1)
+
+        cohort_sizes = (
+
+            df.groupby(dims)
+
+            .agg({'user_id': 'nunique'})
+
+            .rename(columns={'user_id': 'cohort_size'})
+
+        )
+
+        result = cohort_sizes.merge(result, on=dims, how='left').fillna(0)
+
+        result = result.div(result['cohort_size'], axis=0)
+
+        result = result[['cohort_size'] + list(range(horizon_days))]
+
+        result['cohort_size'] = cohort_sizes
+
+        cac = df[['user_id', 'acquisition_cost'] + dims].drop_duplicates()
+
+        cac = (
+
+            cac.groupby(dims)
+
+            .agg({'acquisition_cost': 'mean'})
+
+            .rename(columns={'acquisition_cost': 'cac'})
+
+        )
+
+        roi = result.div(cac['cac'], axis=0)
+
+        roi = roi[~roi['cohort_size'].isin([np.inf])]
+
+        roi['cohort_size'] = cohort_sizes
+
+        roi['cac'] = cac['cac']
+
+        roi = roi[['cohort_size', 'cac'] + list(range(horizon_days))]
+
+        return result, roi
+
+
+    result_grouped, roi_grouped = group_by_dimensions(
+
+        result_raw, dimensions, horizon_days
+
+    )
+
+    if 'cohort' in dimensions:
+
+        dimensions = []
+
+    result_in_time, roi_in_time = group_by_dimensions(
+
+        result_raw, dimensions + ['dt'], horizon_days
+
+    )
+
+
+    return (
+
+        result_raw,  # сырые данные
+
+        result_grouped,  # таблица LTV
+
+        result_in_time,  # таблица динамики LTV
+
+        roi_grouped,  # таблица ROI
+
+        roi_in_time,  # таблица динамики ROI
+
+    )
+
+
+
+visits = pd.read_csv('ch02_problems03_visits.csv')  # журнал сессий
+
+purchases = pd.read_csv('ch02_problems02_orders.csv')  # покупки
+
+ad_costs = pd.read_csv('ch02_problems02_costs.csv')  # траты на рекламу
+
+events = None  # других событий нет
+
+
+# преобразование данных о времени
+
+visits['session_start'] = pd.to_datetime(visits['session_start'])
+
+purchases['event_dt'] = pd.to_datetime(purchases['event_dt'])
+
+
+# разбиваем траты на рекламу по дням
+
+min_date = datetime(2020, 7, 11)
+
+max_date = datetime(2020, 8, 10)
+
+days_num = (max_date - min_date).days
+
+daily_costs = []
+
+for index, values in ad_costs.iterrows():
+
+    channel_name = values['channel']
+
+    channel_costs = values['costs']
+
+    avg_channel_costs = channel_costs / days_num
+
+    for i in range(days_num):
+
+        current_day = min_date + timedelta(days=i)
+
+        daily_costs += [[current_day, channel_name, avg_channel_costs]]
+
+daily_costs = pd.DataFrame(daily_costs, columns=['dt', 'channel', 'costs'])
+
+daily_costs['dt'] = daily_costs['dt'].dt.date
+
+
+users = get_profiles(visits, purchases, events, daily_costs)  # профили с CAC
+
+
+# получите сырые данные, таблицы LTV и ROI, а также таблицы динамики LTV и ROI
+
+ltv_raw, ltv, ltv_history, roi, roi_history = get_ltv(users,purchases,datetime(2020, 8, 10).date(),7, dimensions=['channel'])
+
+
+report =  roi.drop(columns={['cac'],['cohort_size']})
+
+# исключите размеры когорт и CAC из таблицы ROI
+
+
+# строим кривые ROI
+
+report.T.plot(grid=True, figsize=(10, 5), xticks=list(report.columns.values))
+
+plt.title('ROI с разбивкой по каналам привлечения')
+
+plt.ylabel('ROI')
+
+plt.xlabel('Лайфтайм')
+
+plt.axhline(y=1, color='red', linestyle='--', label='Уровень окупаемости')
+
+plt.legend()
+
+plt.show()
+
+print(roi.head(5))
+
+***
+
+## 08 Как проверить себя. Удержание, конверсия, LTV, CAC и ROI
+
+Практические задания отсутствуют
+
+***
+
+## 09 Продвинутая визуализация. Параметр sharey
+
+Практические задания отсутствуют
+
+***
+
+## 10 Продвинутая визуализация. Скользящее среднее
+
+Практические задания отсутствуют
+
+***
+
+## 11 Продвинутая визуализация — практика
+
+### Задача 1
+
+import pandas as pd
+
+import numpy as np
+
+from datetime import datetime, timedelta
+
+from matplotlib import pyplot as plt
+
+
+# загружаем и преобразуем данные
+
+dau = pd.read_csv('ch03_problems03_active_users.csv')
+
+dau['dt'] = pd.to_datetime(dau['dt'])
+
+
+# считаем количество уникальный пользователей в каждый из дней
+
+dau = (
+
+    dau.groupby('dt')
+
+    .agg({'user_id': 'nunique'})
+
+    .rename(columns={'user_id': 'DAU'})
+
+)
+
+
+window =  7 # задайте окно сглаживания
+
+dau['DAU mean, window = 7'] =  dau['DAU'].rolling(window).mean() # посчитайте скользящее среднее
+
+dau['DAU median, window = 7'] = dau['DAU'].rolling(window).median() # посчитайте скользящую медиану
+
+
+window =  14 # задайте окно сглаживания
+
+dau['DAU mean, window = 14'] = dau['DAU'].rolling(window).mean() # посчитайте скользящее среднее
+
+dau['DAU median, window = 14'] = dau['DAU'].rolling(window).median() # посчитайте скользящую медиану
+
+
+# строим график
+
+dau.plot(grid = True)
+
+plt.xlabel('Дата')
+
+plt.title('DAU и сглаженный DAU')
+
+plt.show()
+
+### Задача 2
+
+import pandas as pd
+
+import numpy as np
+
+from datetime import datetime, timedelta
+
+from matplotlib import pyplot as plt
+
+
+
+# функция для получения пользовательских профилей
+
+def get_profiles(sessions, orders, events, ad_costs, event_names=[]):
+
+    profiles = (
+
+        sessions.sort_values(by=['user_id', 'session_start'])
+
+        .groupby('user_id')
+
+        .agg(
+
+            {
+
+                'session_start': 'first',
+
+                'channel': 'first',
+
+                'device': 'first',
+
+                'region': 'first',
+
+            }
+
+        )
+
+        .rename(columns={'session_start': 'first_ts'})
+
+        .reset_index()
+
+    )
+
+    profiles['dt'] = profiles['first_ts'].dt.date
+
+    profiles['month'] = profiles['first_ts'].astype('datetime64[M]')
+
+    profiles['payer'] = profiles['user_id'].isin(orders['user_id'].unique())
+
+
+    for event in event_names:
+
+        if event in events['event_name'].unique():
+
+            profiles[event] = profiles['user_id'].isin(
+
+                events.query('event_name == @event')['user_id'].unique()
+
+            )
+
+    new_users = (
+
+        profiles.groupby(['dt', 'channel'])
+
+        .agg({'user_id': 'nunique'})
+
+        .rename(columns={'user_id': 'unique_users'})
+
+        .reset_index()
+
+    )
+
+    ad_costs = ad_costs.merge(new_users, on=['dt', 'channel'], how='left')
+
+    ad_costs['acquisition_cost'] = ad_costs['costs'] / ad_costs['unique_users']
+
+    profiles = profiles.merge(
+
+        ad_costs[['dt', 'channel', 'acquisition_cost']],
+
+        on=['dt', 'channel'],
+
+        how='left',
+
+    )
+
+    profiles['acquisition_cost'] = profiles['acquisition_cost'].fillna(0)
+
+
+    return profiles
+
+
+
+# функция для расчёта LTV и ROI
+
+def get_ltv(
+
+    profiles,
+
+    purchases,
+
+    observation_date,
+
+    horizon_days,
+
+    dimensions=[],
+
+    ignore_horizon=False,
+
+):
+
+
+    last_suitable_acquisition_date = observation_date
+
+    if not ignore_horizon:
+
+        last_suitable_acquisition_date = observation_date - timedelta(
+
+            days=horizon_days - 1
+
+        )
+
+    result_raw = profiles.query('dt <= @last_suitable_acquisition_date')
+
+    result_raw = result_raw.merge(
+
+        purchases[['user_id', 'event_dt', 'revenue']], on='user_id', how='left'
+
+    )
+
+    result_raw['lifetime'] = (
+
+        result_raw['event_dt'] - result_raw['first_ts']
+
+    ).dt.days
+
+
+    if len(dimensions) == 0:
+
+        result_raw['cohort'] = 'All users'
+
+        dimensions = dimensions + ['cohort']
+
+
+    def group_by_dimensions(df, dims, horizon_days):
+
+        result = df.pivot_table(
+
+            index=dims, columns='lifetime', values='revenue', aggfunc='sum'
+
+        )
+
+        result = result.fillna(0).cumsum(axis=1)
+
+        cohort_sizes = (
+
+            df.groupby(dims)
+
+            .agg({'user_id': 'nunique'})
+
+            .rename(columns={'user_id': 'cohort_size'})
+
+        )
+
+        result = cohort_sizes.merge(result, on=dims, how='left').fillna(0)
+
+        result = result.div(result['cohort_size'], axis=0)
+
+        result = result[['cohort_size'] + list(range(horizon_days))]
+
+        result['cohort_size'] = cohort_sizes
+
+        cac = df[['user_id', 'acquisition_cost'] + dims].drop_duplicates()
+
+        cac = (
+
+            cac.groupby(dims)
+
+            .agg({'acquisition_cost': 'mean'})
+
+            .rename(columns={'acquisition_cost': 'cac'})
+
+        )
+
+        roi = result.div(cac['cac'], axis=0)
+
+        roi = roi[~roi['cohort_size'].isin([np.inf])]
+
+        roi['cohort_size'] = cohort_sizes
+
+        roi['cac'] = cac['cac']
+
+        roi = roi[['cohort_size', 'cac'] + list(range(horizon_days))]
+
+        return result, roi
+
+
+    result_grouped, roi_grouped = group_by_dimensions(
+
+        result_raw, dimensions, horizon_days
+
+    )
+
+    if 'cohort' in dimensions:
+
+        dimensions = []
+
+    result_in_time, roi_in_time = group_by_dimensions(
+
+        result_raw, dimensions + ['dt'], horizon_days
+
+    )
+
+
+    return (
+
+        result_raw,  # сырые данные
+
+        result_grouped,  # таблица LTV
+
+        result_in_time,  # таблица динамики LTV
+
+        roi_grouped,  # таблица ROI
+
+        roi_in_time,  # таблица динамики ROI
+
+    )
+
+# функция для сглаживания датафрейма
+
+def filter_data(df, window):
+
+    for column in df.columns.values:
+
+        df[column] = df[column].rolling(window).mean() 
+
+    return df
+
+
+
+# функция для визуализации LTV и ROI
+
+def plot_ltv_roi(ltv, ltv_history, roi, roi_history, horizon, window=7):
+
+
+    plt.figure(figsize=(20, 10))
+
+
+    ltv = ltv.drop(columns=['cohort_size'])
+
+    ltv_history = ltv_history.drop(columns=['cohort_size'])[[horizon - 1]]
+
+    cac_history = roi_history[['cac']]
+
+    roi = roi.drop(columns=['cohort_size', 'cac'])
+
+    roi_history = roi_history.drop(columns=['cohort_size', 'cac'])[
+
+        [horizon - 1]
+
+    ]
+
+
+    # первый график — кривые ltv
+
+    ax1 = plt.subplot(2, 3, 1)
+
+    ltv.T.plot(grid=True, ax=ax1)
+
+    plt.legend()
+
+    plt.xlabel('Лайфтайм')
+
+    plt.title('LTV')
+
+
+    # второй график — динамика ltv
+
+    ax2 = plt.subplot(2, 3, 2, sharey=ax1)
+
+    columns = [name for name in ltv_history.index.names if name not in ['dt']]
+
+    filtered_data = ltv_history.pivot_table(
+
+        index='dt', columns=columns, values=horizon - 1, aggfunc='mean'
+
+    )
+
+    filter_data(filtered_data, window).plot(grid=True, ax=ax2)
+
+    plt.xlabel('Дата привлечения')
+
+    plt.title('Динамика LTV пользователей на {}-й день'.format(horizon))
+
+
+    # третий график — динамика cac
+
+    ax3 = plt.subplot(2, 3, 3, sharey=ax1)
+
+    columns = [name for name in cac_history.index.names if name not in ['dt']]
+
+    filtered_data = cac_history.pivot_table(
+
+        index='dt', columns=columns, values='cac', aggfunc='mean'
+
+    )
+
+    filter_data(filtered_data, window).plot(grid=True, ax=ax3)
+
+    plt.xlabel('Дата привлечения')
+
+    plt.title('Динамика стоимости привлечения пользователей')
+
+
+    # четвёртый график — кривые roi
+
+    ax4 = plt.subplot(2, 3, 4)
+
+    roi.T.plot(grid=True, ax=ax4)
+
+    plt.axhline(y=1, color='red', linestyle='--', label='Уровень окупаемости')
+
+    plt.legend()
+
+    plt.xlabel('Лайфтайм')
+
+    plt.title('ROI')
+
+
+    # пятый график — динамика roi
+
+    ax5 = plt.subplot(2, 3, 5, sharey=ax4)
+
+    columns = [name for name in roi_history.index.names if name not in ['dt']]
+
+    filtered_data = roi_history.pivot_table(
+
+        index='dt', columns=columns, values=horizon - 1, aggfunc='mean'
+
+    )
+
+    filter_data(filtered_data, window).plot(grid=True, ax=ax5)
+
+    plt.axhline(y=1, color='red', linestyle='--', label='Уровень окупаемости')
+
+    plt.xlabel('Дата привлечения')
+
+    plt.title('Динамика ROI пользователей на {}-й день'.format(horizon))
+
+
+    plt.tight_layout()
+
+    plt.show()
+
+visits = pd.read_csv('ch02_problems03_visits.csv')  # журнал сессий
+
+purchases = pd.read_csv('ch02_problems02_orders.csv')  # покупки
+
+ad_costs = pd.read_csv('ch02_problems02_costs.csv')  # траты на рекламу
+
+events = None  # других событий нет
+
+
+# преобразование данных о времени
+
+visits['session_start'] = pd.to_datetime(visits['session_start'])
+
+purchases['event_dt'] = pd.to_datetime(purchases['event_dt'])
+
+
+# разбиваем траты на рекламу по дням
+
+min_date = datetime(2020, 7, 11)
+
+max_date = datetime(2020, 8, 10)
+
+days_num = (max_date - min_date).days
+
+daily_costs = []
+
+for index, values in ad_costs.iterrows():
+
+    channel_name = values['channel']
+
+    channel_costs = values['costs']
+
+    avg_channel_costs = channel_costs / days_num
+
+    for i in range(days_num):
+
+        current_day = min_date + timedelta(days=i)
+
+        daily_costs += [[current_day, channel_name, avg_channel_costs]]
+
+daily_costs = pd.DataFrame(daily_costs, columns=['dt', 'channel', 'costs'])
+
+daily_costs['dt'] = daily_costs['dt'].dt.date
+
+
+# получаем профили с CAC
+
+users = get_profiles(visits, purchases, events, daily_costs)
+
+
+# считаем LTV и ROI с разбивкой по устройствам
+
+ltv_raw, ltv, ltv_history, roi, roi_history = get_ltv(
+
+    users, purchases, datetime(2020, 8, 10).date(), 7, dimensions=['device']
+
+)
+
+
+# постройте графики LTV, CAC и ROI
+
+plot_ltv_roi(ltv, ltv_history, roi, roi_history, 7, window=3)
+
+## 12 Разбор кейса
+
+Практические задания отсутствуют
+
+***
+
+## 13 Заключение
+
+Практические задания отсутствуют
+
+***
+
+
+# Пользовательские метрики
+
+## 01 Введение
+
+Практические задания отсутствуют
+
+***
+
+## 02 Оценка пользовательской активности
+
+### Задача 1
+
+import pandas as pd
+
+
+users_data = pd.read_csv('users_data.csv')
+
+users_data['session_start_ts'] = pd.to_datetime(users_data['session_start_ts'])
+
+users_data['session_end_ts'] = pd.to_datetime(users_data['session_end_ts'])
+
+users_data['session_year'] = users_data['session_start_ts'].dt.year
+
+users_data['session_month'] = users_data['session_start_ts'].dt.month
+
+users_data['session_week'] = users_data['session_start_ts'].dt.isocalendar().week
+
+users_data['session_date'] = users_data['session_start_ts'].dt.date
+
+
+mau_total = (users_data.groupby(['session_year', 'session_month'])
+
+    .agg({'id': 'nunique'})
+
+    .mean())
+
+
+print(int(mau_total))
+
+### Задача 2
+
+import pandas as pd
+
+
+users_data = pd.read_csv('users_data.csv')
+
+
+users_data['session_start_ts'] = pd.to_datetime(users_data['session_start_ts'])
+
+users_data['session_end_ts'] = pd.to_datetime(users_data['session_end_ts'])
+
+
+users_data['session_year'] = users_data['session_start_ts'].dt.year
+
+users_data['session_month'] = users_data['session_start_ts'].dt.month
+
+users_data['session_week'] = (
+
+    users_data['session_start_ts'].dt.isocalendar().week
+
+)
+
+users_data['session_date'] = users_data['session_start_ts'].dt.date
+
+
+mau_total = (
+
+    users_data.groupby(['session_year', 'session_month'])
+
+    .agg({'id': 'nunique'})
+
+    .mean()
+
+)
+
+
+dau_total = (
+
+    users_data.groupby(['session_year', 'session_date'])
+
+    .agg({'id': 'nunique'})
+
+    .mean()
+
+)
+
+wau_total = (
+
+    users_data.groupby(['session_year', 'session_week'])
+
+    .agg({'id': 'nunique'})
+
+    .mean()
+
+)
+
+
+sticky_wau = 100 * dau_total / wau_total
+
+print(sticky_wau)
+
+sticky_mau = 100 * dau_total / mau_total
+
+print(sticky_mau)
+
+***
+
+## 03 Пользовательская сессия
+
+###  Задача 1
+
+import pandas as pd
+
+
+users_data = pd.read_csv('users_data.csv')
+
+
+users_data['session_start_ts'] = pd.to_datetime(users_data['session_start_ts'])
+
+users_data['session_end_ts'] = pd.to_datetime(users_data['session_end_ts'])
+
+
+users_data['session_year']  = users_data['session_start_ts'].dt.year
+
+users_data['session_month'] = users_data['session_start_ts'].dt.month
+
+
+sessions_per_user = (users_data
+
+                     .groupby(['session_year','session_month'])
+
+                     .agg({'id': ['count', 'nunique']})
+
+                     )
+
+sessions_per_user.columns = ['n_sessions', 'n_users']
+
+sessions_per_user['sess_per_user'] = (
+
+    sessions_per_user['n_sessions'] / sessions_per_user['n_users']
+
+)
+
+
+print(sessions_per_user)
+
+###  Задача 2
+
+import pandas as pd
+
+
+users_data = pd.read_csv('users_data.csv')
+
+
+users_data['session_start_ts'] = pd.to_datetime(users_data['session_start_ts'])
+
+users_data['session_end_ts'] = pd.to_datetime(users_data['session_end_ts'])
+
+
+users_data['session_duration_sec'] =  (
+
+    users_data['session_end_ts'] - users_data['session_start_ts']
+
+).dt.seconds
+
+users_data['session_duration_sec'].hist(bins=100)
+
+
+###  Задача 3
+
+import pandas as pd
+
+
+users_data = pd.read_csv('users_data.csv')
+
+
+users_data['session_start_ts'] = pd.to_datetime(users_data['session_start_ts'])
+
+users_data['session_end_ts'] = pd.to_datetime(users_data['session_end_ts'])
+
+
+users_data['session_duration_sec'] = (
+
+    users_data['session_end_ts'] - users_data['session_start_ts']
+
+).dt.seconds
+
+msl = users_data['session_duration_sec'].median()
+
+print(msl)
+
+***
+
+## 04 Расследование аномалий
+
+Практические задания отсутствуют
+
+***
+
+## 05 Заключение
+
+Практические задания отсутствуют
+
+***

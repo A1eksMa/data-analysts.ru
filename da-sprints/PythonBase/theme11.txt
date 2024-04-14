@@ -1,0 +1,546 @@
+#01 Введение
+
+
+#02 Задача: обновление Яндекс Музыки
+
+
+#03 Яндекс Музыка: работа с предобработанными данными
+
+#==============
+
+import pandas as pd
+
+
+df = pd.read_csv('music_log_upd.csv')
+
+print(df.head(15))
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+print(df.columns)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+na_number = df.isna().sum()
+
+print(na_number)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+duplicated_number = df.duplicated().sum()
+
+print(duplicated_number)
+
+#==============
+
+
+#04 Группировка данных
+#05 Яндекс Музыка: группировка данных
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+track_grouping = df.groupby('user_id')['genre_name']
+
+track_counting = track_grouping.count()
+
+print(track_counting.head(30))
+
+#==============
+
+import pandas as pd
+
+
+df = pd.read_csv('music_log_upd.csv')
+
+track_grouping = df.groupby('user_id')['genre_name']
+
+
+
+def user_tracks(group):
+
+    for col in group:
+
+        # назначьте условие: если длина столбца col с индексом 1 больше 50, тогда
+
+        if len(col[1])>50:
+
+            # в переменной user сохраняется элемент col[0]
+
+            user = col[0]
+
+            return user
+
+#==============
+
+import pandas as pd
+
+
+df = pd.read_csv('music_log_upd.csv')
+
+track_grouping = df.groupby('user_id')['genre_name']
+
+
+
+def user_tracks(group):
+
+    for col in group:
+
+        if len(col[1]) > 50:
+
+            user = col[0]
+
+            return user
+
+        
+
+search_id = user_tracks(track_grouping)
+
+print(search_id)
+
+#==============
+
+#06 Сортировка данных
+
+
+#07 Яндекс Музыка: сортировка данных
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+
+genre_grouping = df.groupby('user_id')['genre_name']
+
+
+def user_genres(group):
+
+    for col in group:
+
+        if len(col[1]) > 50:
+
+            user = col[0]
+
+            return user
+
+
+search_id = user_genres(genre_grouping)
+
+
+music_user = df.loc[df['user_id'] == search_id]
+
+music_user = music_user.loc[music_user['total_play_seconds'] != 0]
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+
+genre_grouping = df.groupby('user_id')['genre_name']
+
+
+def user_genres(group):
+
+    for col in group:
+
+        if len(col[1]) > 50:
+
+            user = col[0]
+
+            return user
+
+
+search_id = user_genres(genre_grouping)
+
+music_user = df.loc[df['user_id'] == search_id]
+
+music_user = music_user.loc[music_user['total_play_seconds'] != 0]
+
+sum_music_user = music_user.groupby('genre_name')['total_play_seconds'].sum()
+
+print(sum_music_user)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+
+genre_grouping = df.groupby('user_id')['genre_name']
+
+
+def user_genres(group):
+
+    for col in group:
+
+        if len(col[1]) > 50:
+
+            user = col[0]
+
+            return user
+
+
+search_id = user_genres(genre_grouping)
+
+music_user = df.loc[df['user_id'] == search_id]
+
+music_user = music_user.loc[music_user['total_play_seconds'] != 0]
+
+sum_music_user = music_user.groupby('genre_name')['total_play_seconds'].sum()
+
+#print(sum_music_user)
+
+count_music_user = music_user.groupby('genre_name')['genre_name'].count()
+
+print(count_music_user)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+
+genre_grouping = df.groupby('user_id')['genre_name']
+
+
+def user_genres(group):
+
+    for col in group:
+
+        if len(col[1]) > 50:
+
+            user = col[0]
+
+            return user
+
+
+search_id = user_genres(genre_grouping)
+
+music_user = df.loc[df['user_id'] == search_id]
+
+music_user = music_user.loc[music_user['total_play_seconds'] != 0]
+
+sum_music_user = music_user.groupby('genre_name')['total_play_seconds'].sum()
+
+#print(sum_music_user)
+
+count_music_user = music_user.groupby('genre_name')['genre_name'].count()
+
+#print(count_music_user)
+
+final_sum = sum_music_user.sort_values(ascending=False)
+
+print(final_sum)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+
+genre_grouping = df.groupby('user_id')['genre_name']
+
+
+def user_genres(group):
+
+    for col in group:
+
+        if len(col[1]) > 50:
+
+            user = col[0]
+
+            return user
+
+
+search_id = user_genres(genre_grouping)
+
+music_user = df.loc[df['user_id'] == search_id]
+
+music_user = music_user.loc[music_user['total_play_seconds'] != 0]
+
+sum_music_user = music_user.groupby('genre_name')['total_play_seconds'].sum()
+
+#print(sum_music_user)
+
+count_music_user = music_user.groupby('genre_name')['genre_name'].count()
+
+#print(count_music_user)
+
+final_sum = sum_music_user.sort_values(ascending=False)
+
+#print(final_sum)
+
+final_count = count_music_user.sort_values(ascending=False)
+
+print(final_count)
+
+#==============
+
+#08 Описательная статистика
+
+
+#09 Яндекс Музыка: описательная статистика
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+pop_music = df.loc[df['genre_name']=='pop']
+
+pop_music = pop_music[pop_music['total_play_seconds'] != 0]
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+pop_music = df.loc[df['genre_name']=='pop']
+
+pop_music = pop_music[pop_music['total_play_seconds'] != 0]
+
+pop_music_max_total_play = pop_music['total_play_seconds'].max()
+
+print(pop_music_max_total_play)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+pop_music = df.loc[df['genre_name']=='pop']
+
+pop_music = pop_music[pop_music['total_play_seconds'] != 0]
+
+pop_music_max_total_play = pop_music['total_play_seconds'].max()
+
+#print(pop_music_max_total_play)
+
+
+pop_music_max_info = pop_music.loc[pop_music['total_play_seconds']==pop_music['total_play_seconds'].max()]
+
+print(pop_music_max_info)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+pop_music = df.loc[df['genre_name']=='pop']
+
+pop_music = pop_music[pop_music['total_play_seconds'] != 0]
+
+pop_music_max_total_play = pop_music['total_play_seconds'].max()
+
+#print(pop_music_max_total_play)
+
+
+pop_music_max_info = pop_music.loc[pop_music['total_play_seconds']==pop_music['total_play_seconds'].max()]
+
+#print(pop_music_max_info)
+
+
+pop_music_min_total_play = pop_music['total_play_seconds'].min()
+
+print(pop_music_min_total_play)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+pop_music = df.loc[df['genre_name']=='pop']
+
+pop_music = pop_music[pop_music['total_play_seconds'] != 0]
+
+pop_music_max_total_play = pop_music['total_play_seconds'].max()
+
+#print(pop_music_max_total_play)
+
+
+pop_music_max_info = pop_music.loc[pop_music['total_play_seconds']==pop_music['total_play_seconds'].max()]
+
+#print(pop_music_max_info)
+
+
+pop_music_min_total_play = pop_music['total_play_seconds'].min()
+
+#print(pop_music_min_total_play)
+
+
+pop_music_min_info = pop_music.loc[pop_music['total_play_seconds']==pop_music['total_play_seconds'].min()]
+
+print(pop_music_min_info)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+pop_music = df.loc[df['genre_name']=='pop']
+
+pop_music = pop_music[pop_music['total_play_seconds'] != 0]
+
+pop_music_max_total_play = pop_music['total_play_seconds'].max()
+
+#print(pop_music_max_total_play)
+
+
+pop_music_max_info = pop_music.loc[pop_music['total_play_seconds']==pop_music['total_play_seconds'].max()]
+
+#print(pop_music_max_info)
+
+
+pop_music_min_total_play = pop_music['total_play_seconds'].min()
+
+#print(pop_music_min_total_play)
+
+
+pop_music_min_info = pop_music.loc[pop_music['total_play_seconds']==pop_music['total_play_seconds'].min()]
+
+#print(pop_music_min_info)
+
+
+pop_music_median = pop_music['total_play_seconds'].median()
+
+print(pop_music_median)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+pop_music = df.loc[df['genre_name']=='pop']
+
+pop_music = pop_music[pop_music['total_play_seconds'] != 0]
+
+pop_music_max_total_play = pop_music['total_play_seconds'].max()
+
+#print(pop_music_max_total_play)
+
+
+pop_music_max_info = pop_music.loc[pop_music['total_play_seconds']==pop_music['total_play_seconds'].max()]
+
+#print(pop_music_max_info)
+
+
+pop_music_min_total_play = pop_music['total_play_seconds'].min()
+
+#print(pop_music_min_total_play)
+
+
+pop_music_min_info = pop_music.loc[pop_music['total_play_seconds']==pop_music['total_play_seconds'].min()]
+
+#print(pop_music_min_info)
+
+
+pop_music_median = pop_music['total_play_seconds'].median()
+
+#print(pop_music_median)
+
+
+pop_music_mean =  pop_music['total_play_seconds'].mean()
+
+print(pop_music_mean)
+
+#==============
+
+#10 Яндекс Музыка: решение кейса и оформление результатов
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+current_engagement = df.groupby('user_id')
+
+current_engagement = current_engagement.sum()
+
+current_engagement = current_engagement.median()
+
+print(current_engagement)
+
+#==============
+
+import pandas as pd
+
+exp = [['engagement', 0, 0, 0]]
+
+columns = ['metrics','before_test','after_test','absolute_difference']
+
+exp[0][1] = 57.456
+
+exp[0][2] = 62.344431
+
+exp[0][3] = exp[0][2] - exp[0][1]
+
+metrics = pd.DataFrame(data=exp,columns=columns)
+
+print(metrics)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd.csv')
+
+genre_rock = df.loc[df['genre_name']=='rock']
+
+genre_rock = genre_rock[genre_rock['total_play_seconds'] != 0]
+
+genre_rock_max = genre_rock['total_play_seconds'].max()
+
+genre_rock_min = genre_rock['total_play_seconds'].min()
+
+print('Максимальное время прослушивания в жанре рок равно:', genre_rock_max)# максимальное время прослушивания в жанре рок
+
+print('Минимальное время прослушивания в жанре рок равно:',genre_rock_min) # минимальное время прослушивания в жанре рок
+
+#==============
+
+import pandas as pd
+
+data = [['pop', 8663, 34.6, 1158.03, 0.000794],
+
+       ['rock', 6828, 33.3, 1699.14882, 0.014183]]
+
+columns = ['genre_name','total_track','skip_track','max_total_time','min_total_time']
+
+research_genres_result = pd.DataFrame(data=data,columns=columns)
+
+print(research_genres_result)
+
+#==============
+
+
+#11 Заключение

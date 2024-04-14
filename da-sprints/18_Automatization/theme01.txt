@@ -1,0 +1,105 @@
+#Основы запуска сриптов
+##01 Введение
+Практические задания отсутствуют
+***
+##02 Основы работы с командной строкой
+Практические задания отсутствуют
+***
+##03 Доступ к командной строке на вашей локальной машине
+Практические задания отсутствуют
+***
+##04 Основные команды для работы с консолью
+Практические задания отсутствуют
+***
+##05 Настройка учётной записи в Яндекс Облаке
+Практические задания отсутствуют
+***
+##06 Установка Python на локальной машине
+Практические задания отсутствуют
+***
+##07 Запуск скрипта из командной строки
+Практические задания отсутствуют
+***
+##08 Запуск скрипта из командной строки (практика)
+***
+### Задание 1
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	import pandas as pd
+	
+	# исполняемый код скрипта
+	if __name__ == "__main__": urbanization = pd.read_csv('/datasets/urbanization.csv') print( urbanization.head())
+	
+***
+### Задание 2
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	
+	import sys import getopt
+	
+	import pandas as pd
+	
+	if __name__ == "__main__":
+	
+	    # Задаём определения входных параметров
+	    unixOptions = "r:" gnuOptions = ["regions="]
+	
+	    # Читаем входные параметры
+	    fullCmdArguments = sys.argv argumentList = fullCmdArguments[1:] try: arguments, values = getopt.getopt(argumentList, unixOptions, gnuOptions) except getopt.error as 
+	    err:
+	        print(str(err)) sys.exit(2)
+	
+	    # Обрабатываем входные параметры
+	    regions = 'Germany,France,Russia'.split(',') for currentArgument, currentValue in arguments: if currentArgument in ("r:","--regions"): regions = 
+	            currentValue.split(',')
+	
+	    urbanization = pd.read_csv('/datasets/urbanization.csv')
+	
+	    # Фильтруем и определяем максимальный уровень урбанизации
+	    urbanization = urbanization.query('Entity in @regions') urbanization = urbanization.groupby('Entity').agg({'Urban': max})
+	
+	    print(urbanization)
+	
+***
+### Задание 3
+	#!/usr/bin/python
+	# -*- coding: utf-8 -*-
+	
+	import sys import getopt from datetime import datetime
+	
+	import pandas as pd
+	
+	if __name__ == "__main__":
+	
+	    # Задаём определения входных параметров
+	    unixOptions = "r:s:e:" # напишите код gnuOptions = ["regions=", "start_dt=", "end_dt="]
+	
+	    fullCmdArguments = sys.argv argumentList = fullCmdArguments[1:] try: arguments, values = getopt.getopt(argumentList, unixOptions, gnuOptions) except getopt.error as 
+	    err:
+	        print(str(err)) sys.exit(2)
+	
+	    # Обрабатываем входные параметры
+	    regions = 'Germany,France,Russia'.split(',') start_dt = '1998-01-01 00:00:00' end_dt = '1999-12-31 23:59:59' for currentArgument, currentValue in arguments: if 
+	        currentArgument in ("-r", "--regions"):
+	            regions = currentValue.split(',') elif currentArgument in ("-s", "--start_dt"): start_dt = datetime.strptime(currentValue, '%Y-%m-%d %H:%M:%S') elif 
+	        currentArgument in ("-e", "--end_dt"):
+	            end_dt = datetime.strptime(currentValue, '%Y-%m-%d %H:%M:%S')
+	
+	    urbanization = pd.read_csv('/datasets/urbanization.csv')[['Entity', 'Year', 'Urban']]
+	
+	    # Приводим колонки urbanization к нужным типам
+	    urbanization['Year'] = pd.to_datetime(urbanization['Year'], format='%Y-%m-%d')
+	
+	    # Фильтруем и определяем максимальный уровень урбанизации
+	    urbanization = urbanization.query('Entity in @regions and Year >= @start_dt and Year <= @end_dt') # напишите код
+	
+	    print(urbanization.sort_values(by = ['Entity','Year'])) ***
+##09 Запуск скрипта по расписанию
+Практические задания отсутствуют
+***
+##10 Памятка по отладке cron
+Практические задания отсутствуют
+***
+##11 Заключение
+Практические задания отсутствуют
+***

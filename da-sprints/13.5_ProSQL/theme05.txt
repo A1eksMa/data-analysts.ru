@@ -1,0 +1,84 @@
+# Рамки в оконных функциях. Дополнительные инструменты SQL
+***
+## 01 Определение рамки. Режим ROWS
+### Задача 1
+	SELECT order_id, created_at,
+	       MIN(created_at) OVER (ROWS BETWEEN CURRENT ROW AND 10 FOLLOWING)
+	FROM tools_shop.orders;
+### Задача 2
+	SELECT order_id, total_amt,
+	       AVG(total_amt) OVER (ROWS 3 PRECEDING)
+	FROM tools_shop.orders;
+### Задача 3
+	SELECT order_id, user_id, items_cnt,
+	       MAX(items_cnt) OVER (PARTITION BY user_id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING)
+	FROM tools_shop.orders;
+***
+## 02 Определение рамки. Режим RANGE
+### Задача 1
+        SELECT order_id, items_cnt, paid_at,
+               COUNT(items_cnt) OVER (ORDER BY paid_at RANGE BETWEEN '24 hours' PRECEDING AND CURRENT ROW)
+        FROM tools_shop.orders;
+### Задача 2
+	SELECT user_id, created_at, 
+	COUNT(user_id) OVER (ORDER BY created_at RANGE BETWEEN '30 day' PRECEDING AND '30 day' FOLLOWING)
+	FROM tools_shop.users
+***
+## 03 Определение рамки. Ключевое слово UNBOUNDED
+Практические задания отсутствуют
+***
+## 04 Оконные функции выбора. FIRST_VALUE(), LAST_VALUE(), NTH_VALUE()
+### Задача 1
+	SELECT *,
+	       FIRST_VALUE(total_amt) OVER (PARTITION BY user_id ORDER BY created_at)
+	FROM tools_shop.orders;
+### Задача 2
+	SELECT *, 
+	LAST_VALUE(costs) OVER (PARTITION BY CAST(DATE_TRUNC('month', created_at) AS date) ORDER BY created_at ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+	FROM tools_shop.costs
+### Задача 3
+	SELECT DISTINCT NTH_VALUE(user_id, 10000) OVER (ORDER BY created_at ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+	FROM tools_shop.orders; 
+***
+## 05 Исключение записей. Оператор EXCLUDE
+### Задача 1
+	SELECT order_id, total_amt, paid_at,
+	SUM(items_cnt) OVER (ORDER BY paid_at ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW EXCLUDE CURRENT ROW)
+	FROM tools_shop.orders
+	WHERE paid_at BETWEEN '2020-01-01' AND '2020-12-31';
+### Задача 2
+        SELECT
+        AVG(costs) OVER (ORDER BY created_at RANGE BETWEEN '30 days' PRECEDING AND CURRENT ROW EXCLUDE CURRENT ROW)
+	FROM tools_shop.costs
+### Задача 3
+        SELECT order_id, total_amt, created_at,
+        SUM(items_cnt) OVER (ORDER BY created_at::date RANGE BETWEEN '1 day' PRECEDING AND '1 day' FOLLOWING EXCLUDE GROUP)
+        FROM tools_shop.orders;
+***
+## 06 Расчёт скользящих значений
+### Задача 1
+	SELECT CAST(created_at AS date), costs, 
+	AVG(costs) OVER (ORDER BY created_at RANGE BETWEEN '30 days' PRECEDING AND CURRENT ROW EXCLUDE CURRENT ROW)
+	FROM tools_shop.costs
+### Задача 2
+	SELECT dt,
+	       AVG(time_diff) OVER (ORDER BY dt RANGE BETWEEN '7 days' PRECEDING AND CURRENT ROW EXCLUDE GROUP)
+	FROM
+	  (SELECT user_id,
+	          time_diff
+	   FROM
+	     (SELECT user_id,
+	             event_time::date AS dt,
+	             LAG(event_time::date) OVER (PARTITION BY user_id ORDER BY event_time) AS previous_session_dt,
+	             event_time - LAG(event_time) OVER (PARTITION BY user_id ORDER BY event_time) AS time_diff
+	      FROM tools_shop.events) sessions
+	   WHERE time_diff < '30 days' ) time_diff
+	   LIMIT 5000;
+### Задача 3
+	SELECT order_id, total_amt,
+	AVG(total_amt) OVER (ORDER BY created_at RANGE BETWEEN '90 days' PRECEDING AND CURRENT ROW EXCLUDE GROUP)
+	FROM tools_shop.orders
+***
+## 07 Заключение
+Практические задания отсутствуют
+***

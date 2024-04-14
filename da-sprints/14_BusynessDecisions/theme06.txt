@@ -1,0 +1,787 @@
+# Анализ результатов А/В-теста
+
+***
+
+## 01 Введение
+
+Практические задания отсутствуют
+
+***
+
+## 02 Проверка гипотезы о равенстве долей
+
+### Задача
+
+	from scipy import stats as st
+
+	import numpy as np
+
+	import math as mth
+
+	
+
+	alpha = 0.05  # критический уровень статистической значимости
+
+	
+
+	purchases = np.array([100, 100])
+
+	leads = np.array([400, 500])
+
+	
+
+	# пропорция успехов в первой группе:
+
+	p1 = purchases[0]/leads[0]
+
+	
+
+	# пропорция успехов во второй группе:
+
+	p2 = purchases[1]/leads[1]
+
+	
+
+	# пропорция успехов в комбинированном датасете:
+
+	p_combined = (purchases[0] + purchases[1]) / (leads[0] + leads[1])
+
+	
+
+	# разница пропорций в датасетах
+
+	difference = p1 - p2 
+
+	
+
+	z_value = difference / mth.sqrt(p_combined * (1 - p_combined) * (1/leads[0] + 1/leads[1]))
+
+	
+
+	# задаем стандартное нормальное распределение (среднее 0, ст.отклонение 1)
+
+	distr = st.norm(0, 1)  
+
+	
+
+	p_value = (1 - distr.cdf(abs(z_value))) * 2
+
+	
+
+	print('p-значение: ', p_value)
+
+	
+
+	if p_value < alpha:
+
+	    print('Отвергаем нулевую гипотезу: между долями есть значимая разница')
+
+	else:
+
+	    print('Не получилось отвергнуть нулевую гипотезу, нет оснований считать доли разными')
+
+***
+
+## 03 Проверка данных на нормальность. Критерий Шапиро-Уилка
+
+### Задача
+
+	from scipy import stats as st
+
+	
+
+	sales_data = [324,  209,  217,  321,  210,  231,  235,  519,  210,  240,  213,  325,
+
+	  252,  251,  246,  353,  260,  256,  203,  212,  211,  318,  529,  252,
+
+	  227,  278,  221,  222,  257,  289,  208,  256,  308,  395,  485,  350,
+
+	  214,  378,  218,  261,  216,  289,  533,  239,  326,  445,  210,  284,
+
+	  317,  260,  420,  497,  321,  205,  237,  261,  205,  269,  246,  685,
+
+	  246,  207,  317,  236,  519,  230,  208,  202,  216,  234,  242,  200,
+
+	  226,  213,  440, 1026,  318,  286,  210,  216,  227,  256,  221,  216,
+
+	  204,  498,  223,  287,  296,  292,  406,  213,  210,  291,  217,  200,
+
+	  344,  296,  222,  258,  223,  422,  497,  325,  328,  201,  242,  255,
+
+	  203,  252,  254,  221,  527,  231,  506,  203,  261,  678,  209,  261,
+
+	  281,  210,  292,  354,  210,  235,  220,  204,  270,  218,  230,  295,
+
+	  215,  372,  218,  230,  282,  284,  229,  210,  206,  267,  299,  263,
+
+	  563,  215,  258,  214,  351,  201]
+
+	
+
+	alpha = 0.05
+
+	
+
+	results = st.shapiro(sales_data)
+
+	p_value = results[1]
+
+	
+
+	print('p-значение: ', p_value)
+
+	
+
+	if p_value < alpha:
+
+	    print('Отвергаем нулевую гипотезу: распределение не нормально')
+
+	else:
+
+	    print('Не получилось отвергнуть нулевую гипотезу, всё нормально')
+
+***
+
+## 04 Непараметрический тест Уилкоксона-Манна-Уитни
+
+### Задача
+
+	from scipy import stats as st
+
+	
+
+	sales_before = [25939,  14569,  15040,  28317,  21100,  13597,  62869,  46195,  13414,
+
+	  13928,  17136,  14729,  25754,  17254,  16628,  16605,  40711,  74209,
+
+	  14498,  32265,  13873,  16724,  22522,  14824,  21825,  32522,  14485,
+
+	  16779,  17574,  16772,  18331,  19170,  13753,  15551,  17202,  13725,
+
+	  15415,  16155,  49620,  33900,  23834,  25732,  16539,  24449,  14681,
+
+	  15000,  14521,  13298,  14421,  17500,  15949,  16246,  19259,  15283,
+
+	  14418,  18026,  25931,  14182,  13837,  23061,  14074,  25344,  19134,
+
+	  14177,  19357,  96794,  26358,  16599,  15426,  23417,  68856,  44375,
+
+	  14669,  39750,  34531,  14655,  28580,  25176,  55065,  64288,  16069,
+
+	  16745,  13548,  19177,  19173,  16473,  15534,  20115,  16608,  15261,
+
+	  13472,  47956,  21036,  19238,  25955,  14755,  16901,  13740,  13585,
+
+	  23080,  17259,  51311,  47505,  19582,  13968,  46805,  14261,  18376,
+
+	  13314,  37948,  18404,  16911,  18692,  19885,  16619,  15234,  21832,
+
+	 228535,  28377,  16452,  13293,  17915,  15527,  17671,  24046,  15645,
+
+	  14350,  16765,  17600,  14222,  25300,  16941,  14758,  17120,  14621,
+
+	  25596,  20472,  24871,  14504,  17956,  20565,  18868,  16980,  40395,
+
+	  13868,  14572,  13893,  17986,  14490,  16891]
+
+	sales_after = [17484,  18369,  19412,  35496,  30841,  18511,  16438,  16064,  27841,
+
+	  18335,  20978,  18266,  24675,  16355,  15245,  14960,  15448,  14181,
+
+	  20095,  15586,  18594,  14414,  50452,  18804,  16750,  17313,  20047,
+
+	  25674,  30803,  14567,  16871,  17667,  48241,  15191, 135885, 104794,
+
+	  18650,  16708,  26201,  15926,  40253,  17787,  28374,  22989,  21122,
+
+	  14938, 115634,  18351,  15895,  14951,  15177,  25709,  76209,  99617,
+
+	  16452,  16446,  19407,  21144,  14947,  26257,  23723,  18113,  27784,
+
+	  38882,  15907,  15741,  21705,  32604,  16101,  17870,  15794,  18423,
+
+	  18381, 194987,  15335,  14022,  21257,  29935,  14598,  26066,  47228,
+
+	  37022,  15071,  21353,  38690,  40838,  26125,  24722,  30756,  17099,
+
+	  21377,  14611,  44442,  15808,  17173,  93187,  30411,  15279,  25707,
+
+	  35374,  70792,  14918,  21678,  16453,  40998,  27836,  18411,  46965,
+
+	  15968,  22812,  15856,  17933,  23682,  33450,  21727,  17884,  21676,
+
+	 124684,  20145,  16041,  14872,  17588,  17436,  81993,  20497,  17484,
+
+	  58826,  26179,  17515,  27463,  14260,  27331,  17598,  41888,  14037,
+
+	  15517,  19704,  16718,  32514,  38851,  18925,  23982,  14104,  21690,
+
+	  60266,  21071,  42799,  16203,  16694,  22699]
+
+	
+
+	alpha = 0.05
+
+	
+
+	results = st.mannwhitneyu(sales_before, sales_after, True, 'less')
+
+	
+
+	print('p-значение: ', results.pvalue)
+
+	
+
+	if results.pvalue < alpha:
+
+	    print('Отвергаем нулевую гипотезу: разница статистически значима')
+
+	else:
+
+	    print('Не получилось отвергнуть нулевую гипотезу, вывод о различии сделать нельзя')
+
+***
+
+## 05 Стабильность кумулятивных метрик
+
+### Задача 1
+
+	import pandas as pd
+
+	import datetime as dt
+
+	import numpy as np
+
+	
+
+	orders = pd.read_csv('/datasets/data_for_tasks_3.csv', sep=',')
+
+	orders['date'] = orders['date'].map(
+
+	    lambda x: dt.datetime.strptime(x, '%d/%m/%Y')
+
+	)
+
+	
+
+	visitors = pd.read_csv('/datasets/data_for_tasks_3_visitors.csv', sep=',')
+
+	visitors['date'] = visitors['date'].map(
+
+	    lambda x: dt.datetime.strptime(x, '%d/%m/%Y')
+
+	)
+
+	
+
+	print(orders.head(5))
+
+	print(visitors.head(5))
+
+	
+
+	datesGroups = orders[['date', 'group']].drop_duplicates()
+
+	ordersAggregated = datesGroups.apply(
+
+	    lambda x: orders[np.logical_and(orders['date'] <= x['date'], orders['group'] == x['group'])].agg({
+
+	'date' : 'max',
+
+	'group' : 'max',
+
+	'orderId' : pd.Series.nunique,
+
+	'userId' : pd.Series.nunique,
+
+	'revenue' : 'sum'}), axis=1).sort_values(by=['date','group']) 
+
+	
+
+	visitorsAggregated = datesGroups.apply(
+
+	    lambda x: visitors[np.logical_and(visitors['date'] <= x['date'], visitors['group'] == x['group'])].agg({
+
+	'date' : 'max',
+
+	'group' : 'max',
+
+	'visitors' : 'sum'}), axis=1).sort_values(by=['date','group']) 
+
+	
+
+	cumulativeData = ordersAggregated.merge(visitorsAggregated, left_on=['date', 'group'], right_on=['date', 'group'])
+
+	cumulativeData.columns = ['date', 'group', 'orders', 'buyers', 'revenue', 'visitors']
+
+	print(cumulativeData.head())
+
+### Задача 2
+
+	cumulativeRevenueA = cumulativeData[cumulativeData['group']=='A'][['date','revenue', 'orders']]
+
+	cumulativeRevenueB = cumulativeData[cumulativeData['group']=='B'][['date','revenue', 'orders']]
+
+	plt.plot(cumulativeRevenueA['date'], cumulativeRevenueA['revenue'], label='A')
+
+	plt.plot(cumulativeRevenueB['date'], cumulativeRevenueB['revenue'], label='B')
+
+	plt.legend()
+
+### Задача 3
+
+	plt.plot(cumulativeRevenueA['date'], cumulativeRevenueA['revenue']/cumulativeRevenueA['orders'], label='A')
+
+	plt.plot(cumulativeRevenueB['date'], cumulativeRevenueB['revenue']/cumulativeRevenueB['orders'], label='B')
+
+	plt.legend()
+
+### Задача 4
+
+	mergedCumulativeRevenue = cumulativeRevenueA.merge(cumulativeRevenueB, left_on='date', right_on='date', how='left', suffixes=['A', 'B'])
+
+	
+
+	plt.plot(mergedCumulativeRevenue['date'], (mergedCumulativeRevenue['revenueB']/mergedCumulativeRevenue['ordersB'])/(mergedCumulativeRevenue['revenueA']/mergedCumulativeRevenue['ordersA'])-1)
+
+	
+
+	# добавляем ось X
+
+	plt.axhline(y=0, color='black', linestyle='--')
+
+### Задача 5
+
+	# считаем кумулятивную конверсию
+
+	cumulativeData['conversion'] = cumulativeData['orders']/cumulativeData['visitors']
+
+	
+
+	# отделяем данные по группе A
+
+	cumulativeDataA = cumulativeData[cumulativeData['group']=='A']
+
+	
+
+	# отделяем данные по группе B
+
+	cumulativeDataB = cumulativeData[cumulativeData['group']=='B']
+
+	
+
+	# строим графики
+
+	plt.plot(cumulativeDataA['date'], cumulativeDataA['conversion'], label='A')
+
+	plt.plot(cumulativeDataB['date'], cumulativeDataB['conversion'], label='B')
+
+	plt.legend()
+
+	
+
+	# задаем масштаб осей
+
+	plt.axis([dt.datetime(2019, 3, 10), dt.datetime(2019, 4, 23), 0, 0.05])
+
+### Задача 6
+
+	mergedCumulativeConversions = cumulativeDataA[['date','conversion']].merge(cumulativeDataB[['date','conversion']], left_on='date', right_on='date', how='left', suffixes=['A', 'B'])
+
+	
+
+	plt.plot(mergedCumulativeConversions['date'], mergedCumulativeConversions['conversionB']/mergedCumulativeConversions['conversionA']-1, 	label="Относительный прирост конверсии группы B относительно группы A")
+
+	plt.legend()
+
+	
+
+	plt.axhline(y=0, color='black', linestyle='--')
+
+	plt.axhline(y=0.2, color='grey', linestyle='--')
+
+	plt.axis(["2019-03-10", '2019-04-23', -0.5, 0.5])
+
+***
+
+## 06 Анализ выбросов и всплесков: крайние значения данных
+
+### Задача 1
+
+	import pandas as pd
+
+	import datetime as dt
+
+	
+
+	data = pd.read_csv('/datasets/data_for_tasks_3.csv', sep=',')
+
+	data['date'] = data['date'].map(lambda x: dt.datetime.strptime(x, '%d/%m/%Y'))
+
+	
+
+	print(data.head(5))
+
+	
+
+	ordersByUsers = (
+
+	    data.groupby('userId', as_index=False)
+
+	    .agg({'orderId': 'nunique'})
+
+	)
+
+	ordersByUsers.columns = ['userId', 'orders']
+
+	print(ordersByUsers.sort_values(by='orders', ascending=False).head(10))
+
+### Задача 2
+
+	plt.hist(ordersByUsers['orders']) 
+
+### Задача 3
+
+	plt.scatter(x_values, ordersByUsers['orders']) 
+
+### Задача 4
+
+	print(np.percentile(ordersByUsers['orders'], [90, 95, 99])) 
+
+### Задача 5
+
+	plt.hist(data['revenue'])
+
+### Задача 6
+
+	plt.scatter(x_values, data['revenue'])
+
+### Задача 7
+
+	print(np.percentile(data['revenue'], [90, 95, 99]))
+
+***
+
+## 07 Анализ A/B-теста шаг за шагом
+
+### Задача 1
+
+	ordersByUsersA = (
+
+	    orders[orders['group'] == 'A']
+
+	    .groupby('userId', as_index=False)
+
+	    .agg({'orderId': pd.Series.nunique})
+
+	)
+
+	ordersByUsersA.columns = ['userId', 'orders']
+
+	
+
+	ordersByUsersB = (
+
+	    orders[orders['group'] == 'B']
+
+	    .groupby('userId', as_index=False)
+
+	    .agg({'orderId': pd.Series.nunique})
+
+	)
+
+	ordersByUsersB.columns = ['userId', 'orders']
+
+	
+
+	sampleA = pd.concat([ordersByUsersA['orders'],pd.Series(0, index=np.arange(data['visitorsPerDateA'].sum() - len(ordersByUsersA['orders'])), name='orders')],axis=0)
+
+	
+
+	sampleB = pd.concat([ordersByUsersB['orders'],pd.Series(0, index=np.arange(data['visitorsPerDateB'].sum() - len(ordersByUsersB['orders'])), name='orders')],axis=0)
+
+	
+
+	ordersByUsersA = (
+
+	    orders[orders['group'] == 'A']
+
+	    .groupby('userId', as_index=False)
+
+	    .agg({'orderId': pd.Series.nunique})
+
+	)
+
+	ordersByUsersA.columns = ['userId', 'orders']
+
+	
+
+	ordersByUsersB = (
+
+	    orders[orders['group'] == 'B']
+
+	    .groupby('userId', as_index=False)
+
+	    .agg({'orderId': pd.Series.nunique})
+
+	)
+
+	ordersByUsersB.columns = ['userId', 'orders']
+
+	
+
+	sampleA = pd.concat(
+
+	    [
+
+	        ordersByUsersA['orders'],
+
+	        pd.Series(
+
+	            0,
+
+	            index=np.arange(
+
+	                data['visitorsPerDateA'].sum() - len(ordersByUsersA['orders'])
+
+	            ),
+
+	            name='orders',
+
+	        ),
+
+	    ],
+
+	    axis=0,
+
+	)
+
+	
+
+	sampleB = pd.concat(
+
+	    [
+
+	        ordersByUsersB['orders'],
+
+	        pd.Series(
+
+	            0,
+
+	            index=np.arange(
+
+	                data['visitorsPerDateB'].sum() - len(ordersByUsersB['orders'])
+
+	            ),
+
+	            name='orders',
+
+	        ),
+
+	    ],
+
+	    axis=0,
+
+	)
+
+	
+
+	print("{0:.5f}".format(stats.mannwhitneyu(sampleA, sampleB)[1]))
+
+	
+
+	print("{0:.3f}".format((data['ordersPerDateB'].sum()/data['visitorsPerDateB'].sum())/(data['ordersPerDateA'].sum()/data['visitorsPerDateA'].sum())-1))
+
+### Задача 2
+
+	print('{0:.3f}'.format(stats.mannwhitneyu(orders[orders['group']=='A']['revenue'], orders[orders['group']=='B']['revenue'])[1]))
+
+	print('{0:.3f}'.format(orders[orders['group']=='B']['revenue'].mean()/orders[orders['group']=='A']['revenue'].mean()-1))
+
+### Задача 3
+
+	usersWithManyOrders = pd.concat(
+
+	    [
+
+	        ordersByUsersA[ordersByUsersA['orders'] > 2]['userId'],
+
+	        ordersByUsersB[ordersByUsersB['orders'] > 2]['userId'],
+
+	    ],
+
+	    axis=0,
+
+	)
+
+	usersWithExpensiveOrders = orders[orders['revenue'] > 10000]['userId']
+
+	abnormalUsers = (
+
+	    pd.concat([usersWithManyOrders, usersWithExpensiveOrders], axis=0)
+
+	    .drop_duplicates()
+
+	    .sort_values()
+
+	)
+
+	print(abnormalUsers.head(5))
+
+### Задача 4
+
+	sampleAFiltered = pd.concat(
+
+	    [
+
+	        ordersByUsersA[
+
+	            np.logical_not(ordersByUsersA['userId'].isin(abnormalUsers))
+
+	        ]['orders'],
+
+	        pd.Series(
+
+	            0,
+
+	            index=np.arange(
+
+	                data['visitorsPerDateA'].sum() - len(ordersByUsersA['orders'])
+
+	            ),
+
+	            name='orders',
+
+	        ),
+
+	    ],
+
+	    axis=0,
+
+	)
+
+	
+
+	sampleBFiltered = pd.concat(
+
+	    [
+
+	        ordersByUsersB[
+
+	            np.logical_not(ordersByUsersB['userId'].isin(abnormalUsers))
+
+	        ]['orders'],
+
+	        pd.Series(
+
+	            0,
+
+	            index=np.arange(
+
+	                data['visitorsPerDateB'].sum() - len(ordersByUsersB['orders'])
+
+	            ),
+
+	            name='orders',
+
+	        ),
+
+	    ],
+
+	    axis=0,
+
+	)
+
+	
+
+	
+
+	print('{0:.5f}'.format(stats.mannwhitneyu(sampleAFiltered, sampleBFiltered)[1]))
+
+	print('{0:.3f}'.format(sampleBFiltered.mean()/sampleAFiltered.mean()-1)) 
+
+### Задача 5
+
+	print(
+
+	    '{0:.3f}'.format(
+
+	        stats.mannwhitneyu(
+
+	            orders[
+
+	                np.logical_and(
+
+	                    orders['group'] == 'A',
+
+	                    np.logical_not(orders['userId'].isin(abnormalUsers)),
+
+	                )
+
+	            ]['revenue'],
+
+	            orders[
+
+	                np.logical_and(
+
+	                    orders['group'] == 'B',
+
+	                    np.logical_not(orders['userId'].isin(abnormalUsers)),
+
+	                )
+
+	            ]['revenue'],
+
+	        )[1]
+
+	    )
+
+	)
+
+	
+
+	print(
+
+	    "{0:.3f}".format(
+
+	        orders[
+
+	            np.logical_and(
+
+	                orders['group'] == 'B',
+
+	                np.logical_not(orders['userId'].isin(abnormalUsers)),
+
+	            )
+
+	        ]['revenue'].mean()
+
+	        / orders[
+
+	            np.logical_and(
+
+	                orders['group'] == 'A',
+
+	                np.logical_not(orders['userId'].isin(abnormalUsers)),
+
+	            )
+
+	        ]['revenue'].mean()
+
+	        - 1
+
+	    )
+
+	)
+
+***
+
+## 08 Основные ошибки при анализе А/B-тестов
+
+Практические задания отсутствуют
+
+***
+
+## 09 Заключение
+
+Практические задания отсутствуют

@@ -1,0 +1,180 @@
+#01 Введение
+
+
+#02 Могучий Python
+
+
+#03 Переменные
+
+#==============
+
+floors = 24
+
+floors = 25
+
+floors = 30
+
+#==============
+
+ocean_friends = 11
+
+#==============
+
+ocean_friends = 11
+
+ocean_friends = ocean_friends + 2
+
+#==============
+
+ocean = 'Джордж Клуни'
+
+ocean_friend = 'Брэд Питт'
+
+#==============
+
+ocean = 'Джордж Клуни'
+
+ocean_friend = 'Брэд Питт'
+
+ocean = 'Дэнни'
+
+ocean_friend = 'Расти'
+
+#==============
+
+
+#04 Функция print()
+
+#==============
+
+sting_track = 'Shape Of My Heart'
+
+print(sting_track)
+
+#==============
+
+sade_track_dur = 322
+
+print(sade_track_dur)
+
+#==============
+
+
+#05 Знакомство с данными
+
+
+#06 Арифметические операции
+
+#==============
+
+native_speakers = 378.2
+
+total_speakers = 1121
+
+native_speakers_share = native_speakers / total_speakers
+
+print(native_speakers_share)
+
+#==============
+
+jap_total_speakers = 128.3
+
+jap_native_speakers = 128.2
+
+jap_ratio = (jap_total_speakers - jap_native_speakers)/jap_total_speakers
+
+print(jap_ratio)
+
+#==============
+
+first_movie_year = 1896
+
+target_year = 2020
+
+print(target_year - first_movie_year)
+
+#==============
+
+
+#07 Арифметические операции и обработка ошибок
+
+#==============
+
+fra_speakers = 284.9
+
+fra_speakers += 5
+
+print(fra_speakers)
+
+#==============
+
+jap_total_speakers = 0
+
+jap_native_speakers = 128.2
+
+try:
+
+    print((jap_total_speakers - jap_native_speakers) / jap_total_speakers)
+
+except:
+
+    print('Деление на ноль!')
+
+#==============
+
+
+08 Типы данных
+
+#==============
+
+de_website_part = 0.06
+
+print(type(de_website_part))
+
+#==============
+
+chi_language = 'китайский'
+
+chi_total_speakers = 1107
+
+print(type(chi_language))
+
+print(type(chi_total_speakers))
+
+#==============
+
+russian_web_part = 0.061
+
+web_popular = 10000000
+
+russian_web_popular = web_popular * russian_web_part
+
+print(russian_web_popular)
+
+print(type(russian_web_popular))
+
+#==============
+
+
+#09 Преобразование типов
+
+#==============
+
+cz_total_speakers = 10.6
+
+cz_total_speakers = int(cz_total_speakers)
+
+print(cz_total_speakers)
+
+#==============
+
+fra_total_speakers = '284.9'
+
+fra_total_speakers = float(fra_total_speakers)
+
+print(type(fra_total_speakers))
+
+#==============
+
+
+#10 Заключение

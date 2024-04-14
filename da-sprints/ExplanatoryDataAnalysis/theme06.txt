@@ -1,0 +1,78 @@
+#Валидация результатов
+
+***
+
+##01 Введение
+
+Практические задания отсутствуют
+
+***
+
+##02 Укрупняем группы
+
+###Задача 1 / 7
+
+	final_stat.sort_values(by='median_time').plot(y='median_time', kind='bar', figsize=(10, 5))
+
+###Задача 2 / 7
+
+	final_stat.dropna(subset=['median_time']).sort_values(by='median_time').plot(y='median_time', kind='bar', figsize=(10, 5), grid=True)
+
+###Задача 3 / 7
+
+	final_stat['stations'].hist(bins=100)
+
+###Задача 4 / 7
+
+	big_nets_stat = final_stat[final_stat['stations']>10]
+	print(big_nets_stat)
+
+###Задача 5 / 7
+
+	station_stat_full['group_name'] = station_stat_full['name'].where(station_stat_full['name'].isin(big_nets_stat.index), 'Другие')
+	print(station_stat_full.head(5))
+
+###Задача 6 / 7
+
+	stat_grouped = (
+	    station_stat_full
+	    .query('count > 30')
+	    .pivot_table(index='group_name', values='time_spent', aggfunc=['median', 'count'])
+	) 
+	stat_grouped.columns = ['time_spent', 'count']
+	stat_grouped = stat_grouped.sort_values(by='time_spent')
+	print(stat_grouped)
+
+###Задача 7 / 7
+
+	stat_grouped.plot(y='count', kind='pie', figsize=(8, 8))
+
+***
+
+##03 Разбитые по группам данные
+
+###Задача 1 / 3
+
+	good_data['group_name'] = (
+	    good_data['name']
+	    .where(good_data['name'].isin(big_nets_stat.index), 'Другие')
+	)
+	print(good_data.head(5))
+
+###Задача 2 / 3
+
+	group_data = good_data.groupby('group_name').count()
+	for name in group_data.index:
+	    group_data.hist(column='time_spent', bins=50)
+
+###Задача 3 / 3
+
+	group_data = good_data.groupby('group_name').count()
+	for name in group_data.index:
+	    group_data.plot(y='time_spent', title=name, kind='hist', bins=50)
+
+***
+
+##04 Заключение
+
+***

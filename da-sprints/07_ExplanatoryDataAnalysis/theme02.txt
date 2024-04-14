@@ -1,0 +1,277 @@
+#Первые графики и выводы
+
+***
+
+##01 Введение
+
+***
+
+##02 Знакомство с задачей
+
+### Задача
+
+>Прочитайте файл `visits.csv` из папки `/datasets/`, указав в качестве разделителя знак табуляции \t, и сохраните результат в датафрейме `data`. Выведите его первые пять строк.
+
+	import pandas as pd
+	data = pd.read_csv('/datasets/visits.csv', sep='\t') 
+	print(data.head(5))
+
+***
+
+##03 Сводные таблицы для расчёта среднего
+
+### Применяем сводные таблицы
+
+>Сводные таблицы используют на разных этапах работы с данными. Можно начать с оценки данных и посчитать среднее время заправки в секундах. Нужные значения хранит столбец `time_spent`
+
+	import pandas as pd
+	data = pd.read_csv ('/datasets/visits.csv', sep='\t')
+	stat = data.pivot_table(index='name', values='time_spent')
+	print(stat)
+
+***
+
+##04 Есть ли проблемы в данных?
+
+### Задача 1
+
+>Сохраните количество строк датафрейма в переменную `total_visits`. Результат выведите на экран
+
+	import pandas as pd
+	data = pd.read_csv ('/datasets/visits.csv', sep='\t')
+	total_visits = len(data)
+	print('Количество заездов:',total_visits)
+
+***
+
+### Задача 2
+
+>Теперь нужно понять, сколько АЗС в данных. У каждой станции есть свой номер — `id`. Чтобы найти количество АЗС, посчитайте уникальные `id`
+
+	import pandas as pd
+	data = pd.read_csv ('/datasets/visits.csv', sep='\t')
+	total_visits = len(data)
+	print('Количество заездов:',total_visits)
+	total_stations = len(data['id'].unique())
+	print('Количество АЗС:',total_stations)
+
+***
+
+### Задача 3
+
+>Выведите минимальное и максимальное значения столбца `date_time` через пробел, вызвав функцию `print()` только один раз
+
+	import pandas as pd
+	data = pd.read_csv ('/datasets/visits.csv', sep='\t')
+	total_visits = len(data)
+	print('Количество заездов:',total_visits)
+	total_stations = len(data['id'].unique())
+	print('Количество АЗС:',total_stations)
+	print(data['date_time'].min(),data['date_time'].max())
+
+***
+
+### Задача 4
+
+>Теперь можно найти среднее количество посещений АЗС за день. 
+
+	import pandas as pd
+	data = pd.read_csv ('/datasets/visits.csv', sep='\t')
+	total_visits = len(data)
+	print('Количество заездов:',total_visits)
+	total_stations = len(data['id'].unique())
+	print('Количество АЗС:',total_stations)
+	print(data['date_time'].min(),data['date_time'].max())
+	total_days = 7
+	station_visits_per_day = (total_visits/total_days)/total_stations
+	print('Количество заездов на АЗС в сутки:',station_visits_per_day)
+
+***
+
+### Задача 5
+
+>Выведите на экран 10 сетей АЗС с наибольшим количеством заездов, вызвав метод `value_counts()` для нужного столбца
+
+	import pandas as pd
+	data = pd.read_csv ('/datasets/visits.csv', sep='\t')
+	total_visits = len(data)
+	print('Количество заездов:',total_visits)
+	print('Количество АЗС:',total_stations)
+	total_stations = len(data['id'].unique())
+	print(data['date_time'].min(),data['date_time'].max())
+	total_days = 7
+	station_visits_per_day = (total_visits/total_days)/total_stations
+	print('Количество заездов на АЗС в сутки:',station_visits_per_day)
+	print(data['name'].value_counts().head(10))
+
+***
+
+##05 Гистограмма
+
+###Задача 1
+
+>Постройте гистограмму по значениям времени, проведённого на АЗС. Эти значения хранятся в столбце `time_spent`
+
+	import pandas as pd
+	data = pd.read_csv ('/datasets/visits.csv', sep='\t')
+	data['time_spent'].hist()
+
+***
+
+###Задача 2
+
+>Постройте новую гистограмму и увеличьте число корзин до `100`
+
+	import pandas as pd
+	data = pd.read_csv ('/datasets/visits.csv', sep='\t')
+	data['time_spent'].hist(bins=100)
+
+***
+
+###Задача 3
+
+>Используйте параметр range, чтобы изучить распределение значений `time_spent`, находящихся в диапазоне от 0 до 1500. Количество корзин оставьте прежним — `100`
+
+	import pandas as pd
+	data = pd.read_csv ('/datasets/visits.csv', sep='\t')
+	data['time_spent'].hist(bins=100,range=(0,1500))
+
+***
+
+##06 Гистограмма для двух кубиков
+
+***
+
+##07 Задача 1 / 2
+
+>Будем бросать на стол 10 монет и считать количество выпавших орлов
+
+	import random
+	import pandas as pd
+	
+	# Функция, имитирующая один бросок монеты.
+	# От англ. coin - монета, flip - бросок монеты.
+	def coin_flip():
+	    # возможны два варианта:
+	    # - выпала решка, это +0 орлов
+	    # - выпал орёл, это +1 орёл
+	    score = random.randint(0, 1)
+	    return score
+	
+
+	# Функция для суммирования числа орлов в нескольких бросках.
+	# Орёл и решка переводятся на английский как heads и tails.
+	# Аргумент repeat говорит, сколько раз бросать монету
+	# (от англ. repeat - повторение).
+	def flips_heads(repeat):
+	    total = 0
+	    for i in range(repeat):
+	        flip = coin_flip()
+	        total += flip
+	    return total
+	
+	# Cоздаём пустой список. В него мы
+	# будем складывать результаты экспериментов.
+	experiments = []
+	
+	for i in range(1000):
+	    score = flips_heads(10)
+	
+	    # Напомним: функция append() добавляет новый
+	    # элемент score в конец списка experiments.
+	    experiments.append(score)
+	
+	# превращаем список в DataFrame
+	df_experiments = pd.DataFrame(experiments)
+	
+	df_experiments.hist(bins=11,range=(0,11))
+	# постройте гистограмму для df_experiments
+	
+***
+
+##08 Задача 2 / 2
+
+>Валерик каждый день едет на работу ... Постройте гистограмму опозданий Валерика за 5 лет c параметром `bins=10`
+
+	import random
+	import pandas as pd
+	
+	# Функция, имитирующая время ожидания автобуса.
+	# (от англ. bus - автобус, wait - ждать, time - время)
+	def bus_wait_time():
+	    return random.randint(0, 10)
+	
+	
+	# Функция, имитирующая время ожидания поезда в метро.
+	# (от англ. train - поезд, wait - ждать, time - время)
+	def train_wait_time():
+	    return random.randint(0, 5)
+	
+	
+	# Функция подсчёта полного опоздания за день.
+	# от англ. total - полный, итоговый, delay - задержка, опоздание
+	def total_delay():
+	    # обратите внимание, как в Python переносят длинные строки
+	    return (
+	        bus_wait_time()
+	        + train_wait_time()
+	        + train_wait_time()
+	        + bus_wait_time()
+	    )
+	
+	
+	# создайте пустой список
+	days = []
+	
+	for i in range(365 * 5):
+	    delay = total_delay()
+	    days.append(delay)
+	    # добавьте опоздание в список days
+	    
+	# превращаем список в DataFrame
+	df_days = pd.DataFrame(days)
+	
+	# постройте гистограмму для df_days
+	df_days.hist(bins=10)
+
+***
+
+##09 Распределения
+
+Практические задания отсутствуют
+
+***
+
+##10 Диаграмма размаха
+
+Практические задания отсутствуют
+
+***
+
+##11 Диаграмма размаха в Python
+
+>Нарисуйте диаграмму размаха для data, ограничив диапазон по вертикали значениями -100 и 1000
+
+	import matplotlib.pyplot as plt
+	import pandas as pd
+	data = pd.read_csv ('/datasets/visits.csv', sep='\t')
+	plt.ylim(-100, 1000)
+	data.boxplot() 
+
+***
+
+##12 Описание данных
+
+>Примените к таблице `data` метод `describe()` и выведите на экран список характерных значений
+
+	import pandas as pd
+	data = pd.read_csv ('/datasets/visits.csv', sep='\t')
+	print(data.describe()) 
+
+***
+
+##13 Заключение
+
+Практические задания отсутствуют
+
+***

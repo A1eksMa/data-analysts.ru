@@ -1,0 +1,245 @@
+#01 От осины не родятся апельсины. Принцип GIGO
+
+
+#02 Поиск проблем в данных
+
+
+#03 Переименование столбцов
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log.csv')
+
+df.info()
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log.csv')
+
+print(df.columns)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log.csv')
+
+df = df.rename(columns={'  user_id':'user_id', 'total play':'total_play', 'Artist':'artist'})
+
+#Index(['  user_id', 'total play', 'Artist', 'genre', 'track'], dtype='object')
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log.csv')
+
+df = df.rename(columns={'  user_id':'user_id', 'total play':'total_play', 'Artist':'artist'})
+
+print(df.columns)
+
+#==============
+
+
+#04 Обработка пропущенных значений
+
+#05 Яндекс Музыка: пропущенные значения
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd_col.csv')
+
+df.info()
+
+#==============
+
+print(df.isna().sum())
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd_col.csv')
+
+df['track_name'] = df['track_name'].fillna('unknown') 
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd_col.csv')
+
+df['track_name'] = df['track_name'].fillna('unknown')
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd_col.csv')
+
+df['track_name'] = df['track_name'].fillna('unknown')
+
+df['artist_name'] = df['artist_name'].fillna('unknown')
+
+df = df.dropna(subset=['genre_name'])
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd_col.csv')
+
+df['track_name'] = df['track_name'].fillna('unknown')
+
+df['artist_name'] = df['artist_name'].fillna('unknown')
+
+df = df.dropna(subset=['genre_name'])
+
+df.info()
+
+#==============
+
+
+#06 Обработка дубликатов
+
+#07 Яндекс Музыка: дубликаты
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd_nan.csv')
+
+shape_table = df.shape
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd_nan.csv')
+
+shape_table = df.shape
+
+print(df.duplicated().sum()) 
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd_nan.csv')
+
+shape_table = df.shape
+
+print(df.duplicated().sum()) 
+
+df = df.drop_duplicates().reset_index(drop=True) 
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd_nan.csv')
+
+shape_table = df.shape
+
+print(df.duplicated().sum()) 
+
+df = df.drop_duplicates().reset_index(drop=True)
+
+shape_table_update = df.shape
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd_nan.csv')
+
+shape_table = df.shape
+
+print(df.duplicated().sum()) 
+
+df = df.drop_duplicates().reset_index(drop=True)
+
+shape_table_update = df.shape
+
+if shape_table == shape_table_update:
+
+    print('Размер таблицы не изменился, текущий размер:',shape_table_update)
+
+elif shape_table > shape_table_update:
+
+    print('Таблица уменьшилась, текущий размер:',shape_table_update)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd_nan.csv')
+
+print(df['genre_name'].unique())
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd_nan.csv')
+
+print(sorted(df['genre_name'].unique()))
+
+df['genre_name'] = df['genre_name'].replace('электроника','electronic')
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log_upd_nan.csv')
+
+print(df['genre_name'].unique())
+
+df['genre_name'] = df['genre_name'].replace('электроника','electronic')
+
+genre_final_count = df['genre_name'].loc[df['genre_name'] == 'электроника'].count()
+
+print(genre_final_count)
+
+#==============
+
+#08 Лаборатория алгоритма предобработки
+
+#==============
+
+import pandas as pd
+
+
+df = pd.read_csv('music_log.csv')
+
+df = df.rename(columns={'  user_id':'user_id', 'total play':'total_play', 'Artist':'artist'})
+
+# объявите список columns_to_replace с названиями столбцов track, artist, genre
+
+columns_to_replace = ['track','artist','genre']
+
+# заполните отсутствующие значения столбцов из списка columns_to_replace значением 'unknown' в цикле
+
+for column in columns_to_replace:
+
+    df[column] = df[column].fillna('unknown')
+
+# удалите строки-дубликаты из датафрейма df
+
+df = df.drop_duplicates().reset_index(drop=True)
+
+# выведите на экран первые 20 строчек обновлённого набора данных df
+
+print(df.head(20))
+
+#==============
+
+
+#09 Заключение

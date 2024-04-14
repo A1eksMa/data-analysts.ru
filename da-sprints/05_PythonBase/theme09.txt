@@ -1,0 +1,339 @@
+#01 Анализ данных продолжается здесь
+
+
+#02 Библиотека Pandas
+
+#==============
+
+import pandas as pd
+
+
+music = [
+
+    ['Bob Dylan', 'Like A Rolling Stone'],
+
+    ['John Lennon', 'Imagine'],
+
+    ['The Beatles', 'Hey Jude'],
+
+    ['Nirvana', 'Smells Like Teen Spirit'],
+
+]
+
+
+entries = ['artist', 'track']
+
+
+playlist = pandas.DataFrame(data=music,columns=entries)
+
+print(playlist)
+
+#==============
+
+
+#03 Получение данных
+
+
+#04 Обзор данных
+
+
+#05 Яндекс Музыка: обзор данных
+
+#==============
+
+import pandas as pd
+
+
+df = pd.read_csv('music_log.csv')
+
+shape_table = df.shape
+
+print('Размер таблицы:', shape_table)
+
+#==============
+
+import pandas as pd
+
+
+df = pd.read_csv('music_log.csv') 
+
+shape_table = df.shape
+
+
+observations_table = shape_table[0]
+
+print('Количество наблюдений:',observations_table)
+
+#==============
+
+import pandas as pd
+
+
+df = pd.read_csv('music_log.csv')
+
+df.info()# напишите вызов метода info() и нажмите кнопку «Выполнить»
+
+# затем раскомментируйте строку ниже и впишите туда полученное количество наблюдений
+
+observations_info_table = len(df.info())
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log.csv')
+
+
+observations_info_table = df.shape[0]
+
+observations_table = 67963
+
+if observations_info_table==observations_table:
+
+    print('Решение верно, количество наблюдений равно', observations_table)
+
+else:
+
+    print('Решение неверно, проверьте ещё раз!')
+
+#==============
+#06 Индексация в DataFrame
+
+
+#07 Яндекс Музыка: индексация
+
+#==============
+
+import pandas as pd
+
+
+df = pd.read_csv('music_log.csv')
+
+genre_fight = df.loc[:,['genre','Artist']]
+
+print(genre_fight)
+
+#==============
+
+import pandas as pd
+
+
+df = pd.read_csv('music_log.csv')
+
+genre_fight = df[['genre', 'Artist']]
+
+genre_pop = genre_fight.loc[genre_fight.loc[:,'genre'] == 'pop'] ['genre'].count()
+
+print('Число прослушанных треков в жанре поп равно',genre_pop)
+
+#==============
+
+import pandas as pd
+
+
+df = pd.read_csv('music_log.csv')
+
+genre_fight = df[['genre', 'Artist']]
+
+genre_pop = genre_fight.loc[genre_fight.loc[:,'genre'] == 'pop'] ['genre'].count()
+
+genre_rock = genre_fight.loc[genre_fight.loc[:,'genre'] == 'rock'] ['genre'].count()
+
+print('Число прослушанных треков в жанре поп равно',genre_pop)
+
+print('Число прослушанных треков в жанре рок равно',genre_rock)
+
+#==============
+
+import pandas as pd
+
+
+df = pd.read_csv('music_log.csv')
+
+genre_fight = df[['genre', 'Artist']]
+
+genre_pop = genre_fight.loc[genre_fight.loc[:,'genre'] == 'pop'] ['genre'].count()
+
+genre_rock = genre_fight.loc[genre_fight.loc[:,'genre'] == 'rock'] ['genre'].count()
+
+print('Число прослушанных треков в жанре поп равно',genre_pop)
+
+print('Число прослушанных треков в жанре рок равно',genre_rock)
+
+if genre_pop>genre_rock:
+
+    print('Поп-музыку слушают больше.')
+
+elif genre_rock>genre_pop:
+
+    print('Рок слушают больше.')
+
+else:
+
+    print('Поп и рок слушают одинаково часто.')
+
+#==============
+
+
+#08 Объект Series
+
+
+#09 Яндекс Музыка: Series
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log.csv')
+
+rock = df.loc[df.loc[:,'genre'] == 'rock']
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log.csv')
+
+rock = df.loc[df.loc[:,'genre'] == 'rock']
+
+#==============???
+
+import pandas as pd
+
+df = pd.read_csv('music_log.csv')
+
+
+rock = df[df['genre'] == 'rock']
+
+rock_time = rock['total play']
+
+rock_haters = rock_time[rock_time <= 5].count()
+
+print("Количество пропущенных треков жанра рок равно", rock_haters)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log.csv')
+
+
+rock = df[df['genre'] == 'rock']
+
+rock_time = rock['total play']
+
+rock_haters = rock_time[rock_time <= 5].count()
+
+print("Количество пропущенных треков жанра рок равно", rock_haters)
+
+
+pop = df[df['genre'] == 'pop']
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log.csv')
+
+
+rock = df[df['genre'] == 'rock']
+
+rock_time = rock['total play']
+
+rock_haters = rock_time[rock_time <= 5].count()
+
+print("Количество пропущенных треков жанра рок равно", rock_haters)
+
+
+pop = df[df['genre'] == 'pop']
+
+pop_time = pop['total play']
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log.csv')
+
+
+rock = df[df['genre'] == 'rock']
+
+rock_time = rock['total play']
+
+rock_haters = rock_time[rock_time <= 5].count()
+
+print("Количество пропущенных треков жанра рок равно", rock_haters)
+
+
+pop = df[df['genre'] == 'pop']
+
+pop_time = pop['total play']
+
+pop_haters = pop_time[pop_time <= 5].count()
+
+print("Количество пропущенных треков жанра поп равно", pop_haters)
+
+#==============
+
+import pandas as pd
+
+df = pd.read_csv('music_log.csv')
+
+
+rock = df[df['genre'] == 'rock']
+
+rock_time = rock['total play']
+
+rock_haters = rock_time[rock_time <= 5].count()
+
+print("Количество пропущенных треков жанра рок равно", rock_haters)
+
+
+pop = df[df['genre'] == 'pop']
+
+pop_time = pop['total play']
+
+pop_haters = pop_time[pop_time <= 5].count()
+
+print("Количество пропущенных треков жанра поп равно", pop_haters)
+
+rock_skip = rock_haters / len(rock)
+
+pop_skip = pop_haters / len(pop)
+
+print('Доля пропущенных композиций жанра рок равна:',rock_skip)
+
+print('Доля пропущенных композиций жанра поп равна:',pop_skip)
+
+#==============
+
+
+#10 Лаборатория индексации
+
+#==============
+
+import pandas as pd
+
+board_df = pd.read_csv('game_board.csv')
+
+#==============
+
+print(board_df.loc[0,'J'])
+
+#==============
+
+print(board_df.loc[1:3,'B'])
+
+#==============
+
+print(board_df.loc[5,'C':'F'])
+
+#==============
+
+board_df = pd.read_csv('game_board.csv')
+
+print(board_df[board_df['H'] == 1]['H'])
+
+#==============
+
+
+#11 Заключение

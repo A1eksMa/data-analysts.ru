@@ -1,0 +1,89 @@
+# Основы проверки гипотез в бизнесе
+
+***
+
+## 01 Введение
+
+Практические задания отсутствуют
+
+***
+
+## 02 Зачем и как приоритизировать гипотезы
+
+Практические задания отсутствуют
+
+***
+
+## 03 Зачем и как приоритизировать гипотезы
+
+### Задача 1
+
+	import pandas as pd
+
+	data = pd.read_csv('/datasets/hypothesis_4-1-1.csv', sep=',')
+
+	print(data)
+
+	data['WSJF'] = (data['user_business_value'] + data['time_criticality'] + data['risk_reduction_opportunity_enablement'])/data['job_size']
+
+	print(data[['hypothesis','WSJF']].sort_values(by='WSJF', ascending=False))
+
+### Задача 2
+
+	import pandas as pd
+
+	
+
+	data = pd.read_csv('/datasets/hypothesis_4-1-2.csv', sep=',')
+
+	data['ICE'] = data['impact'] * data['confidence']/data['efforts']
+
+	data['ICE'] = data['ICE'].astype('float')
+
+	print(data[['hypothesis','ICE']].sort_values(by='ICE', ascending=False))
+
+### Задача 3
+
+	import pandas as pd
+
+	data = pd.read_csv('/datasets/hypothesis_4-1-2.csv', sep=',')
+
+	print(data)
+
+	data['RICE'] = data['reach'] * data['impact'] * data['confidence']/data['efforts']
+
+	data['RICE'] = data['RICE'].astype('float')
+
+	print(data[['hypothesis','RICE']].sort_values(by='RICE', ascending=False))
+
+***
+
+## 04 Параметр Reach
+
+Практические задания отсутствуют
+
+***
+
+## 05 Параметр Impact
+
+Практические задания отсутствуют
+
+***
+
+## 06 Параметр Confidence
+
+Практические задания отсутствуют
+
+***
+
+## 07 Параметр Efforts
+
+Практические задания отсутствуют
+
+***
+
+## 08 Заключение
+
+Практические задания отсутствуют
+
+***

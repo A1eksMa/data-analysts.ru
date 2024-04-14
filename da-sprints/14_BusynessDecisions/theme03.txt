@@ -1,0 +1,95 @@
+# Выбор метода проведения эксперимента
+
+***
+
+## 01 Введение
+
+Практические задания отсутствуют
+
+***
+
+## 02 Методы проведения эксперимента
+
+Практические задания отсутствуют
+
+***
+
+## 03 Качественные методы проверки гипотезы
+
+Практические задания отсутствуют
+
+***
+
+## 04 Преимущества и недостатки A/B-теста
+
+Практические задания отсутствуют
+
+***
+
+## 05 Пример результатов A/B-теста
+
+Практические задания отсутствуют
+
+***
+
+## 06 Пример результатов A/B-теста
+
+### Задача 1
+
+	import pandas as pd
+
+	data = pd.read_csv('/datasets/data_3-3.csv', sep=',')
+
+	print(data.head(5))
+
+	table = (
+
+	    data.groupby('group', as_index=False)
+
+	    .agg({'visitors': 'sum', 'orders': 'sum'})
+
+	)
+
+	
+
+	print(table)
+
+### Задача 2
+
+	import pandas as pd
+
+	
+
+	data = pd.read_csv('/datasets/data_3-3.csv', sep=',')
+
+	
+
+	print(data.head(5))
+
+	
+
+	table = (
+
+	    data.groupby('group', as_index=False)
+
+	    .agg({'visitors': 'sum', 'orders': 'sum'})
+
+	)
+
+	
+
+	table['ordersToVisitorsRatio'] = (
+
+	    table['orders'] / table['visitors']
+
+	).map(lambda x: "{0:.4f}".format(x))
+
+	print(table) 
+
+***
+
+## 07 Заключение
+
+Практические задания отсутствуют
+
+***

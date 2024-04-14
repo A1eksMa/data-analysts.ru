@@ -1,0 +1,78 @@
+#Расчёт бизнес-показателей
+***
+## 01 Введение
+Практические задания отсутствуют
+***
+## 02 Что такое схема данных
+Практические задания отсутствуют
+***
+## 03 Исследование данных: теория
+Практические задания отсутствуют
+***
+## 04 Исследование данных: практика
+Практические задания отсутствуют
+***
+## 05 Расчёт Lifetime Value
+### Задача 1
+	SELECT SUM(total_amt) / COUNT(DISTINCT user_id) AS ltv
+	FROM tools_shop.orders
+### Задача 2
+	SELECT CAST(DATE_TRUNC('month', u.created_at) AS date),
+	SUM(o.total_amt)/ COUNT(DISTINCT o.user_id) AS ltv
+	FROM tools_shop.orders o
+	JOIN tools_shop.users u ON o.user_id = u.user_id
+	GROUP BY CAST(DATE_TRUNC('month', u.created_at) AS date)
+***
+## 06 Расчёт относительных значений. Конверсия
+### Задача
+	SELECT ROUND(COUNT(DISTINCT(o.user_id)) * 100.0 / COUNT(DISTINCT (u.user_id)),2)
+	FROM tools_shop.users u 
+	LEFT JOIN tools_shop.orders o ON u.user_id = o.user_id
+***
+## 07 Расчёт средних значений. ARPU и ARPPU
+### Задача 1
+	SELECT SUM(o.total_amt) / COUNT(DISTINCT (u.user_id)) AS arpu
+	FROM tools_shop.users u 
+	LEFT JOIN tools_shop.orders o ON u.user_id = o.user_id
+### Задача 2
+	SELECT CAST(o.event_dt AS date),
+	SUM(o.revenue) / COUNT(DISTINCT p.user_id) AS arppu
+	FROM online_store.orders o
+	JOIN online_store.profiles p ON o.user_id = p.user_id
+	GROUP BY CAST(o.event_dt AS date);
+### Задача 3
+	SELECT CAST(DATE_TRUNC('year', o.created_at) AS date),
+	ROUND(SUM(o.total_amt) / COUNT(DISTINCT (u.user_id)),2) AS arppu
+	FROM tools_shop.users u 
+	JOIN tools_shop.orders o ON u.user_id = o.user_id
+	GROUP BY CAST(DATE_TRUNC('year', o.created_at) AS date)
+***
+## 08 ROI. Динамика возврата инвестиций: теория
+Практические задания отсутствуют
+***
+## 09 ROI. Динамика возврата инвестиций: практика
+### Задача 1
+	SELECT CAST(DATE_TRUNC('month', o.paid_at) AS date), SUM(o.total_amt)
+	FROM tools_shop.orders o
+	GROUP BY CAST(DATE_TRUNC('month', o.paid_at) AS date)
+### Задача 2
+	SELECT CAST(DATE_TRUNC('month', c.created_at) AS date), SUM(c.costs)
+	FROM tools_shop.costs c
+	GROUP BY CAST(DATE_TRUNC('month', c.created_at) AS date)
+### Задача 3
+	SELECT one.dt, total_amt * 100 / costs AS ROI
+	FROM
+	(SELECT DATE_TRUNC('month', created_at)::date AS dt,
+	       SUM(costs) AS costs
+	FROM tools_shop.costs
+	GROUP BY dt) AS two
+	JOIN
+	(SELECT DATE_TRUNC('month', paid_at)::date AS dt,
+	       SUM(total_amt) AS total_amt
+	FROM tools_shop.orders
+	GROUP BY dt) AS one
+	ON two.dt = one.dt;
+***
+## 10 Заключение
+Практические задания отсутствуют
+***
